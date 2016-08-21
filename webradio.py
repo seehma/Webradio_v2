@@ -2053,7 +2053,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     @pyqtSlot()  # Connected to usb_manager                                              SIGNAL("sig_usb_disconnected")
     def on_usb_disconnected(self):
-        self.gpio_watchdog.set_output_LOW(32)      # turn off status LED
+        self.gpio_watchdog.set_output_LOW(self.get_save_value_from_globals_configuration("GPIOS_OUT", "out_usb_status"))       # turn off status LED
         logger.info("Webradio: USB Stick disconnected")
         if self.mode == "media":
             self.exchange_model()
@@ -2061,7 +2061,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     @pyqtSlot()  # Connected to usb_manager                                                 SIGNAL("sig_usb_connected")
     def on_usb_connected(self):
-        self.gpio_watchdog.set_output_HIGH(32)      # turn on status LED
+        self.gpio_watchdog.set_output_HIGH(self.get_save_value_from_globals_configuration("GPIOS_OUT", "out_usb_status"))      # turn on status LED
         logger.info("Webradio: USB Stick connected")
         if self.mode == "media":
             self.exchange_model()
@@ -2073,8 +2073,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         Switch on audio amplifier using relais 1 & 2  (pin 31 and 33)
         """
-        self.gpio_watchdog.set_output_HIGH(31)
-        self.gpio_watchdog.set_output_HIGH(33)
+        self.gpio_watchdog.set_output_HIGH(self.get_save_value_from_globals_configuration("GPIOS_OUT",
+                                                                                          "out_relais1_status"))
+        self.gpio_watchdog.set_output_HIGH(self.get_save_value_from_globals_configuration("GPIOS_OUT",
+                                                                                          "out_relais2_status"))
         self.audio_amp_isActive = True
 
     @pyqtSlot()  # Connected to signal                                                      SIGNAL("sig_audio_amp_off")
@@ -2082,25 +2084,31 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         Switch off audio amplifier using relais 1 & 2  (pin 31 and 33)
         """
-        self.gpio_watchdog.set_output_LOW(31)
-        self.gpio_watchdog.set_output_LOW(33)
+        self.gpio_watchdog.set_output_LOW(self.get_save_value_from_globals_configuration("GPIOS_OUT",
+                                                                                         "out_relais1_status"))
+        self.gpio_watchdog.set_output_LOW(self.get_save_value_from_globals_configuration("GPIOS_OUT",
+                                                                                         "out_relais2_status"))
         self.audio_amp_isActive = False
 
     @pyqtSlot()  # Connected to                                                             SIGNAL("sig_status_on")
     def statusLED_on(self):
-        self.gpio_watchdog.set_output_HIGH(36)      # turn on status LED
+        self.gpio_watchdog.set_output_HIGH(self.get_save_value_from_globals_configuration("GPIOS_OUT",
+                                                                                          "out_power_status"))      # turn on status LED
 
     @pyqtSlot()  # Connected to                                                             SIGNAL("sig_status_off")
     def statusLED_off(self):
-        self.gpio_watchdog.set_output_LOW(36)      # turn on status LED
+        self.gpio_watchdog.set_output_LOW(self.get_save_value_from_globals_configuration("GPIOS_OUT",
+                                                                                         "out_power_status"))      # turn on status LED
 
     @pyqtSlot()  # Connected to                                                             SIGNAL("sig_LCD_on")
     def LCD_on(self):
-        self.gpio_watchdog.set_output_LOW(35)      # turn LCD ON
+        self.gpio_watchdog.set_output_LOW(self.get_save_value_from_globals_configuration("GPIOS_OUT",
+                                                                                         "out_relais3_status"))      # turn LCD ON
 
     @pyqtSlot()  # Connected to                                                             SIGNAL("sig_LCD_off")
     def LCD_off(self):
-        self.gpio_watchdog.set_output_HIGH(35)      # turn LCD OFF
+        self.gpio_watchdog.set_output_HIGH(self.get_save_value_from_globals_configuration("GPIOS_OUT",
+                                                                                          "out_relais3_status"))      # turn LCD OFF
 
     @pyqtSlot()
     def onSelectAll(self):
@@ -2242,7 +2250,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     if self.usb_manager.ismounted():
                         print("Webradio: umount usb stick ")
                         self.usb_manager.umount()
-                    logger.info("update database")
                     self.player.updateDatabase(VARIABLE_DATABASE)
 
                 elif self.usb_manager.ismounted():
@@ -2897,6 +2904,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def systemCall(self, command):
         return_value = sp.Popen(command, shell=True, stdout=sp.PIPE).stdout.read()
         return return_value
+
+    def get_save_value_from_globals_configuration(self, sectionkey=None, valuekey=None):
+        '''
+        Function to get values from the global-variables in a saver way (avoid the call of "get" to a None-Type
+        Args:
+            sectionkey: Section descriptor as String
+            valuekey:  Value descriptor as String
+
+        Returns: Value or None
+        '''
+        if sectionkey is None or valuekey is None:
+            return None
+        try:
+            first_dict = global_vars.configuration.get(sectionkey)
+        except:
+            return None
+        if first_dict is not None:
+            return first_dict.get(valuekey)
+        else:
+            return None
 
 
 class RadioStation(object):

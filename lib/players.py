@@ -210,6 +210,7 @@ class MPC_Player(object):
         :param path: (optional) path inside Musicfolder
         :return: --
         """
+        logger.info("Updating Variable Database: {0}".format(path))
         self.client.update(path)
 
     @reconnect

@@ -175,6 +175,7 @@ class Gpio_Watchdog(QObject):
                 time.sleep(10)    # try it in 10 seconds again...
 
     def set_output_HIGH(self, pin):
+        if pin is None: return False
         self.initReady = False
         # setting initReady temporary to false, is just to protect the switches ... not to catch any EMV
         if int(pin) in pins_in_use:
@@ -187,6 +188,7 @@ class Gpio_Watchdog(QObject):
         return False
 
     def set_output_LOW(self, pin):
+        if pin is None: return False
         self.initReady = False
         # setting initReady temporary to false, is just to protect the switches ... not to catch any EMV
         if int(pin) in pins_in_use:
