@@ -146,8 +146,8 @@ class MPC_Player(object):
         #if not os.path.exists(path): return False
 
         if os.path.isfile(path) and path.endswith((".mp3",".MP3")) and path.startswith(MusicFolder):
-            print("Provided path is a mp3-file")
             pathToAdd = path.split(MusicFolder)[1][1:]
+            print("Provided path is a mp3-file", pathToAdd)
             song_id = self.client.addid(pathToAdd.encode('utf-8'))
             return song_id
         else:

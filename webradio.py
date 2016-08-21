@@ -2843,7 +2843,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return False
 
         #print("TYPE111:", type(pathes[0])) # str
-        #print("PATH111", pathes[0])
+        #print("PATH111", pathes, MusicFolder)
         #print(unicode(pathes[0]))
 
         firstIDinPlaylist = self.player.add(unicode(pathes[0]), MusicFolder)
@@ -2868,7 +2868,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if len(pathes) == 0:
             return False
 
-        firstIDinPlaylist = self.player.add(os.path.join(MusicFolder,pathes[0]), MusicFolder)
+        firstIDinPlaylist = self.player.add(os.path.join(MusicFolder,unicode(pathes[0])), MusicFolder)
         if len(pathes) > 1:
             for pathesToAdd in pathes[1:]:
                 if not self.player.add(os.path.join(MusicFolder,pathesToAdd), MusicFolder):
