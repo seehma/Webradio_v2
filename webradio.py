@@ -2057,7 +2057,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         logger.info("Webradio: USB Stick disconnected")
         if self.mode == "media":
             self.exchange_model()
-            pass
+        if self.player is not None:
+            self.player.updateDatabase(VARIABLE_DATABASE)
 
     @pyqtSlot()  # Connected to usb_manager                                                 SIGNAL("sig_usb_connected")
     def on_usb_connected(self):

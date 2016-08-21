@@ -206,12 +206,12 @@ class MPC_Player(object):
     @reconnect
     def updateDatabase(self, path=""):
         """
-
         :param path: (optional) path inside Musicfolder
         :return: --
         """
-        logger.info("Updating Variable Database: {0}".format(path))
-        self.client.update(path)
+        logger.info("Updating Variable Database: {0}, {1}".format(path, type(path)))
+        ret = self.client.update(path)
+        logger.debug("Result of Updating Variable Database: {0}".format(ret))
 
     @reconnect
     def setRepeat(self, arg):
