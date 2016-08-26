@@ -201,7 +201,7 @@ FAQ
 (5) Installation von Python Abhängigkeiten
 ==========================================
 
-    - "sudo apt-get install python-qt4 python-mpd python-mpdclient python-rpi.gpio"
+    - "sudo apt-get install python-qt4 python-mpd python-mpdclient python-rpi.gpio python-lxml"
     - Hierdurch werden alle notwendigen Pythonpakete nachinstalliert, die bei einer "normalen" Installation
       noch nicht mitinstalliert wurden.
 
@@ -452,6 +452,20 @@ Nun sollte der Sender "ffn" ohne Probleme ab zu spielen sein.
 Hinweis:
 In der mpd Verison aus Raspbian Wheezy (0.16.7-2) scheint o.g. Bug nicht zu existieren. Daher sollte dieses Problem mit Wheezy nicht auftauchen.
 Bitte mal testen und Bescheid geben ob es funktioniert hat!
+
+##################################################
+
+Thema "Album-Covers werden nicht angezeigt / heruntergeladen"
+
+Seit unbekannter Dauer gibt es ein Problem mit der API von lastFM die ein defektes XML-File ausliefert.
+Um dies zu umgehen ist es notwendig, dass die aktuelle Version (ab 26.08.2016) von lib/lastFM_AlbumArtGrabber.py verwendet wird und ausserdem das Paket "python-lxml" installiert ist.
+
+Solltest du webradio.py bereits vor o.g. Datum installiert haben, kannst du das File das bei dir Lokal liegt, einfach durch das aktualisierte auf das auf der Dropbox liegt ersetzen. 
+Allerdings ist es notwendig die fehlende Bibliothek zu installieren. Dies geht jedoch ganz einfach mit:
+
+sudo apt-get install python-lxml
+
+Nach einem Neustart von webradio.py sollte die Anzeige des Album-Covers (wieder) funktionieren.
 
 
 

@@ -1,7 +1,8 @@
 import urllib
 try:
     #import xml.etree.cElementTree as ETree
-    from lxml import etree as ETree
+    from lxml import etree as ETree   # Attention! This might not be available at every systems!
+    # if missing, you can install it with "sudo apt-get install python-lxml"
 except:
     import xml.etree.ElementTree as ETree
 
@@ -28,7 +29,7 @@ class LastFMDownloader(object):
         #Due to a change in the API, Namespace prefix is not defined an causes Errors! 
         #Hotfix: Use "lxml" instead of "xml"
         parser = ETree.XMLParser(recover=True)
-        xml_data = ETree.fromstring(response, parser) # Read in XML data
+        xml_data = ETree.fromstring(response, parser)  # Read in XML data
         
 
         for element in xml_data.getiterator("album"):
