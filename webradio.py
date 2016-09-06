@@ -26,6 +26,7 @@ from PyQt4.QtGui import QIcon, QMainWindow, QFont, QAbstractItemView, QCursor, Q
 from lib import global_vars
 from lib.LM_Widgets_scaled_contents import Scaling_QLabel
 from lib.flickercharm import FlickCharm
+from lib.screensaver import Screensaver_Overlay
 
 _ = lambda x : x
 
@@ -355,6 +356,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             #print("Rest is Done",QTime.currentTime())
             self.splash = AnimatedSplashScreen(":/loading.gif")
             self.charm = FlickCharm()
+
+            self.screensaver = Screensaver_Overlay(self)
+            self.screensaver.hide()
 
         def __define_widgets_presettings(self):
 
@@ -2103,6 +2107,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     @pyqtSlot()  # Connected to                                                             SIGNAL("sig_LCD_on")
     def LCD_on(self):
+
+        if global_vars.configuration.get("GENERAL").get("screensaver"):
+            # if you do not use a relais for LCD-Backlight control, you will see a screensaver ... hide it.
+            logger.info("Hide Screensaver")
+            self.screensaver.hide()
         self.gpio_watchdog.set_output_LOW(self.get_save_value_from_globals_configuration("GPIOS_OUT",
                                                                                          "out_relais3_status"))      # turn LCD ON
 
@@ -2110,6 +2119,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def LCD_off(self):
         self.gpio_watchdog.set_output_HIGH(self.get_save_value_from_globals_configuration("GPIOS_OUT",
                                                                                           "out_relais3_status"))      # turn LCD OFF
+        if global_vars.configuration.get("GENERAL").get("screensaver"):
+            # if you do not use a relais for LCD-Backlight control, you will see a screensaver instead
+            logger.info("Show Screensaver")
+            self.screensaver.show()
 
     @pyqtSlot()
     def onSelectAll(self):
