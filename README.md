@@ -76,9 +76,21 @@ __**Zusatzfunktionen welche z.Z. in Arbeit sind von V1 zu V2:**__
     <td>Momentan liegt das Programm in DE (Deutsch) und EN (Englisch) vor. Die Sprache wird automatisch gewählt. Eine
     eigenständige Auswahl wurde noch nicht im Layout umgesetzt und kann daher noch nicht verwendet werden.</td>
   </tr>
+  <tr>
+    <td>Alternative Anzeige im Standby-Mode</td>
+    <td>Viele Nutzer benutzen kein Relais oder Schaltung um das LCD ab zu schalten, oder zumindest die
+    Hintergrundbeleuchtung ab zu dunkeln, daher entstand der Wunsch, dass alternativ zum GPIO-Signal eine Art
+    "Bildschirmschoner angezeigt wird". Angezeigt soll werden: Eine Uhr, das Datum, der Wochentag die aktuelle
+    Aussentemperatur und ein Symbol für die aktuelle Wetterlage am eingestellten Ort.</td>
+    <td>Fertig!</td>
+  </tr>
 </table>
 ---
 
 ###Änderungen und Optimierungen die nebenher laufen:
 1. Wenn kein DHT11 Temperatur-/Luftfeuchte-Messer angeschlossen ist wird nun nicht mehr nur ein "Standardwert" angezeigt,
 sondern die aktuellen Temperaturdaten aus dem Wetterwidget in der Titelleiste angezeigt.
+
+2. Implementierung von sog. "Themes", mit welchen man das Erscheinungsbild beeinflussen kann. Stylesheets werden aus
+dem jeweiligen Theme geladen und sind somit variabel und für den Nutzer anpassbar (z.B. wenn eine spezielle Farbe
+benötigt wird).
