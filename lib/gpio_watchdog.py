@@ -142,7 +142,6 @@ class Gpio_Watchdog(QObject):
         for entry in self.gpio_states.iterkeys():
             self.gpio_states.update({entry: 1})   # Switches are 1 if the are released ....
 
-
     def switch_event(self, event):
         if event == RotaryEncoder.CLOCKWISE:
             self.emit(SIGNAL("gpio_rotary_turned"), "clockwise")
@@ -175,7 +174,9 @@ class Gpio_Watchdog(QObject):
                 time.sleep(10)    # try it in 10 seconds again...
 
     def set_output_HIGH(self, pin):
-        if pin is None: return False
+        if pin is None:
+            logger.warning("Channel: {0}, is not valid. Abort.".format(pin))
+            return False
         self.initReady = False
         # setting initReady temporary to false, is just to protect the switches ... not to catch any EMV
         if int(pin) in pins_in_use:
@@ -188,7 +189,9 @@ class Gpio_Watchdog(QObject):
         return False
 
     def set_output_LOW(self, pin):
-        if pin is None: return False
+        if pin is None:
+            logger.warning("Channel: {0}, is not valid. Abort.".format(pin))
+            return False
         self.initReady = False
         # setting initReady temporary to false, is just to protect the switches ... not to catch any EMV
         if int(pin) in pins_in_use:
