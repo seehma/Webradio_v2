@@ -357,7 +357,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.splash = AnimatedSplashScreen(":/loading.gif")
             self.charm = FlickCharm()
 
-            self.screensaver = Screensaver_Overlay(self)
+            self.screensaver = Screensaver_Overlay(cwd, self)
             self.screensaver.hide()
 
         def __define_widgets_presettings(self):

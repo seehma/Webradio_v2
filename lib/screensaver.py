@@ -8,6 +8,7 @@ from datetime import datetime as date
 import pyqapi as weather
 import global_vars
 import logging
+import os
 
 logger = logging.getLogger("webradio")
 
@@ -26,8 +27,9 @@ class Screensaver_Overlay(QWidget):
     Just like a Screensaver.
     '''
 
-    def __init__(self, parent=None):
+    def __init__(self, cwd, parent=None):
         super(Screensaver_Overlay, self).__init__(parent)
+        self.cwd = cwd
         self.setAttribute(Qt.WA_StyledBackground)    #want a styled Background
         self.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         self.setupUI()  # setup layout and widgets
@@ -155,7 +157,7 @@ class Screensaver_Overlay(QWidget):
         Updates the current Time, Day and Date
         '''
         self.lbl_time.setText(self.tr(time.strftime("%H:%M")))
-        self.lbl_day.setText(self.tr(date.today().strftime("%A")))
+        self.lbl_day.setText(self.tr(date.today().strftime("%A")) + ", ")
         self.lbl_date.setText(self.tr(date.today().strftime("%d.%b.%Y")))
 
     def updateWeather(self):
@@ -167,8 +169,8 @@ class Screensaver_Overlay(QWidget):
         if location_ID is None:
             return   #return if no location ID can be loaded...
         temp_condition = weather.get_weather_from_weather_com(location_ID)
-        self.lbl_weather_icon.setPicturePath("./res/weather/icon/{0}/static".format(
-            temp_condition['current_conditions']['icon']))
+        self.lbl_weather_icon.setPicturePath(os.path.join(self.cwd, "res/weather/icon",
+                                                          temp_condition['current_conditions']['icon'], "static"))
 
         self.lbl_temperature.setText(temp_condition['current_conditions']['temperature']+QString.fromUtf8("°C"))
 
