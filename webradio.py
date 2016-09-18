@@ -2864,8 +2864,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if len(pathes) > 1:
             for pathesToAdd in pathes[1:]:
                 if not self.player.add(unicode(pathesToAdd), MusicFolder):
-                    pass
-                    #print("file: {0} can not be added".format(pathesToAdd))
+                    logger.warning("file: {0} can not be added".format(pathesToAdd))
 
         if not firstIDinPlaylist is False:
             pass

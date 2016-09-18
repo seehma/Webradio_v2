@@ -137,7 +137,7 @@ class MPC_Player(object):
         If the path is a directory, all files, and sub-folders (including files) will be added.
 
         :param absoluteFilePath: "/home/user/Music/myfile.mp3"
-        :param MusicFolder: the Music-Folder wich is specified in mpd-conf
+        :param MusicFolder: the Music-Folder which is specified in mpd-conf
         :return: id of the "Track" added or False if something was wrong.
         """
 
@@ -147,10 +147,12 @@ class MPC_Player(object):
 
         if os.path.isfile(path) and path.endswith((".mp3",".MP3")) and path.startswith(MusicFolder):
             pathToAdd = path.split(MusicFolder)[1][1:]
-            print("Provided path is a mp3-file", pathToAdd)
+            logger.info("Player add: {0}".format(pathToAdd.encode('utf-8')))
             song_id = self.client.addid(pathToAdd.encode('utf-8'))
             return song_id
         else:
+            logger.error("Player add: {0} in Musicfolder {1} failed to add.".format(path.encode('utf-8'),
+                                                                                    MusicFolder.encode('utf-8')))
             return False
 
     @reconnect
