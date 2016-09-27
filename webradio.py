@@ -398,7 +398,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             self.lbl_albumArt.setScaledContents(True)
 
-            self.tabWidget_main.setIconSize(QSize(40,40))
+            # the tabsize (width) is defined in the specific stylesheet, read the width and adjust the Icons
+            tabsize_per_stylesheet = self.tabWidget_main.tabBar().sizeHint().width()
+            if self.height() <= 530 and tabsize_per_stylesheet > 48:
+                # in case that the window is smaller than 530px high, limit the tab-size to 40 to avaid "up/down"-Btns
+                tabsize_per_stylesheet = 48
+            self.tabWidget_main.setIconSize(QSize(tabsize_per_stylesheet, tabsize_per_stylesheet))
+
             self.tabWidget_main.setTabIcon(0, QIcon(":/radio.png"))
             self.tabWidget_main.setTabText(0,"")
 

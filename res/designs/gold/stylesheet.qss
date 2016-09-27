@@ -42,6 +42,7 @@ QTabWidget::pane{
 QTabBar::tab{
         border: 2;
         border-color: black;
+        width:60px;
         }
 QTreeView{
         background: rgb(76, 76, 76);
