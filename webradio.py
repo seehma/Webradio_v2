@@ -1840,7 +1840,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 if trigger_for_switching_to_radio:
                     self.tabWidget_main.setCurrentIndex(0)
 
-            elif url.endswith((".mp3",".MP3")):
+            elif url.lower().endswith((".mp3", ".ogg", ".oga")):   # 20161003 ogg and oga added, url.lower() implemented
                 logger.info("Received url which looks like a filename ({0}) .Ignoring it for changeStation".format(url))
                 if self.mode is not "media":
                     print("Switch to media mode, because im in Radio Mode..")
@@ -2908,7 +2908,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.model.setRootPath(MusicFolder)
         self.model.setIconProvider(self.myProvider)
         self.model.setFilter(QDir.AllEntries|QDir.NoDotAndDotDot|QDir.AllDirs|QDir.Name)
-        self.model.setNameFilters(['*.mp3','*.MP3'])
+        self.model.setNameFilters(['*.mp3', '*.MP3', '*.ogg', '*.OGG', '*.oga', '*.OGA'])
 
         #self.model.setSorting(QDir.Name|QDir.DirsFirst)
         self.treeView.setModel(self.model)

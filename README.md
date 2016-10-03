@@ -97,3 +97,5 @@ sondern die aktuellen Temperaturdaten aus dem Wetterwidget in der Titelleiste an
 2. Implementierung von sog. "Themes", mit welchen man das Erscheinungsbild beeinflussen kann. Stylesheets werden aus
 dem jeweiligen Theme geladen und sind somit variabel und für den Nutzer anpassbar (z.B. wenn eine spezielle Farbe
 benötigt wird).
+
+3. Erweiterung der Dateiunterstützung für lokale Medien von der Dateiendung *.mp3 um *.ogg und *.oga
