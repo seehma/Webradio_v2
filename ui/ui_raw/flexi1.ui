@@ -708,7 +708,7 @@
             <item>
              <widget class="QStackedWidget" name="stackedWidget_2">
               <property name="currentIndex">
-               <number>1</number>
+               <number>3</number>
               </property>
               <widget class="QWidget" name="page_5">
                <layout class="QHBoxLayout" name="horizontalLayout_22">
@@ -1671,7 +1671,7 @@
                  </rect>
                 </property>
                 <property name="text">
-                 <string>Design-Vorlage:</string>
+                 <string>Design-Template:</string>
                 </property>
                </widget>
                <widget class="QComboBox" name="cB_design">
@@ -1679,6 +1679,29 @@
                  <rect>
                   <x>230</x>
                   <y>50</y>
+                  <width>211</width>
+                  <height>41</height>
+                 </rect>
+                </property>
+               </widget>
+               <widget class="Scaling_QLabel" name="label_4">
+                <property name="geometry">
+                 <rect>
+                  <x>70</x>
+                  <y>120</y>
+                  <width>151</width>
+                  <height>41</height>
+                 </rect>
+                </property>
+                <property name="text">
+                 <string>Language:</string>
+                </property>
+               </widget>
+               <widget class="QComboBox" name="cB_language">
+                <property name="geometry">
+                 <rect>
+                  <x>230</x>
+                  <y>120</y>
                   <width>211</width>
                   <height>41</height>
                  </rect>
@@ -2034,17 +2057,17 @@
   <customwidget>
    <class>Scaling_QLabel</class>
    <extends>QLabel</extends>
-   <header>LM_Widgets_scaled_contents</header>
+   <header>lib.LM_Widgets_scaled_contents</header>
   </customwidget>
   <customwidget>
    <class>Scaling_QPushButton_Icon</class>
    <extends>QPushButton</extends>
-   <header>LM_Widgets_scaled_contents</header>
+   <header>lib.LM_Widgets_scaled_contents</header>
   </customwidget>
   <customwidget>
    <class>Scaling_QPushButton_Text</class>
    <extends>QPushButton</extends>
-   <header>LM_Widgets_scaled_contents</header>
+   <header>lib.LM_Widgets_scaled_contents</header>
   </customwidget>
  </customwidgets>
  <resources/>

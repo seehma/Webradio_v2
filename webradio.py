@@ -16,9 +16,11 @@ import time
 import urllib
 import importlib
 import shutil
+import re
+import csv
 
 from PyQt4.QtCore import QString, QSize, Qt, SIGNAL, QSettings, QTime, QTimer, QDir, pyqtSlot, QObject, QEvent, \
-    QThread, QLocale, QTranslator, QLibraryInfo, QChar
+    QThread, QLocale, QTranslator, QLibraryInfo, QChar, QVariant
 from PyQt4.QtGui import QIcon, QMainWindow, QFont, QAbstractItemView, QCursor, QDesktopWidget, QPixmap, \
     QListWidgetItem, QMessageBox, QSplashScreen, QPushButton, QMovie, QApplication, QVBoxLayout, QFileIconProvider, \
     QDialog
@@ -96,17 +98,17 @@ def read_conf(filepath, extention=".ini"):
         logger.error(_("Configuration {0} can not be read! Error: {1}").format(filepath, e))
         raise IOError
 
-def write_conf(filepath, section="", option="", value="", extention=".ini"):
+def write_conf():
     '''
-    Reading a ini-like configuration-File and return it in a dict. {section:{option:value}}
-    :param filepath: absolute filepath to the configuration-file
-    :param extention: ".ini", ".conf", ".whatever"
-    :return: Dict {'General': {'second': '1', 'thisisabool': True, 'key': '"value"'}}
-    '''
+    Write the current configuration of global_vars.configuration to a filepath
 
+    :return: True / False
+    '''
+    filepath = os.path.join(cwd, "webradio.conf")
     if not os.path.exists(filepath):
-        logger.error(_('Configuration-File "{0}" does not exist').format(filepath))
-        return False
+        logger.warning(_('Configuration-File "{0}" does not exist, I am creating it').format(filepath))
+        with open(filepath, 'a'):
+            os.utime(filepath, None)  # create that file if it does not exist
     else:
         basename = os.path.basename(filepath)
 
@@ -115,14 +117,20 @@ def write_conf(filepath, section="", option="", value="", extention=".ini"):
         logger.error(_('Configuration "{0}" does not exist or can not be accessed.').format(basename))
         raise IOError
 
-    if not os.path.splitext(filepath)[1] == extention:
-        logger.error(_('Configuration-File "{0}" has wrong file-format (need {1})').format(basename, extention))
-        raise IOError
     try:
         config = ConfigParser.RawConfigParser(allow_no_value=False)
         config.read(filepath)
-        config.set(section, option, value)
+        for sections in global_vars.configuration:
+            section = sections
+            options = global_vars.configuration.get(sections)
+            #print options
+            for option in options:
+                #print option
+                value = options.get(option)
+                #print value
+                config.set(section, option, value)
         # Writing our configuration file
+        logger.info("Writing to user webradio.conf")
         with open(filepath, 'wb') as configfile:
             config.write(configfile)
     except:
@@ -281,7 +289,7 @@ except ImportError:  # load the GPIO simulator instead. The signals are the same
     MusicFolder = global_vars.configuration.get("DEVELOPMENT").get("musicfolder")
     VARIABLE_DATABASE = global_vars.configuration.get("DEVELOPMENT").get("variable_database_name")
 
-__version__ = "0.2.3"
+__version__ = "0.2.4"
 
 BasenameFavoritesPlaylist = "favorites"
 LogoFolder = os.path.join(cwd, "Logos")
@@ -304,7 +312,117 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         app.processEvents()
         #self.startup_actions()
+        self.language_txt=""
+        self.language_translator=None
         logger.info("Init sucessfull.")
+
+    def changeLanguage_to(self, newid):
+        '''
+        Try to Change the Language to "lang" (string)
+        Args:
+            lang: <str>
+        '''
+        try:
+            lang = self.cB_language.itemData(newid, Qt.UserRole).toString()
+        except:
+            logger.error("Error setting Language with ID {0}".format(newid))
+            return False
+        lang = str(lang)
+        if self.language_txt == lang:  # do nothing if language is already set...
+            return
+        mytranslator = QTranslator()
+        print("LANG =",lang)
+        if mytranslator.load("local_{0}".format(lang), os.path.join(cwd, "locale")):
+            self.setTranslation(mytranslator, str(lang))
+            global_vars.configuration.get("GENERAL").update({"language": str(lang)})
+            write_conf()
+        elif lang == "en":
+            self.setTranslation(mytranslator, str(lang))  # set an empty translator as second one
+            global_vars.configuration.get("GENERAL").update({"language": str(lang)})
+            write_conf()
+        else:
+            logger.error("Language-Change failed because Translation can not be loaded.")
+
+    def setTranslation(self, qTranslator, lang_txt):
+        '''
+        Set the qTranslator-Ref and a short lang_txt like "de" or "en" to variables
+        Args:
+            qTranslator: QTranslator-Object
+            lang_txt: "str" like "de" or "en"
+
+        Returns: False if there was an Error and Translator can not be set.
+        '''
+        if not isinstance(qTranslator, QTranslator) or not isinstance(lang_txt, str):
+            logger.warning("Language can not be set! Check:", qTranslator, lang_txt)
+            return False
+        if self.language_translator is not None:   # None= Initial condition, no additional Translator is installed
+            app.removeTranslator(self.language_translator)
+        self.language_translator = qTranslator
+        self.language_txt = lang_txt if "_" not in lang_txt else lang_txt.split("_")[0].lower()  # system-lang is de_DE
+        #Set the correct index of the combobox in settingstab, presenting current language.
+        index_lang = self.cB_language.findData(QVariant(self.language_txt), Qt.UserRole, Qt.MatchFixedString)
+        if index_lang >= 0:
+            self.cB_language.setCurrentIndex(index_lang)   # this will fire a "currentIndexChanged" but with no effect.
+
+        app.installTranslator(qTranslator)  # signal "QEvent.LanguageChange" will be fired, see Eventfilter -> _updateT.
+
+    def _updateTranslation(self):   # called with Event.LanguageChanged (see Eventfilter)
+
+        self.setWindowTitle(self.tr("Raspi Web Radio"))
+        self.lbl_Ueberschrift.setText(self.tr("Raspi - Web Radio Tuner"))
+        self.label.setText(self.tr("currently playing..."))
+        self.pB_in_ihrer_naehe.setText(self.tr("Stations near of you"))
+        self.pB_Sendervorschlaege_fuer_sie.setText(self.tr("Station proposals"))
+        self.pB_sender_nach_kategorie.setText(self.tr("Choose station by category"))
+        self.pB_sender_suchen.setText(self.tr("Search stations..."))
+        self.pB_nach_Genre.setText(self.tr("Station by \"Genre\""))
+        self.pB_nach_Thema.setText(self.tr("Station by \"Theme\""))
+        self.pB_nach_Land.setText(self.tr("Station by \"Country\""))
+        self.pB_nach_Stadt.setText(self.tr("Station by \"Town\""))
+        self.pB_nach_Sprache.setText(self.tr("Station by \"Language\""))
+        self.label_3.setText(self.tr("Design-Template:"))
+        self.label_4.setText(self.tr("Language:"))
+
+        self.weatherWidget.retranslateUi(self)
+
+        self.virtualKeyboard.backButton.setText(self.tr('Delete'))
+        self.virtualKeyboard.cancelButton.setText(self.tr("Abort"))
+        self.virtualKeyboard.spaceButton.setText(self.tr("Space"))
+
+        self.virtualKeyboard2.backButton.setText(self.tr('Delete'))
+        self.virtualKeyboard2.cancelButton.setText(self.tr("Abort"))
+        self.virtualKeyboard2.spaceButton.setText(self.tr("Space"))
+
+    def _readPossibleTranslations(self):
+        '''
+        Check the subfolder "locale" for available translation files (*.qm), if there are any, load a csv with
+        long descriptions for appreviatinos (de = German...). Collect a list and return it.
+        Returns: List with available Languages incl. appreviation ( [["German (de)", "de"], ["France (fr)", "fr"]....] )
+        '''
+        translations_txt = [["English (en)", "en"]]
+        folder_for_translations = os.path.join(cwd, "locale")
+
+        qm_files = [f for f in os.listdir(folder_for_translations) if os.path.splitext(f)[1] == ".qm" \
+                    and os.path.splitext(f)[0].startswith("local_")]  # ['local_de.qm']
+
+        if len(qm_files) > 0:
+            language_file_short_to_cleartext = {}
+            # load lang_code.csv and create a dict in form of {"de":"German", "fr":"France"...}
+            with open(os.path.join(folder_for_translations,"lang_code.csv"), "rb") as inputfile:
+                for row in csv.reader(inputfile):   #['Afar', 'aa']
+                    language_file_short_to_cleartext.setdefault(row[1].decode('utf-8'), row[0].decode('utf-8'))
+            # check each file for its language-code and check if the lang-code is in the dictionary with long-text
+            for entry in qm_files:
+                lang = re.search('local_(.+?)\.qm', entry)   # each file is like the pattern "local_****.qm"
+                if lang:
+                    short_code = lang.group(1)
+                    long_txt = language_file_short_to_cleartext.get(short_code, short_code)
+                    translation_txt = [long_txt + " (" + short_code + ")", short_code]  # ["German (de)", "de"]
+                    if translation_txt not in translations_txt: translations_txt.append(translation_txt)
+
+            return translations_txt  # ( [["German", "de"], ["France", "fr"]....] )
+        else:
+            return translations_txt   # []
 
     def reRead_config(self):
         global_vars.configuration = read_conf(os.path.join(cwd, "webradio.conf"), ".conf")
@@ -578,12 +696,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             #populating cB for Design-Changes with possibilities and set the current Index
             content = os.listdir(os.path.join(cwd, "res", "designs"))
-            self.cB_design.clear() # empty existing items (if function is called from Design-Change)
+            self.cB_design.clear()  # empty existing items (if function is called from Design-Change)
             self.cB_design.addItems([i for i in content if not i.endswith(".pyc") and not i.endswith(".py")])
             index = self.cB_design.findText(global_vars.configuration.get("GENERAL").get("design"),
                                             Qt.MatchFixedString)
             if index >= 0:
                  self.cB_design.setCurrentIndex(index)
+
+            #populating cB for Language
+            langs = self._readPossibleTranslations()   #[["German", "de"], ["France", "fr"]....]
+            self.cB_language.clear()
+            for entry in langs:
+                self.cB_language.addItem(entry[0], userData=QVariant(entry[1]))
+
+            #index_lang = self.cB_language.findData(self.language_txt, Qt.UserRole, Qt.MatchFixedString)
+            #if index_lang >= 0:
+            #    self.cB_design.setCurrentIndex(index)   # this will fire a "currentIndexChanged" but with no effect.
+            # Language is not set during startup, so no correct index can be set!
 
         def __setConnections(self):
 
@@ -683,6 +812,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             ##################################################################################### Settings
             self.cB_design.currentIndexChanged.connect(self.setNewDesign)  # overloaded with new index.
+            self.cB_language.currentIndexChanged.connect(self.changeLanguage_to)  # overloaded with new index.
 
         def __initial_variable_setup(self):
             self.currentIndex = self.stackedWidget.currentIndex()
@@ -1142,8 +1272,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.pB_move_down.setIcon(QIcon(":/down.png"))
 
             #if everything was OK, update Value in current conf accordingly.
-            write_conf(os.path.join(cwd, "webradio.conf"), "GENERAL", "design",
-                       global_vars.configuration.get("GENERAL").get("design"), ".conf")
+            write_conf()
 
     def switchModeTo(self, from_mode, to_mode):
         """
@@ -2764,6 +2893,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 if not self.audio_amp_isActive:
                     logger.info("Amp is not active")
                     self.reanimate_from_standby()
+            if Event.type() == QEvent.LanguageChange:
+                self._updateTranslation()
 
         return False # lets the event continue to the edit
 
@@ -3261,8 +3392,16 @@ if __name__ == "__main__":
     app.installTranslator(qtTranslator)
 
     mytranslator = QTranslator()
-    mytranslator.load("local_{0}".format(language), os.path.join(cwd, "locale"))
-    app.installTranslator(mytranslator)
+    user_lang = global_vars.configuration.get("GENERAL").get("language")
+    if user_lang is None:    # if no lang is defined, system-lang
+        logger.info("Load Systemdefault Language")
+        mytranslator.load("local_{0}".format(language), os.path.join(cwd, "locale"))
+    else:
+        logger.info("Load Userspecific Language")
+        language = user_lang
+        mytranslator.load("local_{0}".format(language), os.path.join(cwd, "locale"))
+
+    # app.installTranslator(mytranslator)  # Installation will be handeled by the GUI
 
     splash = QSplashScreen(QPixmap(":/loading_wall.png"))
     splash.show()
@@ -3277,6 +3416,7 @@ if __name__ == "__main__":
     mainwindow = MainWindow(QSize(int(width), int(height)))
 
     mainwindow.startup_actions()
+    mainwindow.setTranslation(mytranslator, str(language))
     mainwindow.show()
     splash.finish(mainwindow)
     if args.fullscreen:
@@ -3389,7 +3529,8 @@ Verison History:
         - automatisch scallierende QLabels und QPushButtons um Layoutgröße zu ermöglichen
 0.2.2   - Sleep-Timer (Zeit bis Shutdown...), 10 Sekunden Frühwarnung
 0.2.3   - Uebersetzung, Basisversion "English", Uebersetzungspaket de_DE (Deutsch/German) angelegt.
-0.2.4   - Installer und Einrichtungsasistent
+0.2.4   - Sprache kann "on the fly" aus dem Settings-Tab geändert werden und Einträge werden dynamisch aufgebaut
+          = Es können ab sofort Übersetzungsfiles eingearbeitet werden.
 '''
 
 '''

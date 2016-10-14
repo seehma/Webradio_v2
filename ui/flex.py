@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'flexi1.ui'
 #
-# Created: Thu Jul 21 21:25:07 2016
-#      by: PyQt4 UI code generator 4.10.4
+# Created by: PyQt4 UI code generator 4.11.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -706,6 +705,12 @@ class Ui_MainWindow(object):
         self.cB_design = QtGui.QComboBox(self.page_7)
         self.cB_design.setGeometry(QtCore.QRect(230, 50, 211, 41))
         self.cB_design.setObjectName(_fromUtf8("cB_design"))
+        self.label_4 = Scaling_QLabel(self.page_7)
+        self.label_4.setGeometry(QtCore.QRect(70, 120, 151, 41))
+        self.label_4.setObjectName(_fromUtf8("label_4"))
+        self.cB_language = QtGui.QComboBox(self.page_7)
+        self.cB_language.setGeometry(QtCore.QRect(230, 120, 211, 41))
+        self.cB_language.setObjectName(_fromUtf8("cB_language"))
         self.stackedWidget_3.addWidget(self.page_7)
         self.page_8 = QtGui.QWidget()
         self.page_8.setObjectName(_fromUtf8("page_8"))
@@ -774,8 +779,8 @@ class Ui_MainWindow(object):
         self.horizontalLayout_6.addLayout(self.verticalLayout)
         self.verticalLayout_2.addLayout(self.horizontalLayout_6)
         self.horizontalLayout_3 = QtGui.QHBoxLayout()
-        self.horizontalLayout_3.setSpacing(0)
         self.horizontalLayout_3.setContentsMargins(-1, 0, -1, -1)
+        self.horizontalLayout_3.setSpacing(0)
         self.horizontalLayout_3.setObjectName(_fromUtf8("horizontalLayout_3"))
         self.horizontalLayout = QtGui.QHBoxLayout()
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
@@ -836,7 +841,7 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         self.tabWidget_main.setCurrentIndex(4)
         self.stackedWidget.setCurrentIndex(0)
-        self.stackedWidget_2.setCurrentIndex(1)
+        self.stackedWidget_2.setCurrentIndex(3)
         self.stackedWidget_3.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -886,7 +891,8 @@ class Ui_MainWindow(object):
         self.tabWidget_main.setTabText(self.tabWidget_main.indexOf(self.tabWidget_mainPage2), _translate("MainWindow", "MP3 Player", None))
         self.tabWidget_main.setTabText(self.tabWidget_main.indexOf(self.tab), _translate("MainWindow", "Wetter", None))
         self.tabWidget_main.setTabText(self.tabWidget_main.indexOf(self.tab_2), _translate("MainWindow", "Sleep-Timer", None))
-        self.label_3.setText(_translate("MainWindow", "Design-Vorlage:", None))
+        self.label_3.setText(_translate("MainWindow", "Design-Template:", None))
+        self.label_4.setText(_translate("MainWindow", "Language:", None))
         self.tabWidget_main.setTabText(self.tabWidget_main.indexOf(self.tab_3), _translate("MainWindow", "Settings", None))
         self.pBHome.setText(_translate("MainWindow", "Home", None))
         self.pBSuchen.setText(_translate("MainWindow", "Suchen", None))
@@ -895,7 +901,7 @@ class Ui_MainWindow(object):
         self.pBVol_down.setText(_translate("MainWindow", "-", None))
         self.pBVol_up.setText(_translate("MainWindow", "+", None))
 
-from mpd_filesystemView import LM_QTreeView
 from database_searcher import LM_QTreeWidget
+from lib.LM_Widgets_scaled_contents import Scaling_QLabel, Scaling_QPushButton_Icon, Scaling_QPushButton_Text
+from mpd_filesystemView import LM_QTreeView
 from sleeptimer import SleepTimer
-from lib.LM_Widgets_scaled_contents import Scaling_QPushButton_Text, Scaling_QPushButton_Icon, Scaling_QLabel
