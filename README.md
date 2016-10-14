@@ -76,8 +76,9 @@ __**Zusatzfunktionen welche z.Z. in Arbeit sind von V1 zu V2:**__
     <td>Mehrsprachigkeit</td>
     <td>Das Programm soll in mehreren Sprachen vorliegen, damit auch Nutzer die nicht aus Deutschland stammen damit
     arbeiten können.</td>
-    <td>Momentan liegt das Programm in DE (Deutsch) und EN (Englisch) vor. Die Sprache wird automatisch gewählt. Eine
-    eigenständige Auswahl wurde noch nicht im Layout umgesetzt und kann daher noch nicht verwendet werden.</td>
+    <td>Momentan liegt das Programm in DE (Deutsch), EN (Englisch) und BY (Bayerisch) vor. 
+    Die Sprache wird automatisch mittels eingestellter Systemsprache gewählt. Eine
+    eigenständige Auswahl kann jederzeit über den Einstellungs-Tab vorgenommen werden.</td>
   </tr>
   <tr>
     <td>Alternative Anzeige im Standby-Mode</td>
@@ -99,3 +100,9 @@ dem jeweiligen Theme geladen und sind somit variabel und für den Nutzer anpassb
 benötigt wird).
 
 3. Erweiterung der Dateiunterstützung für lokale Medien von der Dateiendung *.mp3 um *.ogg und *.oga
+
+###Es werden Übersetzer gesucht!
+Da nun die Unterstützung für weitere Sprachen fertig ist, wäre es wünschenswert mehr Sprachen zu
+unterstützen. Schön wäre, wenn hierzu jemand etwas an Übersetzungen beisteuern könnte!
+
+Bei Interesse einfach über <a href="http://my-darling.is-a-linux-user.org">my-darling.is-a-linux-user.org</a> Kontakt mit mir aufnehmen !
