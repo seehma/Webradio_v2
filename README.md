@@ -101,7 +101,7 @@ benötigt wird).
 
 3. Erweiterung der Dateiunterstützung für lokale Medien von der Dateiendung *.mp3 um *.ogg und *.oga
 
-4. Unterstützung für UPnP über mpd-Addon "upmpdcli" (siehe <a href="">Wiki</a>)
+4. Unterstützung für UPnP über mpd-Addon "upmpdcli" (siehe <a href="https://github.com/Acer54/Webradio_v2/wiki/UPnP--Streaming-Support">Wiki</a>)
 
 ###Es werden Übersetzer gesucht!
 Da nun die Unterstützung für weitere Sprachen fertig ist, wäre es wünschenswert mehr Sprachen zu
