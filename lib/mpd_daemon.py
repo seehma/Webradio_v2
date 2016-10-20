@@ -186,7 +186,9 @@ class MPD_Eventlistener(QObject):
                 self.emit(SIGNAL("sig_mpd_songChanged"), current_song)
 
             # emit trackinfo, for Track played which is not from a streaming-station. we need different information
-            if current_url != last_url and not current_url.startswith("http://") and not current_url == "":
+            #print("DEBUG:", current_url)# http://192.168.178.74:57645/external/audio/media/70351.mp
+            if current_url != last_url and (not current_url.startswith("http://") or "http://192.168." in current_url)\
+                    and not current_url == "":
                 #print("NOW I will emit a Signal, which carries information about track, interpret and what else...")
                 #print("Current_url (corresponding to 'file')", current_url) #03-Deep Inside Myself _ Helpless victim.mp3
                 #print("Current_song (corresponds to 'title'", current_song) #Deep Inside Myself / Helpless victim
@@ -239,11 +241,20 @@ if __name__ == "__main__":
     def onStatusChanged(status):
         print("Status changed to:",status)
 
+    def onPlaylistChanged():
+        print("PlaylistChanged")
+
+    def onMediaLocalChanged(current_url,current_song,current_artist,current_album):
+        print("Media Local Changed:", current_url,current_song,current_artist,current_album)
+
+
     app = QApplication(sys.argv)
     mylistener = MPD_Eventlistener()
     mylistener.connect(mylistener, SIGNAL("sig_mpd_songChanged"), onSongChanged)
     mylistener.connect(mylistener, SIGNAL("sig_mpd_stationChanged"), onStationChanged)
     mylistener.connect(mylistener, SIGNAL("sig_mpd_statusChanged"), onStatusChanged)
+    mylistener.connect(mylistener, SIGNAL("sig_mpd_playlist_changed"), onPlaylistChanged)
+    mylistener.connect(mylistener, SIGNAL("sig_mpd_media_local_changed"), onMediaLocalChanged)
     mylistener.startNotifier()
     app.exec_()
 

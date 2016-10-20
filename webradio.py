@@ -1372,11 +1372,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.player = MPC_Player()
 
             logger.info("Swithing from Radio to Media Mode")
-            #load last media-playlist
-            if self.player.load_playlist("media_playlist"):
-                logger.info("Loading of media-playlist suceeded.")
-            else:
-                self.player.clear()
+            #if the actual running stream is a local UPnP Stream, dont load the media-playlist, because this would
+            #top the track and reset the playlist.
+            if "http://192.168." not in self.player.get_current_playing_filename():
+                #load last media-playlist
+                if self.player.load_playlist("media_playlist"):
+                    logger.info("Loading of media-playlist suceeded.")
+                else:
+                    self.player.clear()
 
             logger.info("Switching to Media-Mode")
             try:
@@ -1927,7 +1930,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         trigger_for_switching_to_radio = False
         if url != "":                                                  # if there is an url sent
             #print("Evaluating:", url)
-            if url.startswith("http://"):                              # check if the url is a url or a filename
+            if url.startswith("http://") and not "http://192.168." in url: # check if the url is a url or a filename
                 logger.debug("Received changed Station, but without name...")
                 #print("received no station name but a url which starts with http://")
                 if not self.mode == "radio":
@@ -1969,20 +1972,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 if trigger_for_switching_to_radio:
                     self.tabWidget_main.setCurrentIndex(0)
 
-            elif url.lower().endswith((".mp3", ".ogg", ".oga")):   # 20161003 ogg and oga added, url.lower() implemented
+            elif url.lower().endswith((".mp3", ".ogg", ".oga", ".mp4")):   # 20161003 ogg and oga added, url.lower() implemented
                 logger.info("Received url which looks like a filename ({0}) .Ignoring it for changeStation".format(url))
                 if self.mode is not "media":
-                    print("Switch to media mode, because im in Radio Mode..")
+                    logger.info("Switch to media mode, because im in Radio Mode..")
                     self.tabWidget_main.setCurrentIndex(1)
-                    #print("add track to playlist {0}".format(url))
-                    ID_to_play = self.player.add(os.path.join(MusicFolder, url), MusicFolder)
-                    #print("play ID: {0}".format(ID_to_play))
-                    self.player.play_title_with_ID(ID_to_play)
+                    if not url.startswith("http://192.168."):
+                        # adding an UPnP Url would fail... override it (will be startet by the client anyway)
+                        ID_to_play = self.player.add(os.path.join(MusicFolder, url), MusicFolder)
+                        #print("play ID: {0}".format(ID_to_play))
+                        self.player.play_title_with_ID(ID_to_play)
                     self.stackedWidget_2.setCurrentIndex(1)
-                    print("current self.mode is :", self.mode)
-
             else:
-                logger.warning("Can not identify File-ending.. it also does not start with http...")
+                logger.warning("Can not identify File-ending..")
 
         else:
             logger.debug("Received changed Station, but without url...")
@@ -2095,7 +2097,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         :param current_album: if available, used for searching LastFM for the artwork of the album
         :return:
         """
-
+        #if "/external/audio/media/" in current_url:
+        if "http://192.168." in current_url and current_url.endswith((".mp3", ".ogg", ".oga", ".mp4")):   # url is a UPnP from the local network ?
+            if self.mode != "media":
+                self.switchModeTo(self.mode, "media")
+                self.tabWidget_main.setCurrentIndex(1)
+                self.stackedWidget_2.setCurrentIndex(1)
         if self.mode == "media":
             logger.info("Media Local Changed to:".format(current_url))
             #index = self.model.index("".join([MusicFolder,"/",current_url]))    # find the QModelIndex of file playing

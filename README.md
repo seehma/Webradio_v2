@@ -101,6 +101,8 @@ benötigt wird).
 
 3. Erweiterung der Dateiunterstützung für lokale Medien von der Dateiendung *.mp3 um *.ogg und *.oga
 
+4. Unterstützung für UPnP über mpd-Addon "upmpdcli" (siehe <a href="">Wiki</a>)
+
 ###Es werden Übersetzer gesucht!
 Da nun die Unterstützung für weitere Sprachen fertig ist, wäre es wünschenswert mehr Sprachen zu
 unterstützen. Schön wäre, wenn hierzu jemand etwas an Übersetzungen beisteuern könnte!

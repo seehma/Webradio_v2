@@ -186,11 +186,14 @@ class MPC_Player(object):
             filepath = None
         except:
             return filepath
-        for entry in playlist:
-            if int(currentID) == int(entry["id"]):
-                filepath=entry["file"]
-                break
-        return filepath
+        try:
+            for entry in playlist:
+                if int(currentID) == int(entry["id"]):
+                    filepath=entry["file"]
+                    break
+            return filepath
+        except ValueError:
+            return ""
 
 
     @reconnect
