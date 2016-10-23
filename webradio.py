@@ -299,7 +299,7 @@ except ImportError:  # load the GPIO simulator instead. The signals are the same
     MusicFolder = global_vars.configuration.get("DEVELOPMENT").get("musicfolder")
     VARIABLE_DATABASE = global_vars.configuration.get("DEVELOPMENT").get("variable_database_name")
 
-__version__ = "0.2.5"
+__version__ = "0.2.6"
 
 BasenameFavoritesPlaylist = "favorites"
 LogoFolder = os.path.join(cwd, "Logos")
@@ -1385,7 +1385,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             #if the actual running stream is a local UPnP Stream, dont load the media-playlist, because this would
             #top the track and reset the playlist.
             try:
-                if "http://192.168." not in self.player.get_current_playing_filename():  # this may fail!
+                if "http://192.168." not in self.player.get_current_playing_filename():  # may fail during a cold-start
                     #load last media-playlist
                     if self.player.load_playlist("media_playlist"):
                         logger.info("Loading of media-playlist suceeded.")
@@ -3562,6 +3562,8 @@ Verison History:
 0.2.4   - Sprache kann "on the fly" aus dem Settings-Tab geändert werden und Einträge werden dynamisch aufgebaut
           = Es können ab sofort Übersetzungsfiles eingearbeitet werden.
 0.2.5   - UPnP Support implementiert (über MPD-Addon "upmpdcli")
+0.2.6   - Bugfix: Fehler beim Start in den Media-Player Modus "if "http://192.168." not in self.player.get_current_playing_filename():
+          TypeError: argument of type 'NoneType' is not iterable"
 '''
 
 '''

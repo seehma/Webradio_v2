@@ -1,0 +1,13 @@
+0.2.6   23.10.2016   Bugfix:
+                Behebung des Fehlers:
+                "if "http://192.168." not in self.player.get_current_playing_filename():
+                TypeError: argument of type 'NoneType' is not iterable"
+                beim Start in den Media-Player-Modus, verursacht, wenn mpd noch keinen gültigen Titel abspielt, jedoch
+                nach einen String (http://192.168) auf einen None-Type geprüft wird.
+
+0.2.5   21.10.2016   Feature-Update:
+                UPnP Support implementiert (über MPD-Addon "upmpdcli")
+                Siehe Installationsanleitung im Wiki
+
+
+Der Changelog von früheren Version ist im Quelltext bzw. am Ende der Datei "webradio.py" ersichtlich.
