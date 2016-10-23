@@ -225,6 +225,7 @@ from lib.virt_keyboard import VirtualKeyboard
 from lib.weather_widget import weather_widget
 from lib.button_labels import MuteButtonLabel, StandbyButtonLabel
 from lib.mpd_daemon import MPD_Eventlistener
+import lib.mpd_conf_parser as mpd_conf
 from lib.usb_manager import USB_manager
 from lib.mpd_filesystemView import LM_QFileSystemModel
 from lib.system_test import test_onlineServices as systemtest
@@ -279,7 +280,16 @@ try:  # try to load the GPIO Watchdog. If not executed at a raspberry pi or no R
     from lib.gpio_watchdog import Gpio_Watchdog
 
     GPIO_active = True if os.geteuid() == 0 else False  # also check if script was started as root-user
-    MusicFolder = global_vars.configuration.get("GENERAL").get("musicfolder")
+    if global_vars.configuration.get("GENERAL").get("musicfolder") is not None:
+        MusicFolder = global_vars.configuration.get("GENERAL").get("musicfolder")  # User forced Music Folder!
+        logger.info("Using User-Forced MPD-Music-Folder: {0}".format(MusicFolder))
+    else:
+        MusicFolder = mpd_conf.getVariableFrom_MPD_Conf("music_directory")
+        logger.info("Using MPD Music-Folder: {0}".format(MusicFolder))
+    if MusicFolder is None:
+        logger.error("Music directory can not be loaded from MPD-Config, nor from webradio.conf! Abort.")
+        raise EnvironmentError
+
     VARIABLE_DATABASE = global_vars.configuration.get("GENERAL").get("variable_database_name")
     if not GPIO_active:
         logger.warning("GPIOs can not be used, because root-privileges are required to do this!")
@@ -289,7 +299,7 @@ except ImportError:  # load the GPIO simulator instead. The signals are the same
     MusicFolder = global_vars.configuration.get("DEVELOPMENT").get("musicfolder")
     VARIABLE_DATABASE = global_vars.configuration.get("DEVELOPMENT").get("variable_database_name")
 
-__version__ = "0.2.4"
+__version__ = "0.2.5"
 
 BasenameFavoritesPlaylist = "favorites"
 LogoFolder = os.path.join(cwd, "Logos")
@@ -1374,8 +1384,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             logger.info("Swithing from Radio to Media Mode")
             #if the actual running stream is a local UPnP Stream, dont load the media-playlist, because this would
             #top the track and reset the playlist.
-            if "http://192.168." not in self.player.get_current_playing_filename():
-                #load last media-playlist
+            try:
+                if "http://192.168." not in self.player.get_current_playing_filename():  # this may fail!
+                    #load last media-playlist
+                    if self.player.load_playlist("media_playlist"):
+                        logger.info("Loading of media-playlist suceeded.")
+                    else:
+                        self.player.clear()
+
+            except TypeError:    #except a None-Type from "self.player.get_current_playing_filename()
                 if self.player.load_playlist("media_playlist"):
                     logger.info("Loading of media-playlist suceeded.")
                 else:
@@ -3416,9 +3433,15 @@ if __name__ == "__main__":
 
     sizeString = global_vars.configuration.get("GENERAL").get("screen_resolution")
     if sizeString is None or "x" not in sizeString:
-        logger.warning(u"No Screen-Resolution defined in Config-Files or in wrong Format: {0}, "
-                       u"setting default Screenresolution (1024x600)".format(sizeString))
-        sizeString = "1024x600"
+        logger.info(u"No Screen-Resolution defined in Config-Files or in wrong Format: {0}, "
+                       u"setting default Screenresolution according Display-Size".format(sizeString))
+
+        screen_resolution = app.desktop().screenGeometry()
+        width, height = screen_resolution.width(), screen_resolution.height()
+        #if width / height is too large or to small, mainwindow will fallback to 1024x600 max and 640x480 min
+        sizeString = "{0}x{1}".format(width, height)
+    else:
+        logger.info(u"Force screen-Resolution according to Config-File: {0}".format(sizeString))
     width, height = sizeString.rstrip().split("x")
     mainwindow = MainWindow(QSize(int(width), int(height)))
 
@@ -3538,6 +3561,7 @@ Verison History:
 0.2.3   - Uebersetzung, Basisversion "English", Uebersetzungspaket de_DE (Deutsch/German) angelegt.
 0.2.4   - Sprache kann "on the fly" aus dem Settings-Tab geändert werden und Einträge werden dynamisch aufgebaut
           = Es können ab sofort Übersetzungsfiles eingearbeitet werden.
+0.2.5   - UPnP Support implementiert (über MPD-Addon "upmpdcli")
 '''
 
 '''
