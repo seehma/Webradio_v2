@@ -1,18 +1,70 @@
+/* stylesheet.qss (fallback) */
 QMainWindow {
         background-image: url(':/carbon.jpg');
         background-repeat: repeat-xy;
         background-position: top-left;
         color: rgb(240, 240, 240);
         }
+/* Settings - Tab */
+QComboBox{
+        color: white;
+        background: rgb(76, 76, 76);
+        selection-background-color: rgb(255, 106, 0);
+        border-style: solid;
+        border-color: black;
+        border-width: 5px;
+        border-radius: 10px;
+        padding: 1px 18px 1px 3px;
+        min-width: 6em;
+        }
+QComboBox::drop-down{
+        subcontrol-origin: padding;
+        subcontrol-position: top right;
+        width: 25px;
+        background-color: rgb(255, 106, 0);
+        border-left-width: 1px;
+        border-left-color: darkgray;
+        border-left-style: solid; /* just a single line */
+        border-top-right-radius: 3px; /* same radius as the QComboBox */
+        border-bottom-right-radius: 3px;
+        }
+QComboBox:!editable:on, QComboBox::drop-down:editable:on {
+        background: rgb(255, 106, 0);
+        }
+QComboBox QListView{
+        background: rgb(76, 76, 76);
+        selection-background-color: rgb(255, 106, 0);
+        color: white;
+        }
+QCheckBox{
+        color: white;
+        }
+QCheckBox::indicator {
+        width: 30px;
+        height: 30px;
+        }
+QCheckBox::indicator:checked {
+        image: url(:/checkbox_checked.png);
+        }
+QCheckBox::indicator:unchecked {
+        image: url(:/checkbox_unchecked.png);
+        }
+/* Color of Label Fonts */
 QLabel{
        color: rgb(240, 240, 240);
        }
+QLabel#lbl_next{                                                  /* Label, next Playing (Media-Player) */
+       color: rgba(240, 240, 240, 50%);
+}
+QLabel#lbl_previouse{                                             /* Label, previouse Playing (Media-Player) */
+       color: rgba(240, 240, 240, 50%);
+}
 QMessageBox {
         background-color: rgb(76, 76, 76);
         color: rgb(240, 240, 240);
         }
 QPushButton{
-        background-color: rgb(42, 42, 42);
+        background-color: rgb(76, 76, 76);
         color: rgb(255, 255, 255);
         border-style: solid;
         border-color: black;
@@ -33,24 +85,40 @@ QListWidgetItem{
         background-color: rgb(76, 76, 76);
         color: rgb(240, 240, 240);
         }
-QStatusbar{
+/* not used any longer */
+/*QStatusbar{
         background: rgb(76, 76, 76);
-        }
+        } */
 QTabWidget::pane{
         border: 0;
         }
 QTabBar::tab{
         border: 2;
         border-color: black;
-        width:60px;
+        width:60px;  /* This defines the icon-size in the Tabwidget */
         }
 QTreeView{
         background: rgb(76, 76, 76);
         border: 2;
         border-color: black;
         }
-QTreeView::item:selected{
+QTreeView::item:selected{                                                 /* File-View Media Player, SELECTED Item */
         background-color: rgb(255, 106, 0);
+        color: rgb(240, 240, 240);
+        }
+QTreeView::item, QTreeView QLabel{                                        /* File-View Media Player, UNSELECTED Item */
+        background-color: rgb(76, 76, 76);
+        color: rgb(180, 180, 180);
+        }
+QTreeView::branch {
+        height: 62;
+        width: 65;
+        }
+QTreeView::branch:closed:has-children {
+        image: url(:/expand.png);
+        }
+QTreeView::branch:open:has-children {
+        image: url(:/collapse.png);
         }
 QHeaderView::section{
         background-color: rgb(76, 76, 76);
@@ -136,14 +204,4 @@ QSlider::handle:horizontal:disabled {
         background: gray;
         border: 1px solid #aaa;
         border-radius: 4px;
-        }
-QTreeView::branch {
-        height: 62;
-        width: 65;
-        }
-QTreeView::branch:closed:has-children {
-        image: url(:/expand.png);
-        }
-QTreeView::branch:open:has-children {
-        image: url(:/collapse.png);
         }

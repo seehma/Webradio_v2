@@ -87,12 +87,15 @@ class weather_widget(QWidget, ui):
 
     def update_widget(self):
         weatherDataUpToDate, changes = self.__update_weatherdata()
+        print("Set new name to Hometownlabel of weatherwidget")
+        self.lbl_hometown.setText(self.LOCATION_NAME)
         if weatherDataUpToDate:
             if not changes:
                 #print("No Changes... do not repopulate the icons...")
                 return
             ############################################Current Condition#############################################
-            print("Startpopulating", QTime.currentTime())
+            #print("Startpopulating", QTime.currentTime())
+            #print("Startpopulating", self.weatherdata["current_conditions"])
             self.lbl_cur_icon.setPicturePath(os.path.join(self.WEATHER_ICONS_FOLDER,
                                                        self.weatherdata['current_conditions']['icon']))
             self.lbl_cur_temp.setText(self.weatherdata['current_conditions']['temperature'])
@@ -202,11 +205,16 @@ class weather_widget(QWidget, ui):
         self.update()
 
     def load_LOCATIO_ID_from_global_vars(self):
+        print("Load new Location ID from globalVars")
+        print(global_vars.configuration.get("GENERAL"))
         if global_vars.configuration.get("GENERAL").get("weather_locationid") is not None:  # act only if loc-code is
-            self.LOCATION_ID = global_vars.configuration.get("GENERAL").get("weather_locationid") # not None
+            print("set new location ID")
+            self.LOCATION_ID = global_vars.configuration.get("GENERAL").get("weather_locationid")  # not None
             if global_vars.configuration.get("GENERAL").get("weather_locationname") is not None:
+                print("set new Name...")
                 self.LOCATION_NAME = global_vars.configuration.get("GENERAL").get("weather_locationname")
             else:
+                print("set NO Name, because Name was None.")
                 self.LOCATION_NAME = ""
 
     def get_LocationId_for(self, cityname):

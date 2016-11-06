@@ -16,8 +16,6 @@ class Database_SearchEngine(object):
     def __init__(self, parent=None):
         pass
 
-
-
     def search_for_Phrase(self, service, searchphrase):
         """
         If searchstring as spaces where the filename hasnt, it will return no result
@@ -279,6 +277,8 @@ class LM_QTreeWidget(QTreeWidget):
                 entry1.setData(0, Qt.UserRole, QVariant((filename,)))
                 entry1.setIcon(0, QIcon(":/mp3.png"))
                 self.childFromAlbum["Unknown Artist"] = entry1
+
+        #TODO: Implement Youtube Playlist-Searchresults
         self.emit(SIGNAL("stop_loading"))
 
         print("Population finished.")
@@ -439,23 +439,6 @@ if __name__ == "__main__":
     window.show()
     sys.exit(app.exec_())
 
-#TODO: Erstelle ein Widget (stacked Widget),
-#TODO: - Abmaße müssen in das UI passen
-#TODO: - Suchfeld einfügen
-#TODO: - Anzeige findet im selben Fenster statt indem das Suchfeld ist
-#TODO: - Bei klick in das suchgeld, wird eine virtuelle Tastatur angezeigt
-#TODO: - Der Suchbefehl wird an die Funktion "Databse_SearchEngine.search_for_Phrase" übergeben
-#TODO: - Das Ergebnis wird aufgelöst in ein QTreewidget übergeben und dargestellt
-# - Das Treewidget funktioniert wie auch das Treewidget in der Filebrowserdarstellung
-#TODO: - flickcharm ist integriert
-#TODO: - es gibt einen Button, mit dem man seine aktuelle Auswahl der Playliste hinzufügen kann
-#TODO: - sobald eine neue Suche durchgeführt wird, wird das alte Ergebis natürlich verworfen
-#TODO: - Es werden Signale emittiert, die ausgewertet werden können, wann der Ladevorgang abgeschlossen ist (splash)
-#TODO: - Das widget ist im UI des webradios eingebunden.
-#TODO: - Der Butten "zurück" ist umfunktioniert (nur im Mediaplayerbetrieb) und stellt eine Lupe dar
-#TODO: - sobald dieser angewählt wird öffnet sich die virtuelle Tastatur
-#TODO: - sobald der Suchvorgang gestartet ist erscheint ein "splash" der anzeigt, dass die Suche läuft
-#TODO: - sobald die Suche abgeschlossen ist, wechselt die Anzeige zu den Suchergebnissen
 # - die Suchergebisse sind aufgebaut wie :
 #      +Nirvana
 #          +Nevermind
@@ -477,6 +460,3 @@ if __name__ == "__main__":
 #      Track_unknown2
 #      ....
 # - Die Tracks die hinzugefügt werden sollen können wie gewohnt ausgewählt werden und mittels eines speziellen
-#TODO:   Buttons in die aktuelle Playliste übernommen werden.
-#TODO: - Die Ansicht wechselt NICHT automatisch, sondern der User muss auf "home" oder auf den Playlisteditor klicken
-

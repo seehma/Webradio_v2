@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from PyQt4.QtGui import QGridLayout, QHBoxLayout, QLineEdit, QPushButton, QSizePolicy, QVBoxLayout, QWidget, QFont
+from PyQt4.QtGui import QGridLayout, QHBoxLayout, QLineEdit, QPushButton, QSizePolicy, QVBoxLayout, QWidget, QFont, \
+    QSpacerItem
 from PyQt4.QtCore import QSize, SIGNAL, QString, Qt, QTimer
 
 font = QFont()          #font for LineEdit ...
@@ -136,7 +137,14 @@ class VirtualKeyboard(QWidget):
 
         self.globalLayout.addWidget(self.inputLine)
         self.globalLayout.addLayout(self.keysLayout)
-        self.globalLayout.addWidget(self.spaceButton)
+        # construct a small horizontal layout, to assure that space-bare is in the middle of the keyboard...
+        tmpLayout = QHBoxLayout()
+        space = QSpacerItem(0,0)
+        tmpLayout.addSpacerItem(space)
+        tmpLayout.addWidget(self.spaceButton)
+        tmpLayout.addSpacerItem(space)
+        self.globalLayout.addLayout(tmpLayout)
+        # self.globalLayout.addWidget(self.spaceButton)   # replaced with layout (tmpLayout)
 
         self.globalLayout.addLayout(self.buttonLayout)
         self.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))

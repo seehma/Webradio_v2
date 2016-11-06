@@ -42,5 +42,7 @@
 <file alias="clock.png">fallback/clock.png</file>
 <file alias="config.png">fallback/config.png</file>
 <file alias="carbon.jpg">fallback/carbon.jpg</file>
+<file alias="checkbox_unchecked.png">fallback/checkbox_unchecked.png</file>
+<file alias="checkbox_checked.png">fallback/checkbox_checked.png</file>
 </qresource>
 </RCC>

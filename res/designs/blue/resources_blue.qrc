@@ -42,5 +42,7 @@
 <file alias="clock.png">blue/clock.png</file>
 <file alias="config.png">blue/config.png</file>
 <file alias="blech.jpg">blue/blech.jpg</file>
+<file alias="checkbox_unchecked.png">blue/checkbox_unchecked.png</file>
+<file alias="checkbox_checked.png">blue/checkbox_checked.png</file>
 </qresource>
 </RCC>

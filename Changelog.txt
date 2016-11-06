@@ -1,12 +1,25 @@
+0.2.7   06.11.2016  Feature-Update:
+               *Speichert Variablen wie "Sprache", "Theme", "Geo-Location-Code", "Geo-Name", "Screensaver an/aus" in
+                den systemweiten Variablen des Betriebssystems. Diese müssen nun nicht mehr in der Config-Datei
+                angegeben werden. Wenn diese dennoch angegeben sind, werden die Einstellungen in der Config-Datei
+                anstelle derer des Systems genutzt. (Force, erzwingen)
+               *Variablen, welche aus anderen Dateien oder Angaben abgeleitet werden können, werden ausgelesen:
+                Music-Folder >> Auslesen aus mpd.conf bzw. der Konfigurationsdatei von MPD
+                Screen-Resolution >> Auslesen aus Displaygröße des Betriebssystems.
+               *Es gibt nun nur noch ein zentrales File, in dem Einstellungen bearbeitet werden müssen.(webradio.conf)
+               *Der Settingstab wurde nun visuell fertiggestellt, Themes wurden angepasst und überarbeitet
+               *Such-Dialog für "Heimatort" wurde fertiggestellt
+               *Kleiner Layout-Aufhübschungen
+
 0.2.6   23.10.2016   Bugfix:
-                Behebung des Fehlers:
+               *Behebung des Fehlers:
                 "if "http://192.168." not in self.player.get_current_playing_filename():
                 TypeError: argument of type 'NoneType' is not iterable"
                 beim Start in den Media-Player-Modus, verursacht, wenn mpd noch keinen gültigen Titel abspielt, jedoch
                 nach einen String (http://192.168) auf einen None-Type geprüft wird.
 
 0.2.5   21.10.2016   Feature-Update:
-                UPnP Support implementiert (über MPD-Addon "upmpdcli")
+               *UPnP Support implementiert (über MPD-Addon "upmpdcli")
                 Siehe Installationsanleitung im Wiki
 
 

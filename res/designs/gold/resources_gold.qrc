@@ -42,5 +42,7 @@
 <file alias="clock.png">gold/clock.png</file>
 <file alias="config.png">gold/config.png</file>
 <file alias="lochblech.jpg">gold/lochblech.jpg</file>
+<file alias="checkbox_unchecked.png">gold/checkbox_unchecked.png</file>
+<file alias="checkbox_checked.png">gold/checkbox_checked.png</file>
 </qresource>
 </RCC>

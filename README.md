@@ -37,7 +37,7 @@ __**Zusatzfunktionen welche z.Z. in Arbeit sind von V1 zu V2:**__
     In der Version2 war es daher angedacht, die Benutzerspezifischen Einstellungen an einer Zentralen Stelle editieren
     zu können. Im ersten Schritt erfolgt die Konfiguration nun über die Datei "webradio.conf", allerdings ist geplant
     hierzu noch ein GUI-basiertes Hilfsprogramm zu erstellen.</td>
-    <td>Konfiguration über webradio.conf funktioniert!</td>
+    <td>Konfiguration über webradio.conf</td>
   </tr>
   <tr>
     <td>Menü für den Standby-Button</td>
@@ -64,13 +64,14 @@ __**Zusatzfunktionen welche z.Z. in Arbeit sind von V1 zu V2:**__
     Programm vorher schließen und neu starten zu müssen. Daher wird ein Einstellungs-Tab erstellt, welcher div. Funktionen
     abbilden kann. Unter anderem ist geplant verschiedenen "Themes" wählen zu können, die Sprache verändern zu können
     aber auch die Position für die Wetteranzeige abändern zu können.</td>
-    <td>In Bearbeitung, Themes funktionieren schon mal...</td>
+    <td>Einstellungen wie "Design-Theme", "Sprache", "Bildschirmschoner", "Heimatstadt" können im laufenden Betrieb
+    geändert werden!</td>
   </tr>
   <tr>
     <td>Wetter-Location</td>
     <td>Die Wetter-Location, also der Code der ausdrückt wo man gerade lebt musste über eine dritte Webseite herausgefunden
     werden und manuell eingetragen werden. Diese soll nun aus dem Programm heraus gesucht und verändert werden können.</td>
-    <td>Funktion implementiert jedoch im Layout noch nicht umgesetzt, daher noch nicht nutzbar.</td>
+    <td>Heimatstadt kann nun direkt über das GUI gesucht und eingestellt werden!</td>
   </tr>
   <tr>
     <td>Mehrsprachigkeit</td>

@@ -827,11 +827,7 @@ def get_loc_id_from_weather_com(search_string):
 
     """
     # Weather.com stores place names as ascii-only, so convert if possible
-    try:
-        # search_string = unidecode(search_string.encode('utf-8'))
-        search_string = unidecode(search_string)
-    except NameError:
-        pass
+    search_string = search_string.encode('utf-8')  # encode utf-8 for transfer in url...
     
     url = LOCID_SEARCH_URL % quote(search_string)
     try:

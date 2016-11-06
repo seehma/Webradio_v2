@@ -98,46 +98,6 @@ def read_conf(filepath, extention=".ini"):
         logger.error(_("Configuration {0} can not be read! Error: {1}").format(filepath, e))
         raise IOError
 
-def write_conf():
-    '''
-    Write the current configuration of global_vars.configuration to a filepath
-
-    :return: True / False
-    '''
-    filepath = os.path.join(cwd, "webradio.conf")
-    if not os.path.exists(filepath):
-        logger.warning(_('Configuration-File "{0}" does not exist, I am creating it').format(filepath))
-        with open(filepath, 'a'):
-            os.utime(filepath, None)  # create that file if it does not exist
-    else:
-        basename = os.path.basename(filepath)
-
-    logger.info(_('Wrinting Configuration-File "{0}"').format(basename))
-    if not os.path.isfile(filepath):
-        logger.error(_('Configuration "{0}" does not exist or can not be accessed.').format(basename))
-        raise IOError
-
-    try:
-        config = ConfigParser.RawConfigParser(allow_no_value=False)
-        config.read(filepath)
-        for sections in global_vars.configuration:
-            section = sections
-            options = global_vars.configuration.get(sections)
-            #print options
-            for option in options:
-                #print option
-                value = options.get(option)
-                #print value
-                config.set(section, option, value)
-        # Writing our configuration file
-        logger.info("Writing to user webradio.conf")
-        with open(filepath, 'wb') as configfile:
-            config.write(configfile)
-    except:
-        e = sys.exc_info()[0]
-        logger.error(_("Configuration {0} can not be written! Error: {1}").format(filepath, e))
-        raise IOError
-
 def setupLogger(console=True, File=False, Variable=False, Filebackupcount=0):
     '''
     Setup a logger for the application
@@ -211,8 +171,7 @@ if args.disable_gpio:
 if os.path.isfile(os.path.join(cwd, "webradio.conf")):
     global_vars.configuration = read_conf(os.path.join(cwd, "webradio.conf"), ".conf")
 else:
-    global_vars.configuration = read_conf(os.path.join(cwd, "webradio_fallback.conf"), ".conf")
-    shutil.copyfile(os.path.join(cwd, "webradio_fallback.conf"), os.path.join(cwd, "webradio.conf"))
+    raise ImportError("No Configuration-File found! Check webradio.conf")
 
 
 ###################### IMPORTS #######################################################
@@ -229,49 +188,10 @@ import lib.mpd_conf_parser as mpd_conf
 from lib.usb_manager import USB_manager
 from lib.mpd_filesystemView import LM_QFileSystemModel
 from lib.system_test import test_onlineServices as systemtest
-# loading the defined design from the global vars and import the resource-file load fallback if there is nothing
-# specified...
-if global_vars.configuration.get("GENERAL").get("design") is not None:
-    logger.info("Loadinging Design: {0}".format(global_vars.configuration.get("GENERAL").get("design")))
-    if os.path.isfile(os.path.join(cwd, "res", "designs", global_vars.configuration.get("GENERAL").get("design"),
-                                   "res.py")):
-        try:
-            #__import__("res.designs.{0}.res".format(global_vars.configuration.get("GENERAL").get("design")))
-            res = importlib.import_module(".res",
-                    package="res.designs.{0}".format(global_vars.configuration.get("GENERAL").get("design")))
-        except ImportError:
-            logger.error("Error: Design can not be loaded!, Loading Fallback!")
-            try:
-                res = importlib.import_module(".res",
-                    package="res.designs.fallback")
-            except ImportError:
-                logger.error("Fallback can not be loaded! Aborting.")
-                raise ImportError
-            else:
-                # assure that right stylesheet is loaded if the user-design has failed to load...
-                global_vars.configuration.get("GENERAL").update({"design": "fallback"})
-    else:
-        logger.error("Specified Design does not exist on this machine! Loading fallback")
-        try:
-            res = importlib.import_module(".res",
-                    package="res.designs.fallback")
-        except ImportError:
-            logger.error("Fallback can not be loaded! Aborting.")
-            raise ImportError
-        else:
-            # assure that right stylesheet is loaded if the user-design has failed to load...
-            global_vars.configuration.get("GENERAL").update({"design": "fallback"})
-else:
-    logger.info("No Design-Specification found in current config-file, Loading Fallback.")
-    try:
-        res = importlib.import_module(".res",
-                package="res.designs.fallback")
-    except ImportError:
-        logger.error("Fallback can not be loaded! Aborting.")
-        raise ImportError
-    else:
-        # assure that right stylesheet is loaded if the user-design has failed to load...
-        global_vars.configuration.get("GENERAL").update({"design": "fallback"})
+# import the resource-file load fallback if there is nothing specified... (initially, for correct Splash-Screen...)
+res = importlib.import_module(".res", package="res.designs.{0}".format(
+QSettings("Laumer", "RapiRadio").value("design_str", "fallback").toString()    # default = Fallback
+))
 
 from lib.lastFM_AlbumArtGrabber import LastFMDownloader
 from lib.gpio_simulator import GPIO_Simulator
@@ -296,10 +216,12 @@ try:  # try to load the GPIO Watchdog. If not executed at a raspberry pi or no R
 except ImportError:  # load the GPIO simulator instead. The signals are the same than from the GPIO watchdog .....
     logger.warning("GPIO Watchdog was not found or can not run at this machine")
     GPIO_active = False
-    MusicFolder = global_vars.configuration.get("DEVELOPMENT").get("musicfolder")
+    #MusicFolder = global_vars.configuration.get("DEVELOPMENT").get("musicfolder")
+    MusicFolder = mpd_conf.getVariableFrom_MPD_Conf("music_directory")
+    logger.info("Using MPD Music-Folder: {0}".format(MusicFolder))
     VARIABLE_DATABASE = global_vars.configuration.get("DEVELOPMENT").get("variable_database_name")
 
-__version__ = "0.2.6"
+__version__ = "0.2.7"
 
 BasenameFavoritesPlaylist = "favorites"
 LogoFolder = os.path.join(cwd, "Logos")
@@ -324,6 +246,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #self.startup_actions()
         self.language_txt=""
         self.language_translator=None
+        self.mode = ""
         logger.info("Init sucessfull.")
 
     def changeLanguage_to(self, newid):
@@ -341,15 +264,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if self.language_txt == lang:  # do nothing if language is already set...
             return
         mytranslator = QTranslator()
-        print("LANG =",lang)
+        #print("LANG =",lang)
         if mytranslator.load("local_{0}".format(lang), os.path.join(cwd, "locale")):
             self.setTranslation(mytranslator, str(lang))
             global_vars.configuration.get("GENERAL").update({"language": str(lang)})
-            write_conf()
+            self.writeSettings()   # Language-Setting is stored in Systemsettings.
         elif lang == "en":
             self.setTranslation(mytranslator, str(lang))  # set an empty translator as second one
             global_vars.configuration.get("GENERAL").update({"language": str(lang)})
-            write_conf()
+            self.writeSettings()  # Language-Setting is stored in Systemsettings.
         else:
             logger.error("Language-Change failed because Translation can not be loaded.")
 
@@ -392,8 +315,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.pB_nach_Sprache.setText(self.tr("Station by \"Language\""))
         self.label_3.setText(self.tr("Design-Template:"))
         self.label_4.setText(self.tr("Language:"))
+        self.label_5.setText(self.tr("Screensaver during Standby:"))
+        self.label_6.setText(self.tr("Hometown:"))
+        self.pB_change_hometown.setText(self.tr("Change..."))
+        self.checkBox_screensaver.setText(self.tr("Show Screensaver"))
 
         self.weatherWidget.retranslateUi(self)
+        self.weatherWidget.lastUpdate = None
+        self.weatherWidget.update_widget()
 
         self.virtualKeyboard.backButton.setText(self.tr('Delete'))
         self.virtualKeyboard.cancelButton.setText(self.tr("Abort"))
@@ -402,6 +331,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.virtualKeyboard2.backButton.setText(self.tr('Delete'))
         self.virtualKeyboard2.cancelButton.setText(self.tr("Abort"))
         self.virtualKeyboard2.spaceButton.setText(self.tr("Space"))
+
+        self.virtualKeyboard3.backButton.setText(self.tr('Delete'))
+        self.virtualKeyboard3.cancelButton.setText(self.tr("Abort"))
+        self.virtualKeyboard3.spaceButton.setText(self.tr("Space"))
 
     def _readPossibleTranslations(self):
         '''
@@ -456,9 +389,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             #print("VirtKeyboard",QTime.currentTime())
             self.virtualKeyboard = VirtualKeyboard()
             self.virtualKeyboard2 = VirtualKeyboard()
+            self.virtualKeyboard3 = VirtualKeyboard()
             #print("Done",QTime.currentTime())
             self.stackedWidget.addWidget(self.virtualKeyboard)
             self.stackedWidget_2.addWidget(self.virtualKeyboard2)  #index 4
+            self.stackedWidget_3.addWidget(self.virtualKeyboard3)  #index 2
             #self.weatherWidget = weather_widget(self.tab)
             self.weatherWidget = weather_widget(cwd, parent=self)
             layout_temp = QVBoxLayout(self.tab)
@@ -520,9 +455,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.charm.activateOn(self.lW_kategorievorschlaege)
             self.lW_stationen_nach_cat.setFont(font)  #schriftgroesse 26 (font)
             self.charm.activateOn(self.lW_stationen_nach_cat)
+            self.lW_hometown_searchresults.setFont(font)  # schriftgroesse 26 (font)
+            self.charm.activateOn(self.lW_hometown_searchresults)
             self.listWidget.setFont(font)
             self.listWidget.setIconSize(QSize(35,35))
             self.charm.activateOn(self.listWidget)
+
+            #TODO: Transfer this to the stylesheets (Themes...)
+            self.checkBox_screensaver.setStyleSheet("QCheckBox::indicator {width: 30px; height: 30px;}")
 
             self.lbl_albumArt.setScaledContents(True)
 
@@ -675,10 +615,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             self.pB_add_to_playlist_2.setText("")
             self.pB_add_to_playlist_2.setIcon(QIcon(":/add.png"))
-            self.pB_add_to_playlist_2.setIconSize(self.pB_add_to_playlist.sizeHint()*1.7)
+            self.pB_add_to_playlist_2.setIconSize(self.pB_add_to_playlist_2.sizeHint()*1.7)
             self.pB_add_to_playlist_2.setFocusPolicy(Qt.NoFocus)
-            ##########
-            ##########
+
             self.pB_move_down_2.setText("")
             self.pB_move_down_2.setIcon(QIcon(":/up.png"))
             self.pB_move_down_2.setIconSize(self.pB_move_down_2.sizeHint()*2)
@@ -703,6 +642,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             #self.treeView.setIconSize(QSize(64,64))
             self.charm.activateOn(self.treeView)
             self.charm.activateOn(self.treeWidget_2)
+
+            self.checkBox_screensaver.setFocusPolicy(Qt.NoFocus)
+            self.pB_change_hometown.setFocusPolicy(Qt.NoFocus)
 
             #populating cB for Design-Changes with possibilities and set the current Index
             content = os.listdir(os.path.join(cwd, "res", "designs"))
@@ -823,6 +765,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             ##################################################################################### Settings
             self.cB_design.currentIndexChanged.connect(self.setNewDesign)  # overloaded with new index.
             self.cB_language.currentIndexChanged.connect(self.changeLanguage_to)  # overloaded with new index.
+            self.connect(self.virtualKeyboard3, SIGNAL("sigInputString"), self.onChangeHometown)
+            self.lW_hometown_searchresults.itemPressed.connect(self.onHometownSelected)
+            self.pB_change_hometown.clicked.connect(self.onSearchHometown)
+            self.checkBox_screensaver.stateChanged.connect(self.onScreensaverChange)
 
         def __initial_variable_setup(self):
             self.currentIndex = self.stackedWidget.currentIndex()
@@ -869,9 +815,83 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 logger.warning("No stored Presets found.")
                 self.gpio_presets = {}
 
-        def __readSettings(self):
+        def __readSystemVars(self):
+            '''
+            Load additional Variables from the system-vars, and add to global-conf.
+            '''
             logger.info('Reading Settings')
             settings = QSettings("Laumer", "RapiRadio")
+            print("DEBUG_ SYS", global_vars.configuration.get("GENERAL"))
+            #Add "screensaver" (bool)
+            if global_vars.configuration.get("GENERAL").get("screensaver") is None:  # if this is not forced due to conf
+                screensaver = settings.value("screensaver_bool", QVariant("1")).toInt()[0]  # default is "screensaver on" == 1
+                global_vars.configuration.get("GENERAL").update({"screensaver": screensaver})
+            else:
+                logger.info("Force Screensaver: {0}".format(global_vars.configuration.get("GENERAL").get("screensaver")))
+            #Add "Theme" (String)
+            if global_vars.configuration.get("GENERAL").get("design") is None:
+                was_in_systemvar = True
+                design = settings.value("design_str", "fallback").toString()    # default = Fallback
+                global_vars.configuration.get("GENERAL").update({"design": str(design.toUtf8()).decode("utf-8")})
+            else:
+                design = global_vars.configuration.get("GENERAL").get("design")
+                logger.info("Force Design: {0}".format(global_vars.configuration.get("GENERAL").get("design")))
+                was_in_systemvar = False
+            if not was_in_systemvar:
+                logger.info("Loadinging Design: {0}".format(global_vars.configuration.get("GENERAL").get("design")))
+                if os.path.isfile(os.path.join(cwd, "res", "designs", global_vars.configuration.get("GENERAL").get("design"),
+                                                       "res.py")):
+                    try:
+                        global res  #we my need to change the resources file...
+                        res.qCleanupResources()  # the current resources are loaded under the name "res"
+                        res = importlib.import_module(".res",
+                                package="res.designs.{0}".format(global_vars.configuration.get("GENERAL").get("design")))
+                        pass
+                    except ImportError:
+                        logger.error("Error: Design can not be loaded!, Loading Fallback!")
+                        global_vars.configuration.get("GENERAL").update({"design": "fallback"})
+
+
+
+            #global_vars.configuration.get("GENERAL").update({"language": str(lang)})
+            #global_vars.configuration.get("GENERAL").update({"design": "fallback"})
+
+            #Add Weather_LocationID (String)
+            #Add Weather_LocationName (String)
+            if global_vars.configuration.get("GENERAL").get("weather_locationid") is None:
+                home_code = settings.value("weather_locationid", "GMXX0007").toString()  # default = Berlin (GMXX0007)
+                global_vars.configuration.get("GENERAL").update({"weather_locationid": str(home_code).decode("utf-8")})
+            else:
+                logger.info("Force weather_locationid: {0}".format(
+                    global_vars.configuration.get("GENERAL").get("weather_locationid")))
+            if global_vars.configuration.get("GENERAL").get("weather_locationname") is None:
+                home_name = settings.value("weather_locationname", "Berlin").toString()  # default = Berlin
+                global_vars.configuration.get("GENERAL").update({"weather_locationname": str(home_name.toUtf8()).decode("utf-8")})
+            else:
+                logger.info("Force weather_locationname: {0}".format(
+                    global_vars.configuration.get("GENERAL").get("weather_locationname")))
+
+        def __readSettings(self):
+            '''
+            Ready application Settings which are stored in the System.
+            Restarts Webradio like it was closed last time.
+            '''
+
+            logger.info('Reading Settings')
+            settings = QSettings("Laumer", "RapiRadio")
+
+            #Add "Language" (String)
+            if global_vars.configuration.get("GENERAL").get("language") is None:
+                user_lang = settings.value("user_lang", unicode(QLocale.system().name())).toString()  # default = system
+                #print("DEBUG: user_lang read:", user_lang)
+                user_lang = str(user_lang) if "_" not in str(user_lang) else str(user_lang).split("_")[0].lower()
+                global_vars.configuration.get("GENERAL").update({"language": user_lang})
+                #print("DEBUG: user_lang:", user_lang, self.language_txt)
+                if self.language_txt != user_lang:  # if not set anyway?
+                    mytranslator = QTranslator()
+                    mytranslator.load("local_{0}".format(user_lang), os.path.join(cwd, "locale"))
+                    self.setTranslation(mytranslator, user_lang)
+                    #print("DEBUG: user_lang: Set new Lang:", user_lang)
 
             selectedLastTab = settings.value("tab", "0")
             selectedLastTab = selectedLastTab.toInt()[0]
@@ -897,6 +917,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if presetting:
             __define_widgets_presettings(self)
         else:
+            __readSystemVars(self)
             __initial_variable_setup(self)
             __define_additional_widgets(self)
             __define_widgets_presettings(self)
@@ -937,16 +958,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         Write Setting of that application. This is called during close-event
         """
         logger.info('Writing Settings')
+        #print("DEBUG", global_vars.configuration.get("GENERAL"))
         settings = QSettings("Laumer", "RapiRadio")
-        if self.myCurrentStation is not None:
-            settings.setValue("last", self.myCurrentStation.id)   # save last played station
-        if self.mode == "radio":
-            tabvalue = 0
-        elif self.mode == "media":
-            tabvalue = 1
-        else:
-            tabvalue = 0
-        settings.setValue("tab", tabvalue)                        # save last tab which was selected
+        settings.setValue("screensaver_bool", QVariant(global_vars.configuration.get("GENERAL").get("screensaver")).toInt()[0])
+        settings.setValue("design_str", global_vars.configuration.get("GENERAL").get("design"))
+        settings.setValue("user_lang", global_vars.configuration.get("GENERAL").get("language"))
+        settings.setValue("weather_locationid", global_vars.configuration.get("GENERAL").get("weather_locationid"))
+        settings.setValue("weather_locationname", global_vars.configuration.get("GENERAL").get("weather_locationname"))
+        if self.myCurrentStation is not None: settings.setValue("last", self.myCurrentStation.id)  # save last played
+        settings.setValue("tab", 1 if self.mode == "media" else 0)             # save last tab which was selected
 
     def saveFavorites(self):
         """
@@ -1282,7 +1302,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.pB_move_down.setIcon(QIcon(":/down.png"))
 
             #if everything was OK, update Value in current conf accordingly.
-            write_conf()
+            self.writeSettings()  # design settings are stored in Systemsettings.
 
     def switchModeTo(self, from_mode, to_mode):
         """
@@ -1521,6 +1541,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return
         elif newIndex == 4:
             #settings
+            self.stackedWidget_3.setCurrentIndex(0)
+            # update Settings
+            self.label_hometown.setText(self.weatherWidget.LOCATION_NAME)
+            self.checkBox_screensaver.setChecked(global_vars.configuration.get("GENERAL").get("screensaver"))
             if self.pBHome.isVisible():
                 self.pBHome.setVisible(False)
                 self.pBSuchen.setVisible(False)
@@ -2365,8 +2389,69 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         elif dialog.exitStatus == self.tr("Abort!"):
             self.widget_sleep_timer.stop(silent=False)
 
+    @pyqtSlot()  # Connected to                                         SIGNAL("sigInputString"), self.onChangeHometown)
+    def onChangeHometown(self, qString):
 
-    ##################################################  GPIO Handling ##################################################
+        if qString == "":  # if cancel was clicked ...
+            self.stackedWidget_3.setCurrentIndex(0)  # return to page 0
+            return
+        app.processEvents()
+        if self.lW_hometown_searchresults.count() != 0:
+            self.lW_hometown_searchresults.clear()
+
+        self.emit(SIGNAL("start_loading"))
+        thread = WorkerThread(self.weatherWidget.get_LocationId_for, unicode(qString))  # Request API using string
+        thread.start()
+        while not thread.isFinished():
+            app.processEvents()
+        searchresult = thread.result()
+
+        if len(searchresult) > 1:   # one is always included (count...)
+            for dicts in searchresult:  # populate Index6 with Items
+                #print("DEBUG:", dicts, searchresult[dicts])
+                if dicts == "count":
+                    continue
+                app.processEvents()
+                newItem = QListWidgetItem(self.lW_hometown_searchresults)
+                newItem.setText(searchresult[dicts][1])  #name
+                newItem.setData(Qt.UserRole, searchresult[dicts][0])  # gmx code
+            self.lW_hometown_searchresults.sortItems(Qt.AscendingOrder)
+            self.emit(SIGNAL("stop_loading"))
+            self.stackedWidget_3.setCurrentIndex(1)
+        else:
+            self.emit(SIGNAL("stop_loading"))
+            app.processEvents()
+            logger.info("No Matches for Hometown: {0}".format(unicode(qString).encode("utf-8")))
+            self.askQuestion(self.tr("'%1' did not give any searchresults").arg(unicode(qString)),
+                             self.tr("Try another"),
+                             self.tr("Try another search keyword"))
+        return True
+
+    @pyqtSlot(QObject)  # Connected to                                     itemPressed.connect(self.onHometownSelected)
+    def onHometownSelected(self, _QListWidgetItem):
+        print("You selected an Item")
+        home_code = _QListWidgetItem.data(Qt.UserRole)
+        home_code = home_code.toString()
+        home_name = _QListWidgetItem.text().split(",")[0]
+        global_vars.configuration.get("GENERAL").update({"weather_locationid" : str(home_code.toUtf8()).decode("utf-8")})
+        global_vars.configuration.get("GENERAL").update({"weather_locationname" : str(home_name.toUtf8()).decode("utf-8")})
+        self.weatherWidget.load_LOCATIO_ID_from_global_vars()
+        self.weatherWidget.lastUpdate = None  # force reload of weather Data
+        self.weatherWidget.update_widget()
+        self.label_hometown.setText(self.weatherWidget.LOCATION_NAME)
+        self.stackedWidget_3.setCurrentIndex(0)
+
+    @pyqtSlot()  # Connected to                                pB_change_hometown.clicked.connect(self.onSearchHometown)
+    def onSearchHometown(self):
+        self.virtualKeyboard3.clearContent()    # clear possible content in virtual keyboard
+        self.stackedWidget_3.setCurrentIndex(2)  # Index2 = Keyboard
+
+    @pyqtSlot(QObject)  # Connected to                                    stateChanged.connect(self.onScreensaverChange)
+    def onScreensaverChange(self, state):
+        if (state == Qt.Checked) != global_vars.configuration.get("GENERAL").get("screensaver"):  # compare
+            global_vars.configuration.get("GENERAL").update({"screensaver": True if state == Qt.Checked else False})
+
+            ##################################################  GPIO Handling ##################################################
 
     @pyqtSlot(str)  # Connected to gpio_watchdog,                                          SIGNAL("gpio_rotary_turned")
     def signalreader_rotary(self, direction):
@@ -3417,10 +3502,7 @@ if __name__ == "__main__":
 
     mytranslator = QTranslator()
     user_lang = global_vars.configuration.get("GENERAL").get("language")
-    if user_lang is None:    # if no lang is defined, system-lang
-        logger.info("Load Systemdefault Language")
-        mytranslator.load("local_{0}".format(language), os.path.join(cwd, "locale"))
-    else:
+    if user_lang is not None:
         logger.info("Load Userspecific Language")
         language = user_lang
         mytranslator.load("local_{0}".format(language), os.path.join(cwd, "locale"))
@@ -3446,7 +3528,9 @@ if __name__ == "__main__":
     mainwindow = MainWindow(QSize(int(width), int(height)))
 
     mainwindow.startup_actions()
-    mainwindow.setTranslation(mytranslator, str(language))
+    if user_lang is not None:
+        mainwindow.setTranslation(mytranslator, str(language))  # Force this language if user initially specified one
+
     mainwindow.show()
     splash.finish(mainwindow)
     if args.fullscreen:
