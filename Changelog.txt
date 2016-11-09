@@ -1,3 +1,7 @@
+0.2.8   xx.xx.xxx   Feature-Update:
+               *Die Suchergebnisse im Mediaplayer, zeigen nun die in einem Ordner enthaltenen Titel in Zahlen an
+                so kann man auf den ersten Blick sehen, wie viele MP3s in einem Ordner sind
+
 0.2.7   06.11.2016  Feature-Update:
                *Speichert Variablen wie "Sprache", "Theme", "Geo-Location-Code", "Geo-Name", "Screensaver an/aus" in
                 den systemweiten Variablen des Betriebssystems. Diese müssen nun nicht mehr in der Config-Datei

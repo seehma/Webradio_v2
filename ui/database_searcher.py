@@ -188,6 +188,9 @@ class LM_QTreeWidget(QTreeWidget):
         self.clicked.connect(self.checkSelection_clicked)
         self.expanded.connect(self.checkSelection_expanded)
         self.collapsed.connect(self.checkSelection_collapsed)
+        self.setColumnCount(2)
+        self.setHeaderHidden(True)
+        self.setItemsExpandable(True)
 
         #self.setSortingEnabled(True)
         #self.sortByColumn(0, Qt.AscendingOrder)
@@ -199,10 +202,9 @@ class LM_QTreeWidget(QTreeWidget):
         self.parentFromAlbum = {}
         self.childFromAlbum = {}
         self.parentFromTitle = {}
+        self.counts = {}
 
-        self.setColumnCount(1)
         self.setHeaderLabels(["Artist/Album/Title"])
-        self.setItemsExpandable(True)
         #print("Check Service")
         if self.service is None:
             #print("Service is none")
@@ -214,7 +216,8 @@ class LM_QTreeWidget(QTreeWidget):
         #data = self.searchEngine.search_for_Phrase(searchphrase)
 
         self.thread = None
-        self.thread = WorkerThread(self.searchEngine.search_for_Phrase,self.service, searchphrase.toLocal8Bit())  # Request API using string
+        self.thread = WorkerThread(self.searchEngine.search_for_Phrase,
+                                   self.service, searchphrase.toLocal8Bit())  # Request API using string
         self.thread.start()
         while not self.thread.isFinished():
             QApplication.processEvents()
@@ -236,6 +239,11 @@ class LM_QTreeWidget(QTreeWidget):
             entry1.setIcon(0, QIcon(":/folder.png"))
             self.parentFromTitle[album.values()[0]] = entry1
             self.childFromArtist[album.keys()[0]] = entry1
+            tmp_count = self.counts.get(parentOfAlbum)
+            if tmp_count is None:
+                self.counts[parentOfAlbum] = 1
+            else:
+                self.counts[parentOfAlbum] += 1
 
         #create titles (childs of Albums)
         for title in data['titles']:
@@ -251,7 +259,12 @@ class LM_QTreeWidget(QTreeWidget):
                     self.parentFromAlbum["Unknown Artist"] = entry0
                     parentOfTitel = entry0
 
-            #print(parentOfTitel)
+            tmp_count = self.counts.get(parentOfTitel)
+            if tmp_count is None:
+                self.counts[parentOfTitel] = 1
+            else:
+                self.counts[parentOfTitel] += 1
+
             entry2 = QTreeWidgetItem(parentOfTitel, [title["title"].decode('utf-8')])
             entry2.setIcon(0, QIcon(":/mp3.png"))
             entry2.setData(0, Qt.UserRole, QVariant((title,)))
@@ -277,6 +290,17 @@ class LM_QTreeWidget(QTreeWidget):
                 entry1.setData(0, Qt.UserRole, QVariant((filename,)))
                 entry1.setIcon(0, QIcon(":/mp3.png"))
                 self.childFromAlbum["Unknown Artist"] = entry1
+                tmp_count = self.counts.get(parentOfFilename)
+                if tmp_count is None:
+                    self.counts[parentOfFilename] = 1
+                else:
+                    self.counts[parentOfFilename] += 1
+
+        # Add a count- Value beside of each searchresult.
+        for key, val in self.counts.iteritems():
+            print(key.text(0), val)
+            key.setText(1, "[" + str(val) + "]")
+        self.resizeColumnToContents(0)
 
         #TODO: Implement Youtube Playlist-Searchresults
         self.emit(SIGNAL("stop_loading"))
@@ -335,6 +359,7 @@ class LM_QTreeWidget(QTreeWidget):
             self.markAllChildrenFrom(args[0])
         else:
             self.unmark(args[0])
+        self.resizeColumnToContents(0)
 
     def checkSelection_clicked(self, *args):
 
@@ -393,6 +418,7 @@ class LM_QTreeWidget(QTreeWidget):
 
     def checkSelection_collapsed(self, *args):
         self.clearSelection()
+        self.resizeColumnToContents(0)
 
     def get_current_selection(self):
 

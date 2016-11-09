@@ -221,7 +221,7 @@ except ImportError:  # load the GPIO simulator instead. The signals are the same
     logger.info("Using MPD Music-Folder: {0}".format(MusicFolder))
     VARIABLE_DATABASE = global_vars.configuration.get("DEVELOPMENT").get("variable_database_name")
 
-__version__ = "0.2.7"
+__version__ = "0.2.8"
 
 BasenameFavoritesPlaylist = "favorites"
 LogoFolder = os.path.join(cwd, "Logos")
