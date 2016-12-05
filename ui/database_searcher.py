@@ -7,9 +7,283 @@ import copy
 import sys
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+import datetime
+import time
+import re
+import commands
+
+from lib.googleapiclient.discovery import build
 #import resources_database_search
 
 #pp = pprint.PrettyPrinter(indent=4)
+import pprint
+pp = pprint.PrettyPrinter(indent=4)
+# Set DEVELOPER_KEY to the API key value from the APIs & auth > Registered apps
+# Please ensure that you have enabled the YouTube Data API for your project.
+DEVELOPER_KEY = "AIzaSyDs9UiXmNXM_kWtWZWCJTtbYAJ90WQmChE"
+YOUTUBE_API_SERVICE_NAME = "youtube"
+YOUTUBE_API_VERSION = "v3"
+youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
+                developerKey=DEVELOPER_KEY)
+
+def iso_Date_to_seconds_int(timestring):
+    '''
+    This function converts an ISO8601 Sting to seconds (in int):
+    P is the duration designator (for period) placed at the start of the duration representation.
+    Y is the year designator that follows the value for the number of years.
+    M is the month designator that follows the value for the number of months.
+    W is the week designator that follows the value for the number of weeks.
+    D is the day designator that follows the value for the number of days.
+    T is the time designator that precedes the time components of the representation.
+    H is the hour designator that follows the value for the number of hours.
+    M is the minute designator that follows the value for the number of minutes.
+    S is the second designator that follows the value for the number of seconds.
+    Args:
+        timestring:'PT3M38S'
+
+    Returns: seconds in int, or -1 (Fail)
+    '''
+    if not timestring.startswith("P"):
+        print("Timestring is not ISO8601 formated.")
+        return -1
+
+    match = re.search('^P.*T(?P<hours>[0-9]+)?H?(?P<minutes>[0-9]+)M?(?P<seconds>[0-9]+)S', timestring)
+    if match:
+        hours = int(match.groups(0)[0]) * 3600   # hours
+        minutes = int(match.groups(0)[1]) * 60   # minutes
+        seconds = int(match.groups(0)[2])
+        return hours + minutes + seconds
+    else:
+        return -1
+
+class Searchresult_Youtube(object):
+
+    def __init__(self, parent=None):
+        self.playlists= {}    # holds the playlists which are the searchresult, initially empty
+        self.countPlaylists=0
+        #self.playlists = self.__load_playlists(searchphrase, max_results)
+
+    def load_playlists(self, query, max_results):
+
+        # Call the search.list method to retrieve results matching the specified
+        # query term.
+
+        # max_results = the amount of downloaded playlist-infos
+
+        search_response = youtube.search().list(
+                          q=query,
+                          type="playlist",   # video , channel ....
+                          part="id,snippet",
+                          maxResults=max_results
+                          ).execute()
+        items = []
+        for search_result in search_response.get("items", []):
+
+            if search_result["id"]["kind"] == "youtube#playlist":
+                #pp.pprint(search_result)
+                entry = {"id": search_result["id"]["playlistId"],
+                         "size": None,
+                         "title": search_result["snippet"]["title"],
+                         "thumb": search_result["snippet"].get("thumbnails", {"default": {}, "high": {}})}
+                # the "size" of a playlist is only included in a playlist itself...
+                count = youtube.playlists().list(
+                    part="snippet,contentDetails",
+                    id=entry.get("id")
+                     ).execute()["items"][0]["contentDetails"]["itemCount"]
+                entry.update({"size": count})
+                if count < 30:  # Load Playlists only with a maximum of 30 Tracks
+                    if len(items) < 10:  # and so this for maximum 10 Playlists...
+                        items.append(entry)
+                    else:
+                        break  # forget about the rest.
+
+        results = {}
+        ident = 0
+
+        for item in items:
+            link = item.get("id")                          #u'id': u'PLt3WBh3heAPuTrBkz0_-9c5kNXTds9wU3',
+            size = item.get("size")                        #u'size': 15,
+            title = item.get("title")                      #u'title': u'Top Tracks for Lana Del Rey',
+            thumb = item.get("thumb")                      #u'title': u'Top Tracks for Lana Del Rey',
+            playlist = Playlist(title, link, size, thumb, self)   #construct playlist-classes
+            results.update({ ident : playlist})
+            ident += 1
+
+        self.playlists = results
+        return results
+
+    def playlist(self, ID):
+        return self.playlists.get(int(ID))
+
+    @property
+    def count(self):
+        return len(self.playlists)
+
+    def __str__(self):
+        representation = ""
+        for ident, object in self.playlists.items():
+            representation += "{0}, {1} ({2})\n".format(ident, object.title.encode("utf-8"), object.size)
+        return representation
+
+class Playlist(object):
+
+    def __init__(self, title, link, size, thumb, parent=None):
+        self.title = title
+        self.size = int(size)
+        self.link = link
+        self.__thumb = thumb
+        self.__tracks = None
+        self.__restrictedCount = 0
+
+    def listTracks(self):
+        if self.__tracks is None:
+            self.load_tracks()
+        return self.__tracks
+
+    def track(self, ID):
+        return self.__tracks.get(int(ID))
+
+    @property
+    def count(self):
+        if self.__tracks is None:
+            self.load_tracks()
+        return len(self.__tracks)
+
+    @property
+    def countRestricted(self):
+        if self.__tracks is None:
+            self.load_tracks()
+        return self.__restrictedCount
+
+    @property
+    def thumb_HQ_link(self):
+        return self.__thumb.get("high").get("url")
+
+    @property
+    def thumb_SQ_link(self):
+        return self.__thumb.get("default").get("url")
+
+    def load_tracks(self):
+        """ Return a dict containing Track objects from a YouTube Playlist.
+
+        The returned Pafy objects are initialised using the arguments to
+        get_playlist() in the manner documented for pafy.new()
+
+        """
+        x = (r"-_0-9a-zA-Z",) * 2 + (r'(?:\&|\#.{1,1000})',)
+        regx = re.compile(r'(?:^|[^%s]+)([%s]{18,})(?:%s|$)' % x)
+        m = regx.search(self.link)
+
+        if not m:
+            err = "Unrecognized playlist url: %s"
+            raise ValueError(err % self.link)
+
+        videolist=[]
+
+        playlistitems_list_request = youtube.playlistItems().list(
+            playlistId=self.link,
+            part="snippet",
+            maxResults=50
+        ).execute()
+
+        for track in playlistitems_list_request["items"]:
+            videolist.append(track["snippet"]["resourceId"]["videoId"])
+
+        # playlist items specific metadata
+        tracks = {}
+
+        for i, v in enumerate(videolist):
+            #https://developers.google.com/youtube/v3/docs/videos/list
+            # Call the videos.list method to retrieve location details for each video.
+            video_response = youtube.videos().list(
+                id=v,
+                part='snippet, contentDetails'
+            ).execute()
+            #pp.pprint(video_response)
+
+            #check if video is "restricted" and override it.
+            if video_response["items"][0].get('contentDetails').get("licensedContent"):
+            #    self.__restrictedCount += 1
+                print("Licensed Content!", video_response["items"][0].get('snippet').get("title"))
+            #    continue
+            #else:
+            title = video_response["items"][0].get('snippet').get("title")
+            thumbnail = video_response["items"][0].get('snippet').get("thumbnails")
+            encrypted_id = v
+            duration = iso_Date_to_seconds_int(video_response["items"][0].get('contentDetails').get("duration"))
+
+            trackobject = Track(title, thumbnail, encrypted_id, duration, self)
+            tracks.update({i: trackobject})
+
+        self.__tracks = tracks
+
+    def __str__(self):
+        if self.__tracks is None:
+            self.load_tracks()
+        representation = ""
+        for ident, object in self.__tracks.items():
+            representation += "{0}, {1}\n".format(ident, object.title.encode("utf-8"))
+        return representation
+
+class Track(object):
+
+    def __init__(self, title, thumbnail, encrypted_id, duration, parent=None):
+        self.title = title
+        self.thumbnails = thumbnail
+        self.id = encrypted_id
+        self.__duration = int(duration)
+        self.expiration = None
+        self.__streamlink = ""
+
+    @property
+    def streamLink(self):
+        """
+        :return: https://r4---sn-25g7sm7s.googlevideo.com/videoplayback?id=2515a8c7e8ba6809&itag=140
+                 &source=youtube&requiressl=yes&pl=19&nh=EAI&mm=31&ms=au&mv=m&ratebypass=yes
+                 &mime=audio/mp4&gir=yes&clen=4189911&lmt=1404272630358150
+                 &dur=260.945&upn=2fbpK-GE08M
+                 &signature=821C0B868E9A8AC68406546920651F04DD177CF1.765460B31D90954DFE42568639889C161FEF8B56
+                 &fexp=901816,906388,938682,9407118,9407991,9408142,9408349,9408379,9408595,9408708,9408710,....
+                 &mt=1431881298&sver=3&key=dg_yt0&ip=217.226.204.174&ipbits=0
+                 &expire=1431902956
+                 &sparams=ip,ipbits,expire,id,itag,source,requiressl,pl,nh,mm,ms,mv,ratebypass,mime,gir,clen,lmt,dur
+        """
+        if self.expiration is None or self.__streamlink == "":
+            # initial case
+            #print("Load new streamlink")
+            ret = commands.getoutput("youtube-dl --prefer-insecure -g -f140 -- {0}".format(self.id))
+            expiration = re.search("(?P<exp>&expire=[^\D]+)", ret).group("exp").split("=")[1]
+            self.expiration = datetime.datetime.fromtimestamp(int(expiration))   # a link expires in about 6 hours !!
+        elif self.expiration > datetime.datetime.now():
+            # use already loaded link if it is still valid
+            #print("Re-Use existing Streamlink")
+            ret = self.__streamlink
+        else:
+            # link is expired. Load a new one, set new expiration
+            #print("Link expired, reload")
+            ret = commands.getoutput("youtube-dl --prefer-insecure -g -f140 {0}".format(self.id))
+            expiration = re.search("(?P<exp>&expire=[^\D]+)", ret).group("exp").split("=")[1]
+            self.expiration = datetime.datetime.fromtimestamp(int(expiration))   # a link expires in about 6 hours !!
+
+        self.__streamlink = ret
+
+        return ret
+
+    @property
+    def duration(self):
+        return time.strftime("%M:%S", time.gmtime(self.__duration))
+
+    @property
+    def thumb_HQ_link(self):
+        return self.thumbnails.get("high").get("url")
+
+    @property
+    def thumb_SQ_link(self):
+        return self.thumbnails.get("default").get("url")
+
+    def __str__(self):
+        return '{0}, {1}'.format(self.title, self.duration)
+
 
 class Database_SearchEngine(object):
 
@@ -163,7 +437,7 @@ class Database_SearchEngine(object):
                         #print("title is not in List.")
                         titlesList.append(list_with_songsDicts[i])
                         #print("Append Song", list_with_songsDicts[i]["title"])
-                        print(i)
+                        #print(i)
                         remaining_files.remove(list_with_songsDicts[i])
 
         # FILES: create a list of all remaining song-dicts
@@ -180,6 +454,9 @@ class Database_SearchEngine(object):
 
 
 class LM_QTreeWidget(QTreeWidget):
+    '''
+    Special QTreewidget which is used to present searchresults from MPD Database-Search (Database-SearchEngine)
+    '''
 
     def __init__(self, parent=None):
         QTreeWidget.__init__(self, parent)
@@ -192,10 +469,7 @@ class LM_QTreeWidget(QTreeWidget):
         self.setHeaderHidden(True)
         self.setItemsExpandable(True)
 
-        #self.setSortingEnabled(True)
-        #self.sortByColumn(0, Qt.AscendingOrder)
-
-    def populateTree(self, searchphrase):
+    def populateTree(self, searchphrase, includeOnline=True):
 
         self.clear()
         self.childFromArtist = {}
@@ -203,6 +477,7 @@ class LM_QTreeWidget(QTreeWidget):
         self.childFromAlbum = {}
         self.parentFromTitle = {}
         self.counts = {}
+        self.onlineresults ={}
 
         self.setHeaderLabels(["Artist/Album/Title"])
         #print("Check Service")
@@ -213,8 +488,8 @@ class LM_QTreeWidget(QTreeWidget):
         self.searchEngine = Database_SearchEngine()
         #print("Phrase:",searchphrase)
         self.emit(SIGNAL("start_loading"))
-        #data = self.searchEngine.search_for_Phrase(searchphrase)
 
+        #Search for Searchphrase with MPC on the local database...
         self.thread = None
         self.thread = WorkerThread(self.searchEngine.search_for_Phrase,
                                    self.service, searchphrase.toLocal8Bit())  # Request API using string
@@ -222,8 +497,21 @@ class LM_QTreeWidget(QTreeWidget):
         while not self.thread.isFinished():
             QApplication.processEvents()
         data = self.thread.result()
-        #print("data received, start populating")
-        #print(data)
+
+        if includeOnline:
+            # Search for Searchphrase with Youtube on the youtube database...
+            self.searchEngine2 = Searchresult_Youtube()
+            #self.emit(SIGNAL("start_loading"))
+            # self.onlineresults = self.searchEngine2.load_playlists(query=searchphrase, max_results="3")
+            self.thread2 = None
+            self.thread2 = WorkerThread(self.searchEngine2.load_playlists, searchphrase.toLocal8Bit(), "30")  # maxresult
+            self.thread2.start()
+            while not self.thread2.isFinished():
+                QApplication.processEvents()
+            self.onlineresults = self.thread2.result() or {}   # if none, we want an empty dict again
+            pp.pprint(self.onlineresults)
+            # self.onlineresults is a dict with Playlists
+
         #create toplevelitems  (Artist Folders)
         for artist in data['artists']:
             entry0 = QTreeWidgetItem(self, [artist.decode('utf-8')])
@@ -296,13 +584,35 @@ class LM_QTreeWidget(QTreeWidget):
                 else:
                     self.counts[parentOfFilename] += 1
 
+        if len(self.onlineresults) > 0:
+            parentOfTitel = self.parentFromAlbum.get("Online-Playlists")
+            if parentOfTitel is None:
+                entry0 = QTreeWidgetItem(self, ["Online-Playlists"])
+                entry0.setIcon(0, QIcon(":/folder.png"))
+                self.parentFromAlbum["Online-Playlists"] = entry0
+
+            for key, playlistopj in self.onlineresults.iteritems():
+                parentOfPlaylist = self.parentFromAlbum["Online-Playlists"]
+                print(playlistopj.title)
+                entry1 = QTreeWidgetItem(parentOfPlaylist, [unicode(playlistopj.title),
+                                                            "[{0}]".format(playlistopj.size)])
+                entry1.setData(0, Qt.UserRole, QVariant((playlistopj,)))
+                entry1.setIcon(0, QIcon(":/folder.png"))   #playlists are folders...
+                #self.childFromAlbum["Online-Playlists"] = entry1
+                self.parentFromTitle[unicode(playlistopj.title)] = entry1
+                self.childFromArtist[unicode(playlistopj.title)] = entry1
+                tmp_count = self.counts.get(parentOfPlaylist)
+                if tmp_count is None:
+                    self.counts[parentOfPlaylist] = 1
+                else:
+                    self.counts[parentOfPlaylist] += 1
+
         # Add a count- Value beside of each searchresult.
         for key, val in self.counts.iteritems():
             print(key.text(0), val)
             key.setText(1, "[" + str(val) + "]")
         self.resizeColumnToContents(0)
 
-        #TODO: Implement Youtube Playlist-Searchresults
         self.emit(SIGNAL("stop_loading"))
 
         print("Population finished.")
@@ -320,8 +630,11 @@ class LM_QTreeWidget(QTreeWidget):
         for i in xrange(self.model().rowCount(QModelIndex)):
             child = self.model().index(i,0, QModelIndex)
             if child.data(Qt.UserRole).toPyObject() is None:
-                continue # ignore children which are folders...
+                continue  # ignore children which are folders...
+            elif isinstance(child.data(Qt.UserRole).toPyObject()[0], Playlist):
+                continue  # ignore online-playlists which are folders in real...
             else:
+                print(child.data(Qt.UserRole).toPyObject())
                 childlist.append(child)
         return childlist
 
@@ -340,7 +653,7 @@ class LM_QTreeWidget(QTreeWidget):
 
 ###########Logic zur Selektion und expand der Dateistruktur ###########################
     def checkSelection_expanded(self, *args):
-
+        print("Expanded")
         initial_selection = self.selectedIndexes()
         childs = self.get_MP3_of_Folder_using_Index(args[0])
         #print("MP3 in Folder:", childs)
@@ -362,7 +675,7 @@ class LM_QTreeWidget(QTreeWidget):
         self.resizeColumnToContents(0)
 
     def checkSelection_clicked(self, *args):
-
+        print("Clicked")
         initial_selection = self.selectedIndexes()
 
         if args[0] in initial_selection:
@@ -377,24 +690,36 @@ class LM_QTreeWidget(QTreeWidget):
 
         #if os.path.isdir(self.model().filePath(args[0])):      #do not use os. calls because of network speed.
         if self.model().hasChildren(args[0]):
-            #print("Folder")
+            print("Folder")
             iamafolder = True
+            iamanonlineplaylist = False
+            iamafile = False
+        elif isinstance(args[0].data(Qt.UserRole).toPyObject()[0], Playlist):
+            print("Playlist")
+            iamafolder = True
+            iamanonlineplaylist = True
             iamafile = False
         else:
-            #print("File")
+            print("File")
             iamafolder = False
+            iamanonlineplaylist = False
             iamafile = True
 
         #wenn ich ein ordner bin und ich markiert bin, dann werden alle meine childs markiert
         if iamafolder and iamselected:
-            #print("Iam a folder an i am selected")
+            print("Iam a folder an i am selected")
             self.clearSelection()
             self.mark(args[0])
+            if iamanonlineplaylist:
+                if args[0].data(Qt.UserRole).toPyObject()[0].size > self.model().rowCount(args[0]):
+                    #the playlist got more tracks than childs are under the playlist... load tracks and append childs.
+                    self.loadPlaylistFromIndex(args[0])
+
             self.markAllChildrenFrom(args[0])
             #print("expand")
             self.expand(args[0])
         elif iamafolder and not iamselected:
-            #print("Iam a folder an i am not selected.")
+            print("Iam a folder an i am not selected.")
             childs = self.get_MP3_of_Folder_using_Index(args[0])
             for child in childs:
                 self.unmark(child)
@@ -417,23 +742,61 @@ class LM_QTreeWidget(QTreeWidget):
             #    parent = parent.parent()
 
     def checkSelection_collapsed(self, *args):
+        print("Collapsed")
         self.clearSelection()
         self.resizeColumnToContents(0)
 
     def get_current_selection(self):
-
+        print("get current Selection")
         selection = self.selectedIndexes()
         filepathes = []
         for item in selection:
             if item.data(Qt.UserRole).toPyObject() is None:
                 continue # ignore children which are folders...
+            elif isinstance(item.data(Qt.UserRole).toPyObject()[0], Playlist):
+                continue  # ignore online-playlists which are folders in real...
             else:
-                filepathes.append(item.data(Qt.UserRole).toPyObject()[0]['file'].decode('utf-8'))
+                if isinstance(item.data(Qt.UserRole).toPyObject()[0], Track):
+                    #url = item.data(Qt.UserRole).toPyObject()[0].streamLink
+                    #title = item.data(Qt.UserRole).toPyObject()[0].title
+                    #filepathes.append(" ".join([url, title]))  # String: Url, Space, Title
+                    filepathes.append(item.data(Qt.UserRole).toPyObject()[0])  #Trackobjekt
+                else:
+                    filepathes.append(item.data(Qt.UserRole).toPyObject()[0]['file'].decode('utf-8'))
         return filepathes
 
     def set_service(self, mpd_service):
         self.service = None
         self.service = mpd_service
+
+    def loadPlaylistFromIndex(self, ModelIndex):
+        playlist = ModelIndex.data(Qt.UserRole).toPyObject()[0]
+        self.emit(SIGNAL("start_loading"))
+        print("Request for Playlist")
+        thread = WorkerThread(playlist.listTracks)
+        thread.start()
+        while not thread.isFinished():
+            QApplication.processEvents()
+        tracks = thread.result()
+        print("Request Done.")
+        #tracks = playlist.listTracks()
+
+        for Id, trackObj in tracks.iteritems():
+            title = trackObj.title
+            print("Title:", title)
+            print("Modelindex:", ModelIndex)
+
+            parentOfTitel = self.itemFromIndex(ModelIndex)
+
+            entry2 = QTreeWidgetItem(parentOfTitel, [unicode(title)])
+            entry2.setIcon(0, QIcon(":/mp3.png"))
+            entry2.setData(0, Qt.UserRole, QVariant((trackObj,)))
+            self.parentFromAlbum[unicode(title)] = entry2
+            print("Created: ", unicode(title))
+
+
+        self.emit(SIGNAL("stop_loading"))
+
 
 class WorkerThread(QThread):
     def __init__(self, function, *args, **kwargs):
@@ -461,6 +824,7 @@ if __name__ == "__main__":
     searchphrase = raw_input("Enter Searchstring: ")
     app = QApplication([])
     window = LM_QTreeWidget()
+    window.populateTree(searchphrase=QString(searchphrase))
 
     window.show()
     sys.exit(app.exec_())

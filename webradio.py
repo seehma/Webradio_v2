@@ -20,7 +20,7 @@ import re
 import csv
 
 from PyQt4.QtCore import QString, QSize, Qt, SIGNAL, QSettings, QTime, QTimer, QDir, pyqtSlot, QObject, QEvent, \
-    QThread, QLocale, QTranslator, QLibraryInfo, QChar, QVariant
+    QThread, QLocale, QTranslator, QLibraryInfo, QChar, QVariant, pyqtSignal
 from PyQt4.QtGui import QIcon, QMainWindow, QFont, QAbstractItemView, QCursor, QDesktopWidget, QPixmap, \
     QListWidgetItem, QMessageBox, QSplashScreen, QPushButton, QMovie, QApplication, QVBoxLayout, QFileIconProvider, \
     QDialog
@@ -188,6 +188,7 @@ import lib.mpd_conf_parser as mpd_conf
 from lib.usb_manager import USB_manager
 from lib.mpd_filesystemView import LM_QFileSystemModel
 from lib.system_test import test_onlineServices as systemtest
+from ui.database_searcher import Track
 # import the resource-file load fallback if there is nothing specified... (initially, for correct Splash-Screen...)
 res = importlib.import_module(".res", package="res.designs.{0}".format(
 QSettings("Laumer", "RapiRadio").value("design_str", "fallback").toString()    # default = Fallback
@@ -708,6 +709,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.connect(self, SIGNAL("sig_status_off"), self.statusLED_off)
             self.connect(self, SIGNAL("sig_LCD_off"), self.LCD_off)
             self.connect(self, SIGNAL("sig_LCD_on"), self.LCD_on)
+            self.connect(self, SIGNAL("screenSaver_off"), self.LCD_off)
+            self.connect(self, SIGNAL("screenSaver_on"), self.LCD_on)
             #################################################################################         page 1
 
             self.pB_in_ihrer_naehe.clicked.connect(self.onInIhrerNaehe)
@@ -1971,7 +1974,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         trigger_for_switching_to_radio = False
         if url != "":                                                  # if there is an url sent
             #print("Evaluating:", url)
-            if url.startswith("http://") and not "http://192.168." in url: # check if the url is a url or a filename
+            if url.startswith("http://") and not "http://192.168." in url and not url.startswith("http://r"): # check if the url is a url or a filename
                 logger.debug("Received changed Station, but without name...")
                 #print("received no station name but a url which starts with http://")
                 if not self.mode == "radio":
@@ -2146,10 +2149,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.stackedWidget_2.setCurrentIndex(1)
         if self.mode == "media":
             logger.info("Media Local Changed to:".format(current_url))
-            #index = self.model.index("".join([MusicFolder,"/",current_url]))    # find the QModelIndex of file playing
-            #self.treeView.clearSelection()
-            #self.treeView.setCurrentIndex(index)                                 # select the file in QTreeView
             names = self.playlisteditor.tellMeWhatsPlaying()
+            #TODO: Get a Track obj instead and load the thumbnail from youtube??
             logger.info("Received PlaylistInformation (last,current,next)".format(names))
             self.lbl_previouse.setText(names[0])
             self.lbl_current_playing.setText(names[1])
@@ -2306,6 +2307,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # if you do not use a relais for LCD-Backlight control, you will see a screensaver instead
             logger.info("Show Screensaver")
             self.screensaver.show()
+
 
     @pyqtSlot()
     def onSelectAll(self):
@@ -3123,22 +3125,30 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def add_selection_to_playlist_from_search(self, pathes):
         #print("TYPE:", type(pathes[0])) # str
         #print("PATH", pathes[0])
+        #TODO: Devide between "youtube-Streamlinks" (starting with https://) and Filenames.
         if len(pathes) == 0:
             return False
+        if isinstance(pathes[0], Track):  # first entry is a Track object from youtube
+            url = pathes[0].streamLink   #it is a Track-object!
+            firstIDinPlaylist = self.player.addid(url)
+            if firstIDinPlaylist:
+                self.playlisteditor.setTranslation(url, pathes[0])   #appen the Trackobject with the url as a key.
+        else:
+            firstIDinPlaylist = self.player.add(os.path.join(MusicFolder, unicode(pathes[0])), MusicFolder)
 
-        firstIDinPlaylist = self.player.add(os.path.join(MusicFolder,unicode(pathes[0])), MusicFolder)
         if len(pathes) > 1:
             for pathesToAdd in pathes[1:]:
-                if not self.player.add(os.path.join(MusicFolder,pathesToAdd), MusicFolder):
-                    pass
+                if isinstance(pathes[0], Track):
+                    url = pathesToAdd.streamLink  # it is a Track-object!
+                    if self.player.addid(url):
+                        self.playlisteditor.setTranslation(url, pathesToAdd)
+                    else:
+                        logger.warning("Failed to add {0}".format(pathesToAdd.dedode("utf-8")))
+                else:
+                    if not self.player.add(os.path.join(MusicFolder, pathesToAdd), MusicFolder):
+                        logger.warning("Failed to add {0}".format(pathesToAdd.dedode("utf-8")))
                     #print("file: {0} can not be added".format(pathesToAdd))
 
-        if not firstIDinPlaylist is False:
-            pass
-            #print("Player added sucessfully '{0}' pathes, "
-            #      "the first path '{1} is called to play now (ID:{2}".format(len(pathes),
-            #                                                                 pathes[0],
-            #                                                                 firstIDinPlaylist))
         return firstIDinPlaylist
 
     def exchange_model(self):
@@ -3212,6 +3222,9 @@ class Playlisteditor(object):
         self.view.setSelectionMode(QAbstractItemView.SingleSelection)
         #self.service = MPC_Player()
         self.playlist = []
+        self.youtubeTranslate = {}  # dict for translating a long link, to human readable filename
+        #TODO: The Translation have to be kept over reboot/ shutdown... otherwise it is populated with None and the
+        #TODO: Trackobject is lost.
 
     @pyqtSlot()                  # Connect here to "update" the playlist shown...
     def grapCurrentPlaylist(self):
@@ -3235,9 +3248,6 @@ class Playlisteditor(object):
             self.view.clear()
             return False
         if self.view.count() > 0: self.view.clear()
-        #font = QFont()
-        #font.setBold(True)
-        #font.setPointSize(14)
         for entry in self.playlist:
             if "title" in entry:
                 if entry["title"] != "":
@@ -3247,8 +3257,21 @@ class Playlisteditor(object):
             else:
                 key = "file"
             #print("for name using key {0}, {1}".format(key, entry[key]))
-            itemname = entry[key].decode('utf-8') if key == "title" else entry[key].split("/")[-1:][0].decode('utf-8')
-            #print(itemname)
+            if key == "title":
+                itemname = entry[key].decode('utf-8')   # key = title
+            else:
+                if entry[key].startswith("http"):
+                    print("Populate with", self.youtubeTranslate.get(entry[key]))
+                    obj = self.youtubeTranslate.get(entry[key])
+                    if obj is not None:
+                        if obj.streamLink != entry[key]:
+                            print("Stramlink is expired!")
+                        itemname = obj.title  # get a name for a url
+                    else:
+                        itemname = self.parent.tr("Unknown - Please delete")
+                else:
+                    itemname = entry[key].split("/")[-1:][0].decode('utf-8')  # key = file
+
             item = QListWidgetItem(itemname)
             item.setTextAlignment(Qt.AlignRight)
             item.setData(Qt.UserRole, [entry["id"], entry["pos"]])
@@ -3292,6 +3315,7 @@ class Playlisteditor(object):
 
     @pyqtSlot()                                 # Connect here the function button "delete"
     def deleteItem(self):
+        #TODO: If a Item is deleted which was a "Translation" or a Track (Youtube) the translation should be updated...
         items = self.view.selectedIndexes()
         if len(items) == 0:
             return
@@ -3368,6 +3392,13 @@ class Playlisteditor(object):
 
         #print("sending song infos", previouse, current, next)
         return [previouse, current, next]
+
+    def setTranslation(self, key, value="unknown"):
+        self.youtubeTranslate.update({key: value})
+
+    def checkTranslationsForObsolet(self):
+        #TODO: Search and find obsolet Translation contents ... otherwise this dict will grow and grow
+        pass
 
 
 class WorkerThread(QThread):
@@ -3489,6 +3520,52 @@ class ShutdownDialog(QDialog):
         self.exitStatus = self.sender().text()
         self.accept()
 
+class Screensaver_watchdog(QObject):
+    '''
+    This Object have to be installed to a Application and works like a monitor which works like well known Screensavers.
+    It emits two kind of Signals which have to be connected to any function.
+    '''
+
+    screenSaver_on = pyqtSignal()   # turn on the screensaver if this signal occures
+    screenSaver_off = pyqtSignal()  # turn off the screensaver if this signal occures
+
+    def __init__(self, parent=None):
+        super(Screensaver_watchdog, self).__init__(parent)
+        self.active = False
+
+        # Es wird ein Timer erstellt, welcher typischer Weise ein Signal namens "timeout()" aussendet, wenn dieser
+        # abgelaufen ist. Siehe Dokumentation : http://doc.qt.io/qt-4.8/qtimer.html
+        # Diese signal wird verbunden mit der Funktion "_on".
+        self.timer = QTimer()
+        self.connect(self.timer, SIGNAL("timeout()"), self._on)
+
+    def eventFilter(self, receiver, event):             # ALLE Events die in der app auftreten laufen hier durch
+        if event.type() == QEvent.MouseButtonPress:    # Wie sehen uns die MouseButtonPress Events an
+            if self.active:                             # wenn der Screensaver gerade aktiv ist,
+                self.screenSaver_off.emit()             # wird dieser ausgeschaltet
+                self.active = False                     # wir merken uns den neuen Zustand
+                self.restartTimer()                     # den Timer starten wir mal neu
+                return True                             # "True" verhindert, dass das Event weiterverarbeitet wird
+            else:                                       # Wenn allerdings kein Screensaver an ist,
+                self.restartTimer()                     # wird einfach nur der Timer zurückgesetzt
+                return super(Screensaver_watchdog,self).eventFilter(receiver, event)  # und der Event wird weiterverarbeitet
+        else:
+            return super(Screensaver_watchdog,self).eventFilter(receiver, event) # alle anderen Events auch....
+
+    def _on(self):     # diese Funktion wird aufgerufen, wenn der Timer abläuft, also ein Reset durchgeführt wird bzw
+        if not self.active:    # der Bildschirm nicht "berührt" wird.
+            self.screenSaver_on.emit()   # wir emitieren ein Signal, das bedeutet, dass der Screensaver eingeschaltet werden soll
+            self.active = True      # und merken uns den neuen Zustand.
+
+    def restartTimer(self):    # Diese Funktion wird immer dann aufgerufen, wenn ein Klick erfolgt und der Screensaver aus ist
+        if self.timer.isActive():  # wenn der Timer bereits läuft, wird er ersteinmal gestoppt
+            self.timer.stop()
+        self.timer.start()   # anschließend wieder gestartet
+        self.active = False  # wir merken uns den Zustand (nicht unbedingt notwendig)
+
+    def setInterval(self, seconds):
+        self.timer.setInterval(int(seconds)*1000)
+
 
 if __name__ == "__main__":
 
@@ -3526,6 +3603,18 @@ if __name__ == "__main__":
         logger.info(u"Force screen-Resolution according to Config-File: {0}".format(sizeString))
     width, height = sizeString.rstrip().split("x")
     mainwindow = MainWindow(QSize(int(width), int(height)))
+
+    screensaver_delay = global_vars.configuration.get("GENERAL").get("screensaverdelay")
+    logger.debug("Screensaver-Delay is set to {0}".format(screensaver_delay))
+    if screensaver_delay:
+        myScreensaver = Screensaver_watchdog() # definiere den Screensaver_watchdog
+        myScreensaver.setInterval(screensaver_delay) # Zeit
+        app.installEventFilter(myScreensaver) # die Main-App bekommt den Eventfilter
+
+        #  der Eventfilter gibt also 2 Signale aus, welche wir noch verbinden:
+        myScreensaver.connect(myScreensaver, SIGNAL("screenSaver_on()"), mainwindow.LCD_off) # Verbindung der Signale
+        myScreensaver.connect(myScreensaver, SIGNAL("screenSaver_off()"), mainwindow.LCD_on) # Verbindung der Signale
+        myScreensaver.restartTimer()
 
     mainwindow.startup_actions()
     if user_lang is not None:

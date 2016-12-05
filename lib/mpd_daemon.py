@@ -188,7 +188,8 @@ class MPD_Eventlistener(QObject):
 
             # emit trackinfo, for Track played which is not from a streaming-station. we need different information
             #print("DEBUG:", current_url)# http://192.168.178.74:57645/external/audio/media/70351.mp
-            if current_url != last_url and (not current_url.startswith("http://") or "http://192.168." in current_url)\
+            if current_url != last_url and (not current_url.startswith("http://") or "http://192.168." in current_url \
+                                         or current_url.startswith("http://r") or current_url.startswith("https://r"))\
                     and not current_url == "":
                 #print("NOW I will emit a Signal, which carries information about track, interpret and what else...")
                 #print("Current_url (corresponding to 'file')", current_url) #03-Deep Inside Myself _ Helpless victim.mp3
