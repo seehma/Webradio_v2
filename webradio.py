@@ -709,8 +709,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.connect(self, SIGNAL("sig_status_off"), self.statusLED_off)
             self.connect(self, SIGNAL("sig_LCD_off"), self.LCD_off)
             self.connect(self, SIGNAL("sig_LCD_on"), self.LCD_on)
-            self.connect(self, SIGNAL("screenSaver_off"), self.LCD_off)
-            self.connect(self, SIGNAL("screenSaver_on"), self.LCD_on)
+            #self.connect(self, SIGNAL("screenSaver_off"), self.RLCD_off)
+            #self.connect(self, SIGNAL("screenSaver_on"), self.RLCD_on)
             #################################################################################         page 1
 
             self.pB_in_ihrer_naehe.clicked.connect(self.onInIhrerNaehe)
@@ -2308,6 +2308,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             logger.info("Show Screensaver")
             self.screensaver.show()
 
+    @pyqtSlot()  # Connected to                                                             SIGNAL("sig_LCD_on")
+    def RLCD_on(self):
+
+        if global_vars.configuration.get("GENERAL").get("screensaver"):
+            # if you do not use a relais for LCD-Backlight control, you will see a screensaver ... hide it.
+            logger.info("Hide only Screensaver")
+            self.screensaver.hide()
+        self.gpio_watchdog.set_output_LOW(self.get_save_value_from_globals_configuration("GPIOS_OUT",
+                                                                                         "out_relais4_status"))      # turn LCD ON
+
+    @pyqtSlot()  # Connected to                                                             SIGNAL("sig_LCD_off")
+    def RLCD_off(self):
+        self.gpio_watchdog.set_output_HIGH(self.get_save_value_from_globals_configuration("GPIOS_OUT",
+                                                                                          "out_relais4_status"))      # turn LCD OFF
+        if global_vars.configuration.get("GENERAL").get("screensaver"):
+            # if you do not use a relais for LCD-Backlight control, you will see a screensaver instead
+            logger.info("Show only Screensaver")
+            self.screensaver.show()
+
 
     @pyqtSlot()
     def onSelectAll(self):
@@ -3612,8 +3631,8 @@ if __name__ == "__main__":
         app.installEventFilter(myScreensaver) # die Main-App bekommt den Eventfilter
 
         #  der Eventfilter gibt also 2 Signale aus, welche wir noch verbinden:
-        myScreensaver.connect(myScreensaver, SIGNAL("screenSaver_on()"), mainwindow.LCD_off) # Verbindung der Signale
-        myScreensaver.connect(myScreensaver, SIGNAL("screenSaver_off()"), mainwindow.LCD_on) # Verbindung der Signale
+        myScreensaver.connect(myScreensaver, SIGNAL("screenSaver_on()"), mainwindow.RLCD_off) # Verbindung der Signale
+        myScreensaver.connect(myScreensaver, SIGNAL("screenSaver_off()"), mainwindow.RLCD_on) # Verbindung der Signale
         myScreensaver.restartTimer()
 
     mainwindow.startup_actions()
