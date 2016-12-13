@@ -29,6 +29,7 @@ def getVariableFrom_MPD_Conf(var_string):
 
     with open(conf_filepath, "r") as conf_file:
         for line in conf_file:
+            line = line.strip()         # some users might have whitespaces in front of key/value pair
             if line.startswith("#"):
                 continue                # ignore comments in the conf-file
             elif line.startswith(var_string):
