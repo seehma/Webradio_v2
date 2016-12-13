@@ -220,6 +220,9 @@ except ImportError:  # load the GPIO simulator instead. The signals are the same
     #MusicFolder = global_vars.configuration.get("DEVELOPMENT").get("musicfolder")
     MusicFolder = mpd_conf.getVariableFrom_MPD_Conf("music_directory")
     logger.info("Using MPD Music-Folder: {0}".format(MusicFolder))
+    if MusicFolder is None:
+        logger.error("Music directory can not be loaded from MPD-Config, nor from webradio.conf! Abort.")
+        raise EnvironmentError
     VARIABLE_DATABASE = global_vars.configuration.get("DEVELOPMENT").get("variable_database_name")
 
 __version__ = "0.2.8"
