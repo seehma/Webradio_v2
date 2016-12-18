@@ -2391,6 +2391,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         Is called by the signal "sleeptimerelapsed" of the Sleep-Timers at Page4.
         If this timer gets fully ellapsed, the webradio will shutdown.
         '''
+        #TODO: User-Requeset -> Option to call "Standby" instead of shutting down the radio! -> Combobox in Page4 !
         self.close()
         if not args.debug:
             self.systemCall("sudo shutdown -h now")
