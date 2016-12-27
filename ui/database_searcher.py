@@ -252,6 +252,8 @@ class Track(object):
             # initial case
             #print("Load new streamlink")
             ret = commands.getoutput("youtube-dl --prefer-insecure -g -f140 -- {0}".format(self.id))
+            #TODO: Expect that the command fail (e.g. youtube-dl is not installed!)
+            # if ret.startswith("http"):   #only if a link was returned
             expiration = re.search("(?P<exp>&expire=[^\D]+)", ret).group("exp").split("=")[1]
             self.expiration = datetime.datetime.fromtimestamp(int(expiration))   # a link expires in about 6 hours !!
         elif self.expiration > datetime.datetime.now():
@@ -262,6 +264,7 @@ class Track(object):
             # link is expired. Load a new one, set new expiration
             #print("Link expired, reload")
             ret = commands.getoutput("youtube-dl --prefer-insecure -g -f140 {0}".format(self.id))
+            #TODO: Expect that the command fail (e.g. youtube-dl is not installed!)
             expiration = re.search("(?P<exp>&expire=[^\D]+)", ret).group("exp").split("=")[1]
             self.expiration = datetime.datetime.fromtimestamp(int(expiration))   # a link expires in about 6 hours !!
 
@@ -499,6 +502,7 @@ class LM_QTreeWidget(QTreeWidget):
         data = self.thread.result()
 
         if includeOnline:
+            #TODO: Check System-dependencies here (Youtube-dl) which are not imported by this module
             # Search for Searchphrase with Youtube on the youtube database...
             self.searchEngine2 = Searchresult_Youtube()
             #self.emit(SIGNAL("start_loading"))
