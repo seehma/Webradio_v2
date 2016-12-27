@@ -20,8 +20,9 @@ try:
     delay_tempmeasurement = int(global_vars.configuration.get("DHT11").get("delay_tempmeasurement"))
 except:
     delay_tempmeasurement = 180
-    logger.error(u"Die Verzögerung (delay_tempmeasurement '{0}' ist ungültig!".format(values.decode("utf-8")))
-    logger.info(u"Die Verzögerung (delay_tempmeasurement wurde auf 180 Sekunden gestellt (3 min.)")
+    logger.warning(u"Die Verzögerung delay_tempmeasurement '{0}' "
+                 u"ist ungültig!".format(str(global_vars.configuration.get("DHT11").get("delay_tempmeasurement")).decode("utf-8")))
+    logger.info(u"Die Verzögerung delay_tempmeasurement wurde auf 180 Sekunden gestellt (3 min.)")
 
 
 class GPIO_Simulator(QWidget):

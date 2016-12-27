@@ -9,7 +9,6 @@
 ################################
 
 import RPi.GPIO as GPIO
-import Adafruit_DHT
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import logging
@@ -34,16 +33,19 @@ for pin in global_vars.configuration.get("GPIOS_OUT").itervalues():
 # Define GPIO inputs for rotary Encoder, if one is in use, else tell variables to be "None"
 
 try:
-    PIN_A = int(global_vars.configuration.get("ROTARY_ENCODER").get("pin_a")) # brown wire
-    PIN_B = int(global_vars.configuration.get("ROTARY_ENCODER").get("pin_b")) # white wire
+    PIN_A = int(global_vars.configuration.get("ROTARY_ENCODER").get("pin_a"))  # brown wire
+    PIN_B = int(global_vars.configuration.get("ROTARY_ENCODER").get("pin_b"))  # white wire
 except (ValueError, TypeError), e:
     logger.warning(u"Ein Rotary-Encoder Pin ist ungültig! {0}".format(e))
     PIN_A = None
     PIN_B = None
 
-BUTTON = 22 # brown wire (2)  -> Button is not in use,
-
-tempsensor = Adafruit_DHT.DHT11
+BUTTON = 22   # brown wire (2)  -> Button is not in use,
+try:
+    import Adafruit_DHT
+    tempsensor = Adafruit_DHT.DHT11
+except ImportError:
+    logging.warning("Adafruit DHT is not installed or can not be loaded. No Hardware-tempsensing available!")
 try:
     GPIO_TEMP = int(global_vars.configuration.get("DHT11").get("gpio_temp")) # give the GPIO not the Pin-No
     delay_tempmeasurement = int(global_vars.configuration.get("DHT11").get("delay_tempmeasurement"))

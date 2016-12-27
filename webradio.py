@@ -23,7 +23,7 @@ from PyQt4.QtCore import QString, QSize, Qt, SIGNAL, QSettings, QTime, QTimer, Q
     QThread, QLocale, QTranslator, QLibraryInfo, QChar, QVariant, pyqtSignal
 from PyQt4.QtGui import QIcon, QMainWindow, QFont, QAbstractItemView, QCursor, QDesktopWidget, QPixmap, \
     QListWidgetItem, QMessageBox, QSplashScreen, QPushButton, QMovie, QApplication, QVBoxLayout, QFileIconProvider, \
-    QDialog
+    QDialog, QWidget, QCheckBox, QSizePolicy
 
 from lib import global_vars
 from lib.LM_Widgets_scaled_contents import Scaling_QLabel
@@ -188,6 +188,7 @@ import lib.mpd_conf_parser as mpd_conf
 from lib.usb_manager import USB_manager
 from lib.mpd_filesystemView import LM_QFileSystemModel
 from lib.system_test import test_onlineServices as systemtest
+from lib.system_test import test_programm_exists as programm_exists
 from ui.database_searcher import Track
 # import the resource-file load fallback if there is nothing specified... (initially, for correct Splash-Screen...)
 res = importlib.import_module(".res", package="res.designs.{0}".format(
@@ -395,10 +396,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.virtualKeyboard2 = VirtualKeyboard()
             self.virtualKeyboard3 = VirtualKeyboard()
             #print("Done",QTime.currentTime())
-            self.stackedWidget.addWidget(self.virtualKeyboard)
-            self.stackedWidget_2.addWidget(self.virtualKeyboard2)  #index 4
-            self.stackedWidget_3.addWidget(self.virtualKeyboard3)  #index 2
-            #self.weatherWidget = weather_widget(self.tab)
+            self.stackedWidget.addWidget(self.virtualKeyboard)     #         -> Radio
+            # Create the "include Online-results" Checkbox for the media-search tool...
+            kombi_widget = QWidget()
+            kombi_layout = QVBoxLayout()
+            self.cB_checkOnline = QCheckBox(self.tr("Include Online-Results"))
+            self.cB_checkOnline.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+            kombi_layout.addWidget(self.cB_checkOnline)
+            self.virtualKeyboard2.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+            kombi_layout.addWidget(self.virtualKeyboard2)
+            kombi_widget.setLayout(kombi_layout)
+            #self.stackedWidget_2.addWidget(self.virtualKeyboard2)  #index 4  -> Media Player
+            self.stackedWidget_2.addWidget(kombi_widget)  #index 4  -> Media Player
+            self.stackedWidget_3.addWidget(self.virtualKeyboard3)  #index 2  -> Weather Code (Settings)
             self.weatherWidget = weather_widget(cwd, parent=self)
             layout_temp = QVBoxLayout(self.tab)
             layout_temp.addWidget(self.weatherWidget)
@@ -1928,8 +1938,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             self.player = MPC_Player()
             self.treeWidget_2.set_service(self.player)
-
-        self.treeWidget_2.populateTree(QString)  # Request API using string
+        self.treeWidget_2.populateTree(QString, self.cB_checkOnline.isChecked()) # Request API using string, include Youtube-Resources(?)
         #self.treeWidget_2.setVisible(True)
 
         if self.treeWidget_2.topLevelItemCount() > 0:
