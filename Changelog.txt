@@ -1,6 +1,16 @@
 0.2.8   xx.xx.xxx   Feature-Update:
                *Die Suchergebnisse im Mediaplayer, zeigen nun die in einem Ordner enthaltenen Titel in Zahlen an
                 so kann man auf den ersten Blick sehen, wie viele MP3s in einem Ordner sind
+               *Möglichkeit in Suchergebnisse aus dem Media-Player sog. "Online-Resourcen" für die
+                Suche mit ein zu binden (Youtube) und entsprechende Titel in die eigene Playliste zu übernehmen und
+                ab zu spielen.
+               *Bildschirmschoner nach bestimmter Zeit, kann aktiviert werden mittels "ScreensaverDelay=600" in den
+                webradio-Konfigs (webradio.conf)
+               *Abschalt-Timer mit mehr Optionen (Herunterfahren + Standby)
+
+                Bugsfix:
+               *Playlist-Editor (Mediaplayer): Font wird bei manchen Auflösungen abgeschnitten. -> Fix
+               *MPD-Settings werden nicht richtig erkannt, wenn Zeile in mpd.conf mit Leerzeichen beginnt -> Fix
 
 0.2.7   06.11.2016  Feature-Update:
                *Speichert Variablen wie "Sprache", "Theme", "Geo-Location-Code", "Geo-Name", "Screensaver an/aus" in
@@ -13,7 +23,7 @@
                *Es gibt nun nur noch ein zentrales File, in dem Einstellungen bearbeitet werden müssen.(webradio.conf)
                *Der Settingstab wurde nun visuell fertiggestellt, Themes wurden angepasst und überarbeitet
                *Such-Dialog für "Heimatort" wurde fertiggestellt
-               *Kleiner Layout-Aufhübschungen
+               *Kleinere Layout-Aufhübschungen
 
 0.2.6   23.10.2016   Bugfix:
                *Behebung des Fehlers:

@@ -11,6 +11,9 @@ import datetime
 import time
 import re
 import commands
+import logging
+
+logger = logging.getLogger("webradio")
 
 from lib.googleapiclient.discovery import build
 #import resources_database_search
@@ -193,27 +196,30 @@ class Playlist(object):
         tracks = {}
 
         for i, v in enumerate(videolist):
-            #https://developers.google.com/youtube/v3/docs/videos/list
-            # Call the videos.list method to retrieve location details for each video.
-            video_response = youtube.videos().list(
-                id=v,
-                part='snippet, contentDetails'
-            ).execute()
-            #pp.pprint(video_response)
+            try:
+                #https://developers.google.com/youtube/v3/docs/videos/list
+                # Call the videos.list method to retrieve location details for each video.
+                video_response = youtube.videos().list(
+                    id=v,
+                    part='snippet, contentDetails'
+                ).execute()
+                #pp.pprint(video_response)
 
-            #check if video is "restricted" and override it.
-            if video_response["items"][0].get('contentDetails').get("licensedContent"):
-            #    self.__restrictedCount += 1
-                print("Licensed Content!", video_response["items"][0].get('snippet').get("title"))
-            #    continue
-            #else:
-            title = video_response["items"][0].get('snippet').get("title")
-            thumbnail = video_response["items"][0].get('snippet').get("thumbnails")
-            encrypted_id = v
-            duration = iso_Date_to_seconds_int(video_response["items"][0].get('contentDetails').get("duration"))
+                #check if video is "restricted" and override it.
+                if video_response["items"][0].get('contentDetails').get("licensedContent"):
+                #    self.__restrictedCount += 1
+                    print("Licensed Content!", video_response["items"][0].get('snippet').get("title"))
+                #    continue
+                #else:
+                title = video_response["items"][0].get('snippet').get("title")
+                thumbnail = video_response["items"][0].get('snippet').get("thumbnails")
+                encrypted_id = v
+                duration = iso_Date_to_seconds_int(video_response["items"][0].get('contentDetails').get("duration"))
 
-            trackobject = Track(title, thumbnail, encrypted_id, duration, self)
-            tracks.update({i: trackobject})
+                trackobject = Track(title, thumbnail, encrypted_id, duration, self)
+                tracks.update({i: trackobject})
+            except IndexError:
+                logger.warning("Ignored File id {0} because of a failure".format(v))
 
         self.__tracks = tracks
 
@@ -248,25 +254,25 @@ class Track(object):
                  &expire=1431902956
                  &sparams=ip,ipbits,expire,id,itag,source,requiressl,pl,nh,mm,ms,mv,ratebypass,mime,gir,clen,lmt,dur
         """
-        if self.expiration is None or self.__streamlink == "":
-            # initial case
-            #print("Load new streamlink")
-            ret = commands.getoutput("youtube-dl --prefer-insecure -g -f140 -- {0}".format(self.id))
-            #TODO: Expect that the command fail (e.g. youtube-dl is not installed!)
-            # if ret.startswith("http"):   #only if a link was returned
-            expiration = re.search("(?P<exp>&expire=[^\D]+)", ret).group("exp").split("=")[1]
-            self.expiration = datetime.datetime.fromtimestamp(int(expiration))   # a link expires in about 6 hours !!
-        elif self.expiration > datetime.datetime.now():
+        if self.expiration is not None and self.expiration > datetime.datetime.now() and self.__streamlink != "":
             # use already loaded link if it is still valid
             #print("Re-Use existing Streamlink")
             ret = self.__streamlink
-        else:
-            # link is expired. Load a new one, set new expiration
+        else:  #if self.expiration is None or self.__streamlink == "":
+            # # initial case or link is expired. Load a new one, set new expiration
             #print("Link expired, reload")
-            ret = commands.getoutput("youtube-dl --prefer-insecure -g -f140 {0}".format(self.id))
-            #TODO: Expect that the command fail (e.g. youtube-dl is not installed!)
-            expiration = re.search("(?P<exp>&expire=[^\D]+)", ret).group("exp").split("=")[1]
-            self.expiration = datetime.datetime.fromtimestamp(int(expiration))   # a link expires in about 6 hours !!
+            ret = commands.getoutput("youtube-dl --prefer-insecure -g -f140 -- {0}".format(self.id))
+            print ret
+            if ret.startswith("http"):   #only if a link was returned
+                try:
+                    expiration = re.search("(?P<exp>&expire=[^\D]+)", ret).group("exp").split("=")[1]
+                    self.expiration = datetime.datetime.fromtimestamp(int(expiration))   # a link expires in about 6 hours !!
+                except:
+                    logger.error("Expiration-Time can not be extracted from Link: {0}, setting to 2 hours".format(ret))
+                    self.expiration = datetime.datetime.now() + datetime.timedelta(hours=2)  # choose a short exiration
+            else:
+                logger.error("Youtube-dl returned: {0}".format(ret))
+                ret = ""
 
         self.__streamlink = ret
 
@@ -502,7 +508,6 @@ class LM_QTreeWidget(QTreeWidget):
         data = self.thread.result()
 
         if includeOnline:
-            #TODO: Check System-dependencies here (Youtube-dl) which are not imported by this module
             # Search for Searchphrase with Youtube on the youtube database...
             self.searchEngine2 = Searchresult_Youtube()
             #self.emit(SIGNAL("start_loading"))

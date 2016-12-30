@@ -91,7 +91,6 @@ class MPC_Player(object):
             logger.warning("Save Playlist {0} FAILED".format(name))
             return False
 
-
     @reconnect
     def play(self):
         time.sleep(1)

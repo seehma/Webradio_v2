@@ -77,7 +77,14 @@ def test_usbconnection():
     pass
 
 def test_programm_exists(name_executable):
-    return spawn.find_executable(name_executable)
+    state = False
+    path = spawn.find_executable(name_executable)
+    if path is not None or path != "":
+        logger.info("{0} is installed".format(name_executable))
+        state = True
+    else:
+        logger.warning("{0} is not installed or can not be found".format(name_executable))
+    return state
 
 
 

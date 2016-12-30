@@ -338,8 +338,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.virtualKeyboard2.spaceButton.setText(self.tr("Space"))
 
         self.virtualKeyboard3.backButton.setText(self.tr('Delete'))
-        self.virtualKeyboard3.cancelButton.setText(self.tr("Abort"))
         self.virtualKeyboard3.spaceButton.setText(self.tr("Space"))
+
+        self.cB_checkOnline.setText(self.tr("Include Online-Results"))
 
     def _readPossibleTranslations(self):
         '''
@@ -401,6 +402,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             kombi_widget = QWidget()
             kombi_layout = QVBoxLayout()
             self.cB_checkOnline = QCheckBox(self.tr("Include Online-Results"))
+            self.cB_checkOnline.setVisible(programm_exists("youtube-dl"))   #determine if youtube-dl is avilable on the system
             self.cB_checkOnline.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
             kombi_layout.addWidget(self.cB_checkOnline)
             self.virtualKeyboard2.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -1986,7 +1988,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         trigger_for_switching_to_radio = False
         if url != "":                                                  # if there is an url sent
             #print("Evaluating:", url)
-            if url.startswith("http://") and not "http://192.168." in url and not url.startswith("http://r"): # check if the url is a url or a filename
+            if url.startswith("http://") and not "http://192.168." in url and not url.startswith("http://r") \
+                    and not url.startswith("https://r"): # check if the url is a url or a filename
+                #TODO: Does this cause problems with streaming Links which are starting with a "r"?? maybe a regex here?
                 logger.debug("Received changed Station, but without name...")
                 #print("received no station name but a url which starts with http://")
                 if not self.mode == "radio":
@@ -2003,7 +2007,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     #print(self.favorites)
                     if self.favorites[key].url in url:                     # if the urls are matching
                         radioID = self.favorites[key].id                   # if yes, remember the ID of this station
-                        print(radioID)
+                        #print(radioID)
                         break                                              # and exit loop
 
                 if not radioID == "" and not radioID == self.myCurrentStation.id:  # if the radioID is not emty any more
@@ -2400,12 +2404,44 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         Is called by the signal "sleeptimerelapsed" of the Sleep-Timers at Page4.
         If this timer gets fully ellapsed, the webradio will shutdown.
         '''
-        #TODO: User-Requeset -> Option to call "Standby" instead of shutting down the radio! -> Combobox in Page4 !
-        self.close()
-        if not args.debug:
-            self.systemCall("sudo shutdown -h now")
+        #User-Requeset -> Option to call "Standby" instead of shutting down the radio! -> Combobox in Page4 !
+        action = self.cB_timerAction.currentIndex()   #0= Shutdown, 1=Standby
+        if action == 0:
+            self.close()
+            if not args.debug:
+                self.systemCall("sudo shutdown -h now")
+            else:
+                logger.debug(u"Would shutdown now!")
         else:
-            logger.debug(u"Would shutdown now!")
+            ######################################################################################################
+            if self.player is not None:
+                self.widget_Mute.mute()
+                # if self.mpd_listener.isrunning():      # this will prevent any ramote applicaten to restart ...
+                #    self.mpd_listener.stopNotifier()   # so I can not switch of the daemon, otherwise it can not be
+                self.lbl_Senderlogo.setText("")
+                self.label.setText("")
+                self.lbl_Fav.setText("")
+                self.lbl_Fav.installEventFilter(self)
+                self.lbl_Sendername.setText("Standby")
+                self.lbl_Musiktitel.setText(u"")
+                self.pBZurueck.setVisible(False)
+                self.tabWidget_main.setEnabled(False)
+                self.widget_Mute.setEnabled(False)
+                self.pBHome.setEnabled(False)
+                self.pBSuchen.setEnabled(False)
+                self.pBFavoriten.setEnabled(False)
+                self.slider_vol.setValue(0)
+                self.slider_vol.setEnabled(False)
+                self.pBVol_down.setEnabled(False)
+                self.pBVol_up.setEnabled(False)
+
+            if self.audio_amp_isActive:
+                self.emit(SIGNAL("sig_audio_amp_off"))
+            self.emit(SIGNAL("sig_LCD_off"))
+
+            self.widget_Standby.setInitialState("off")
+            #########################################################################################################
+
 
     @pyqtSlot()   # Connected to                                                   SIGNAL("onSleepTimerCloseToElapsed")
     def onSleepTimerCloseToElapsed(self):
@@ -2413,10 +2449,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         QTimer.singleShot(0, self.showShutdownDlg)
 
     def showShutdownDlg(self):  # called by a Singleshot-Timer started with "onSleepTimerCloseToElapsed"
+        action = self.cB_timerAction.currentIndex()  # 0= Shutdown, 1=Standby
+        if action == 0:
+            txt = self.tr("Your Webradio will shutdown now!")
+        else:
+            txt = self.tr("Your Webradio will standby now!")
 
-        dialog = ShutdownDialog(text=self.tr("Your Webradio will shutdown now!"), options=[self.tr("Abort!"),
-                                                                                           self.tr("Continue...")],
-                                parent=self)
+        dialog = ShutdownDialog(text=txt, options=[self.tr("Abort!"), self.tr("Continue...")], parent=self)
+        QTimer.singleShot(9500, dialog.close)  #autoclose after 10 sec.
         dialog.exec_()
         if dialog.exitStatus is None:
             return False
@@ -3060,6 +3100,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if self.player != None:
                 self.player.save_playlist("media_playlist")      # assure that current playlist is saved...
                 logger.info("Saved Media-Playlist")
+                self.playlisteditor.checkTranslationsForObsolet()
+                self.playlisteditor.save_yt_translations()
+                logger.info("Saved Media-Playlist-translations (Youtube)")
 
         logger.info("Destroy Player")
         self.player = None
@@ -3170,7 +3213,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         if len(pathes) > 1:
             for pathesToAdd in pathes[1:]:
-                if isinstance(pathes[0], Track):
+                if isinstance(pathesToAdd, Track):
                     url = pathesToAdd.streamLink  # it is a Track-object!
                     if self.player.addid(url):
                         self.playlisteditor.setTranslation(url, pathesToAdd)
@@ -3254,9 +3297,7 @@ class Playlisteditor(object):
         self.view.setSelectionMode(QAbstractItemView.SingleSelection)
         #self.service = MPC_Player()
         self.playlist = []
-        self.youtubeTranslate = {}  # dict for translating a long link, to human readable filename
-        #TODO: The Translation have to be kept over reboot/ shutdown... otherwise it is populated with None and the
-        #TODO: Trackobject is lost.
+        self.load_yt_translations()   # creates a self.youtubeTranslate dictionary
 
     @pyqtSlot()                  # Connect here to "update" the playlist shown...
     def grapCurrentPlaylist(self):
@@ -3292,22 +3333,24 @@ class Playlisteditor(object):
             if key == "title":
                 itemname = entry[key].decode('utf-8')   # key = title
             else:
-                if entry[key].startswith("http"):
-                    print("Populate with", self.youtubeTranslate.get(entry[key]))
-                    obj = self.youtubeTranslate.get(entry[key])
-                    if obj is not None:
+                if entry[key].startswith("http"):    #if a youtubelink or another link is in the entry
+                    #print("Populate with", self.youtubeTranslate.get(entry[key]))
+                    obj = self.youtubeTranslate.get(entry[key])  # try to find the url in the youtube-translation
+                    if obj is not None:     #if found
                         if obj.streamLink != entry[key]:
-                            print("Stramlink is expired!")
+                            #TODO: Exchange the link in mpd-playlist, because the old one was expired
+                            print("Streamlink is expired!", entry["id"], entry["pos"])
                         itemname = obj.title  # get a name for a url
                     else:
+                        #TODO: What about other links which might be supplied from UPnP or something?
                         itemname = self.parent.tr("Unknown - Please delete")
                 else:
-                    itemname = entry[key].split("/")[-1:][0].decode('utf-8')  # key = file
+                    itemname = entry[key].split("/")[-1:][0].decode('utf-8')  # key = (real) filename (not http....)
 
             item = QListWidgetItem(itemname)
             item.setTextAlignment(Qt.AlignRight)
             item.setData(Qt.UserRole, [entry["id"], entry["pos"]])
-            item.setSizeHint(QSize(10,35))
+            #item.setSizeHint(QSize(10, 35))    # removed: user reports that font gets cut on some resolutions
             #item.setFont(font)
             if entry["id"] == songID:
                 item.setIcon(QIcon(":/play.png"))
@@ -3384,27 +3427,6 @@ class Playlisteditor(object):
             playlist_POS_ID[pos] = ID
             playlist_POS_TITLE[pos] = songtitle
 
-            #print(playlist_ID_POS)
-            #print(playlist_POS_ID)
-            #print(playlist_POS_TITLE)
-
-            #print("check pos", pos)
-            #if ID == currentID:
-            #    current= songtitle
-            #    print("setting current to", songtitle)
-            #    continue
-            #elif ID == nextID:
-            #    next = songtitle
-            #    print("setting next to", songtitle)
-            #    #break
-            #if next == "" or str(pos) == "0":
-            #    previouse = songtitle
-
-        #if currentID == "" and nextID == "" and self.view.count() > 0:
-        #    print("Im in if statement... changing next from", next)
-        #    print("Changing also previouse from ... to empty ", previouse)
-        #    next = self.view.item(0).text()
-        #    previouse = ""
         if currentID != "":
             previouse_pos = int(playlist_ID_POS[QString(currentID)]) -1
             #print("Previos position:", previouse_pos)
@@ -3426,11 +3448,61 @@ class Playlisteditor(object):
         return [previouse, current, next]
 
     def setTranslation(self, key, value="unknown"):
+        '''
+        This function updates a dictionary which is used, to translate unreadable urls to human readable titles.
+        Args:
+            key: url like "https://r9:sngkjsngkjnkjfgnkdng
+            value: Track Object
+
+        Returns: Nothing
+        '''
         self.youtubeTranslate.update({key: value})
 
+    def save_yt_translations(self):
+        container = self.youtubeTranslate
+        basename = "tmp_trans"
+        extention = "dmp"
+
+        filename = os.path.join(cwd, "{0}.{1}".format(basename, extention))
+        try:
+            pickle.dump(container, open(filename, "wb"))
+        except IOError:
+            logger.error("was not able to store yt-translations, maybe dont have got the file-permissions needed")
+            return False
+        logger.info("Stored Translations to: {0}".format(filename))
+        return True
+
+    def load_yt_translations(self):
+            basename = "tmp_trans"
+            extention = "dmp"
+
+            Openfile = os.path.join(cwd, "{0}.{1}".format(basename, extention))
+            if os.path.isfile(Openfile):
+                self.youtubeTranslate = pickle.load(open(Openfile, "rb"))
+                logger.info("Found Yt-Translations: {0}".format(Openfile))
+            else:
+                logger.warning("No stored Yt-Translations found.")
+                self.youtubeTranslate = {}
+
     def checkTranslationsForObsolet(self):
-        #TODO: Search and find obsolet Translation contents ... otherwise this dict will grow and grow
-        pass
+        '''
+        Check the current playlist and find "used" translations in self.youtubeTranslate (tracks which are in the play-
+        list and are in the dict ... all others will be deleted because the are not used any longer. This function
+        will be called right before the translations will be dumped (saved)
+
+        Returns: Update of self.youtubeTranslate
+        '''
+        cleaned_youtubeTranslate = {}
+        #playlist = list with dicts : [{pos: 0, file: "http://r2--sn...", id: 31},{pos: 1, file: "http://r2--sn...", id: 32}}]
+        for entry in self.playlist:
+            if "title" in entry:   # ignore entries with titles, because youtube-links only have a "file" key
+                continue
+            else:
+                linkname = entry["file"]
+                if linkname in self.youtubeTranslate:    #store only translations which are currently in the playlist
+                    cleaned_youtubeTranslate.update({linkname: self.youtubeTranslate.get(linkname)})
+
+        self.youtubeTranslate = cleaned_youtubeTranslate
 
 
 class WorkerThread(QThread):
