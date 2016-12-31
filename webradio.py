@@ -3200,7 +3200,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def add_selection_to_playlist_from_search(self, pathes):
         #print("TYPE:", type(pathes[0])) # str
         #print("PATH", pathes[0])
-        #TODO: Devide between "youtube-Streamlinks" (starting with https://) and Filenames.
         if len(pathes) == 0:
             return False
         if isinstance(pathes[0], Track):  # first entry is a Track object from youtube
@@ -3390,7 +3389,6 @@ class Playlisteditor(object):
 
     @pyqtSlot()                                 # Connect here the function button "delete"
     def deleteItem(self):
-        #TODO: If a Item is deleted which was a "Translation" or a Track (Youtube) the translation should be updated...
         items = self.view.selectedIndexes()
         if len(items) == 0:
             return

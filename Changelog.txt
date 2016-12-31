@@ -4,9 +4,9 @@
                *Möglichkeit in Suchergebnisse aus dem Media-Player sog. "Online-Resourcen" für die
                 Suche mit ein zu binden (Youtube) und entsprechende Titel in die eigene Playliste zu übernehmen und
                 ab zu spielen.
-               *Bildschirmschoner nach bestimmter Zeit, kann aktiviert werden mittels "ScreensaverDelay=600" in den
-                webradio-Konfigs (webradio.conf)
-               *Abschalt-Timer mit mehr Optionen (Herunterfahren + Standby)
+               *Bildschirmschoner mit Uhrzeit und Wetterinformationen nach bestimmter Zeit
+               (kann aktiviert werden mittels "ScreensaverDelay=600" in den webradio-Konfigs (webradio.conf))
+               *Abschalt-Timer erhält zusätzliche Aktions-Auswahl-Option (Herunterfahren + Standby)
 
                 Bugsfix:
                *Playlist-Editor (Mediaplayer): Font wird bei manchen Auflösungen abgeschnitten. -> Fix
