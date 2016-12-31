@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'flexi3.ui'
 #
-# Created: Fri Dec 30 11:48:23 2016
+# Created: Sat Dec 31 14:49:36 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -477,7 +477,7 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.pB_autorepeat_2.sizePolicy().hasHeightForWidth())
         self.pB_autorepeat_2.setSizePolicy(sizePolicy)
         self.pB_autorepeat_2.setMinimumSize(QtCore.QSize(81, 51))
-        self.pB_autorepeat_2.setMaximumSize(QtCore.QSize(16777215, 61))
+        self.pB_autorepeat_2.setMaximumSize(QtCore.QSize(111, 61))
         self.pB_autorepeat_2.setFocusPolicy(QtCore.Qt.NoFocus)
         self.pB_autorepeat_2.setCheckable(True)
         self.pB_autorepeat_2.setObjectName(_fromUtf8("pB_autorepeat_2"))
@@ -991,9 +991,9 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
-        self.tabWidget_main.setCurrentIndex(3)
+        self.tabWidget_main.setCurrentIndex(1)
         self.stackedWidget.setCurrentIndex(0)
-        self.stackedWidget_2.setCurrentIndex(2)
+        self.stackedWidget_2.setCurrentIndex(1)
         self.stackedWidget_3.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
