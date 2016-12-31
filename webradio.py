@@ -3214,6 +3214,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             for pathesToAdd in pathes[1:]:
                 if isinstance(pathesToAdd, Track):
                     url = pathesToAdd.streamLink  # it is a Track-object!
+                    if url == "":
+                        continue  #override links which are empty because anything went wrong
                     if self.player.addid(url):
                         self.playlisteditor.setTranslation(url, pathesToAdd)
                     else:

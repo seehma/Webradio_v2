@@ -268,10 +268,11 @@ class Track(object):
                     expiration = re.search("(?P<exp>&expire=[^\D]+)", ret).group("exp").split("=")[1]
                     self.expiration = datetime.datetime.fromtimestamp(int(expiration))   # a link expires in about 6 hours !!
                 except:
-                    logger.error("Expiration-Time can not be extracted from Link: {0}, setting to 2 hours".format(ret))
+                    logger.error("Expiration-Time can not be extracted from Link: {0}, "
+                                 "setting to 2 hours".format(self.title.decode("utf-8")))
                     self.expiration = datetime.datetime.now() + datetime.timedelta(hours=2)  # choose a short exiration
             else:
-                logger.error("Youtube-dl returned: {0}".format(ret))
+                logger.error("Youtube-dl returned: {0}...".format(ret[:60]))  #log only the first 30 letters
                 ret = ""
 
         self.__streamlink = ret
