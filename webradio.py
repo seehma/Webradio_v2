@@ -2164,9 +2164,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.tabWidget_main.setCurrentIndex(1)
                 self.stackedWidget_2.setCurrentIndex(1)
         if self.mode == "media":
-            logger.info("Media Local Changed to:".format(current_url))
+            logger.info("Media Local Changed to: {0}".format(current_url[:10]))
             names = self.playlisteditor.tellMeWhatsPlaying()
-            #TODO: Get a Track obj instead and load the thumbnail from youtube??
             logger.info("Received PlaylistInformation (last,current,next)".format(names))
             self.lbl_previouse.setText(names[0])
             self.lbl_current_playing.setText(names[1])
@@ -2229,6 +2228,58 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             self.lbl_albumArt.setPixmap(albumart.scaled(self.lbl_albumArt.width(),
                                                                         self.lbl_albumArt.height(),
                                                                     Qt.KeepAspectRatio, Qt.SmoothTransformation))
+                            return
+            # if the provided url looks like a youtube link
+            elif current_url.startswith("http://r") or current_url.startswith("https://r"):
+                app.processEvents()
+                logger.info("Downloading Album Art for Youtube-Song")
+                m = hashlib.md5()  # create MD5 hash from given String
+                m.update("{0}".format(names[1]))
+                extentions = ["jpg", "jpeg", "png"]
+                possibleFiles = []
+                for extention in extentions:
+                    fileToCheck = os.path.join(AlbumArtFolder, "{0}.{1}".format(m.hexdigest(), extention))
+                    possibleFiles.append(fileToCheck)
+                DownloadTrigger = True
+                for filename in possibleFiles:
+                    if os.path.isfile(filename):
+                        logger.info("File is existing at: {0}".format(filename))
+                        albumart = QPixmap(filename)
+                        self.lbl_albumArt.setPixmap(albumart.scaled(self.lbl_albumArt.width(),
+                                                                    self.lbl_albumArt.height(),
+                                                                    Qt.KeepAspectRatio, Qt.SmoothTransformation))
+                        DownloadTrigger = False
+                        return
+
+                if DownloadTrigger:
+                    logger.info("Try to download Thumbnail:")
+                    try:
+                        track_obj = self.playlisteditor.youtubeTranslate.get(current_url)
+                        urlResult = track_obj.thumb_HQ_link
+                    except:
+                        urlResult = None
+
+                    logger.info("Searchresult: {0}".format(urlResult))
+                    if urlResult is not None:
+                        logger.info("Downloading url {0}".format(urlResult))
+                        urlResult = str(urlResult)
+                        if urlResult.endswith(".jpg"):
+                            extention = "jpg"
+                        elif urlResult.endswith(".jpeg"):
+                            extention = "jpeg"
+                        elif urlResult.endswith(".png"):
+                            extention = "png"
+                        else:
+                            extention = "png"
+
+                        fileToImport = os.path.join(AlbumArtFolder, "{0}.{1}".format(m.hexdigest(), extention))
+                        url = str(urlResult)
+                        urllib.urlretrieve(url, fileToImport)
+                        if os.path.isfile(fileToImport):
+                            albumart = QPixmap(fileToImport)
+                            self.lbl_albumArt.setPixmap(albumart.scaled(self.lbl_albumArt.width(),
+                                                                        self.lbl_albumArt.height(),
+                                                                        Qt.KeepAspectRatio, Qt.SmoothTransformation))
                             return
 
             fallback = QPixmap(":/albumart_fallback.png")
