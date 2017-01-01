@@ -18,6 +18,7 @@ import importlib
 import shutil
 import re
 import csv
+import copy
 
 from PyQt4.QtCore import QString, QSize, Qt, SIGNAL, QSettings, QTime, QTimer, QDir, pyqtSlot, QObject, QEvent, \
     QThread, QLocale, QTranslator, QLibraryInfo, QChar, QVariant, pyqtSignal
@@ -1333,6 +1334,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             #save current playlist
             if self.player is not None:
                 self.player.save_playlist("media_playlist")      # assure that current playlist is saved...
+                self.playlisteditor.checkTranslationsForObsolet()
+                self.playlisteditor.save_yt_translations()
                 logger.info("Saved playlist, media_playlist")
 
         if to_mode == "radio":
@@ -3348,6 +3351,7 @@ class Playlisteditor(object):
         self.service = service
         self.view.setSelectionMode(QAbstractItemView.SingleSelection)
         #self.service = MPC_Player()
+        self._workerList = []
         self.playlist = []
         self.load_yt_translations()   # creates a self.youtubeTranslate dictionary
 
@@ -3388,10 +3392,27 @@ class Playlisteditor(object):
                 if entry[key].startswith("http"):    #if a youtubelink or another link is in the entry
                     #print("Populate with", self.youtubeTranslate.get(entry[key]))
                     obj = self.youtubeTranslate.get(entry[key])  # try to find the url in the youtube-translation
+                    #print self.youtubeTranslate
+
                     if obj is not None:     #if found
-                        if obj.streamLink != entry[key]:
+                        #print entry[key]
+                        #print entry["id"]
+                        #print entry["pos"]
+                        #print obj.streamLink
+                        #print obj.isExpired()
+                        #print obj.title
+                        #if obj.streamLink != entry[key]:
+                        if obj.isExpired() or obj.streamLink != entry[key]:   # isExpired is a fast function...
                             #TODO: Exchange the link in mpd-playlist, because the old one was expired
                             print("Streamlink is expired!", entry["id"], entry["pos"])
+                            # TODO: Need a worker-thread here ... this might take a while.(large Playlists)
+                            #self.replace_yt_link_in_playlist(entry["id"], entry["pos"], obj.streamLink, copy.deepcopy(obj))
+
+                            thread = WorkerThread(self.replace_yt_link_in_playlist, entry["id"],
+                                                  entry["pos"], copy.deepcopy(obj))
+                            thread.start()
+                            self._workerList.append(thread)
+                        # the tile is the same, even when the url is expired....
                         itemname = obj.title  # get a name for a url
                     else:
                         #TODO: What about other links which might be supplied from UPnP or something?
@@ -3409,6 +3430,15 @@ class Playlisteditor(object):
             self.view.addItem(item)
         if selection_to_restore is not None:
             self.view.setCurrentRow(selection_to_restore)
+
+        # wait for worker-threads to be finished...
+        for threads in self._workerList:
+            while not threads.isFinished():
+                app.processEvents()
+
+        self._workerList = []  #empty the workerlist.
+
+        #self.checkTranslationsForObsolet()    # check youtube translation for obsolet entries
 
     @pyqtSlot()                                # Connect here the function button "up"
     def moveItemUp(self):
@@ -3456,6 +3486,11 @@ class Playlisteditor(object):
             self.view.setSelectionMode(QAbstractItemView.SingleSelection)
         QApplication.processEvents()
         self.grapCurrentPlaylist()
+
+    def replace_yt_link_in_playlist(self, song_id, song_pos, obj_copy):
+        new_url = obj_copy.streamLink  # this is a long runnig process.
+        self.service.replaceIDwith(song_id, song_pos, new_url)
+        self.youtubeTranslate.update({obj_copy.streamLink: obj_copy})
 
     def tellMeWhatsPlaying(self):
         self.grapCurrentPlaylist()

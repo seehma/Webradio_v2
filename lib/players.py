@@ -259,6 +259,14 @@ class MPC_Player(object):
         return True
 
     @reconnect
+    def replaceIDwith(self, song_id, song_position, new_url):
+        self.client.deleteid(song_id)
+        new_id = self.addid(new_url)
+        self.client.moveid(new_id, song_position)
+        return new_id
+
+
+    @reconnect
     def search(self, tag, searchphrase):
         """
         :param tag: "artist" "album" "title" "filename"

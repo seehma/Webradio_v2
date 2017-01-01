@@ -254,7 +254,7 @@ class Track(object):
                  &expire=1431902956
                  &sparams=ip,ipbits,expire,id,itag,source,requiressl,pl,nh,mm,ms,mv,ratebypass,mime,gir,clen,lmt,dur
         """
-        if self.expiration is not None and self.expiration > datetime.datetime.now() and self.__streamlink != "":
+        if not self.isExpired() and self.__streamlink != "":
             # use already loaded link if it is still valid
             #print("Re-Use existing Streamlink")
             ret = self.__streamlink
@@ -262,7 +262,7 @@ class Track(object):
             # # initial case or link is expired. Load a new one, set new expiration
             #print("Link expired, reload")
             ret = commands.getoutput("youtube-dl --prefer-insecure -g -f140 -- {0}".format(self.id))
-            print ret
+            #print ret
             if ret.startswith("http"):   #only if a link was returned
                 try:
                     expiration = re.search("(?P<exp>&expire=[^\D]+)", ret).group("exp").split("=")[1]
@@ -271,6 +271,8 @@ class Track(object):
                     logger.error("Expiration-Time can not be extracted from Link: {0}, "
                                  "setting to 2 hours".format(self.title.decode("utf-8")))
                     self.expiration = datetime.datetime.now() + datetime.timedelta(hours=2)  # choose a short exiration
+                #Debug only, delete after dev
+                #self.expiration = datetime.datetime.now() + datetime.timedelta(minutes=5)  # debug only!
             else:
                 logger.error("Youtube-dl returned: {0}...".format(ret[:60]))  #log only the first 30 letters
                 ret = ""
@@ -278,6 +280,12 @@ class Track(object):
         self.__streamlink = ret
 
         return ret
+
+    def isExpired(self):
+        if self.expiration is not None and self.expiration > datetime.datetime.now():
+            return False
+        else:
+            return True
 
     @property
     def duration(self):
