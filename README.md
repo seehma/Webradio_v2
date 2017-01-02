@@ -91,10 +91,10 @@ __**Zusatzfunktionen welche z.Z. in Arbeit sind von V1 zu V2:**__
   </tr>
   <tr>
     <td>YouTube-Player (Audio)</td>
-    <td>Als Erweiterung zum Media-Player werden nun Suchergebnisse von YouTube mit in Suchergebnisse gelistet,
+    <td>Als Erweiterung zum Media-Player werden nun Suchergebnisse von YouTube mit in den Suchergebnissen gelistet,
     welche wie jeder andere Track in die Playliste eingereiht werden kann. Als Album-Cover wird ein Vorschaubild
     von Youtube angezeigt, der Link kann zur späteren Wiederverwendung in der Playliste verbleiben.</td>
-    <td>In Arbeit!</td>
+    <td>Fertig!</td>
   </tr>
 </table>
 ---
@@ -111,7 +111,9 @@ benötigt wird).
 
 4. Unterstützung für UPnP über mpd-Addon "upmpdcli" (siehe <a href="https://github.com/Acer54/Webradio_v2/wiki/UPnP--Streaming-Support">Wiki</a>)
 
-5. Youtube-Player in Media-Player integriert (in Arbeit)
+5. Youtube-Player in Media-Player integriert
+
+6. Bildschirmschoner (Uhrzeit und Wettersituation) bei längerer Nichtbenutzung (aktivierbar über webradio.conf)
 
 ###Es werden Übersetzer gesucht!
 Da nun die Unterstützung für weitere Sprachen fertig ist, wäre es wünschenswert mehr Sprachen zu
