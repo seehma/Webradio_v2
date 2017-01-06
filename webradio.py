@@ -19,6 +19,7 @@ import shutil
 import re
 import csv
 import copy
+import pwd
 
 from PyQt4.QtCore import QString, QSize, Qt, SIGNAL, QSettings, QTime, QTimer, QDir, pyqtSlot, QObject, QEvent, \
     QThread, QLocale, QTranslator, QLibraryInfo, QChar, QVariant, pyqtSignal
@@ -190,6 +191,8 @@ from lib.usb_manager import USB_manager
 from lib.mpd_filesystemView import LM_QFileSystemModel
 from lib.system_test import test_onlineServices as systemtest
 from lib.system_test import test_programm_exists as programm_exists
+from lib.system_test import isRunningWithSudo
+from lib.system_test import signedInUserName
 from ui.database_searcher import Track
 # import the resource-file load fallback if there is nothing specified... (initially, for correct Splash-Screen...)
 res = importlib.import_module(".res", package="res.designs.{0}".format(
@@ -1006,6 +1009,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         try:
             pickle.dump(container, open(filename, "wb"))
+            if isRunningWithSudo():
+                orig_user = signedInUserName()
+                user = pwd.getpwnam(orig_user)
+                try:
+                    logger.info("Changing File Permissions of: {0}".format(filename))
+                    os.chown(filename, user.pw_uid, user.pw_gid)
+                except:
+                    logger.error("was not able to change File-Permission for {0}".format(orig_user))
+
         except IOError:
             logger.error("was not able to store favorites, maybe dont have got the file-permissions needed")
             return (False, [])
@@ -1027,6 +1039,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         try:
             pickle.dump(container, open(filename, "wb"))
+            if isRunningWithSudo():
+                orig_user = signedInUserName()
+                user = pwd.getpwnam(orig_user)
+                try:
+                    logger.info("Changing File Permissions of: {0}".format(filename))
+                    os.chown(filename, user.pw_uid, user.pw_gid)
+                except:
+                    logger.error("was not able to change File-Permission for {0}".format(orig_user))
         except IOError:
             logger.error("was not able to store presets, maybe dont have got the file-permissions needed")
             return False
@@ -1049,6 +1069,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             with open(filename, "w") as playlistfile:
                 for item in listOfContent:
                     playlistfile.write("%s\n" % item)
+            if isRunningWithSudo():
+                orig_user = signedInUserName()
+                user = pwd.getpwnam(orig_user)
+                try:
+                    logger.info("Changing File Permissions of: {0}".format(filename))
+                    os.chown(filename, user.pw_uid, user.pw_gid)
+                except:
+                    logger.error("was not able to change File-Permission for {0}".format(orig_user))
         except:
             return False
         return True
@@ -3179,6 +3207,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 logger.critical("Reset GPIOs FAILED")
         #print("Now accept event...")
         QCloseEvent.accept()
+
+        # finalize logs and change permission if necessary
+        logger.handlers[0].close()
+        if isRunningWithSudo():
+            orig_user = signedInUserName()
+            user = pwd.getpwnam(orig_user)
+            try:
+                logger.info("Changing File Permissions of: {0}".format(LOG_FILENAME))
+                os.chown(LOG_FILENAME, user.pw_uid, user.pw_gid)
+            except:
+                logger.error("was not able to change File-Permission for {0}".format(orig_user))
+            if os.path.isfile(LOG_FILENAME + ".1"):
+                #do the same for the rollback file
+                rollback = LOG_FILENAME + ".1"
+                try:
+                    logger.info("Changing File Permissions of: {0}".format(rollback))
+                    os.chown(rollback, user.pw_uid, user.pw_gid)
+                except:
+                    logger.error("was not able to change File-Permission for {0}".format(orig_user))
+
         if self.shutdowntrigger:
             #print("Now shutdown")
             commands.getoutput("sudo shutdown -h now")
@@ -3403,11 +3451,8 @@ class Playlisteditor(object):
                         #print obj.title
                         #if obj.streamLink != entry[key]:
                         if obj.isExpired() or obj.streamLink != entry[key]:   # isExpired is a fast function...
-                            #TODO: Exchange the link in mpd-playlist, because the old one was expired
                             print("Streamlink is expired!", entry["id"], entry["pos"])
-                            # TODO: Need a worker-thread here ... this might take a while.(large Playlists)
                             #self.replace_yt_link_in_playlist(entry["id"], entry["pos"], obj.streamLink, copy.deepcopy(obj))
-
                             thread = WorkerThread(self.replace_yt_link_in_playlist, entry["id"],
                                                   entry["pos"], copy.deepcopy(obj))
                             thread.start()
@@ -3552,6 +3597,14 @@ class Playlisteditor(object):
         filename = os.path.join(cwd, "{0}.{1}".format(basename, extention))
         try:
             pickle.dump(container, open(filename, "wb"))
+            if isRunningWithSudo():
+                orig_user = signedInUserName()
+                user = pwd.getpwnam(orig_user)
+                try:
+                    logger.info("Changing File Permissions of: {0}".format(filename))
+                    os.chown(filename, user.pw_uid, user.pw_gid)
+                except:
+                    logger.error("was not able to change File-Permission for {0}".format(orig_user))
         except IOError:
             logger.error("was not able to store yt-translations, maybe dont have got the file-permissions needed")
             return False

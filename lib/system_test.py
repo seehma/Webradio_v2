@@ -3,6 +3,7 @@
 
 import urllib2
 import logging
+import os
 from distutils import spawn
 
 logger = logging.getLogger("webradio")
@@ -86,7 +87,19 @@ def test_programm_exists(name_executable):
         logger.warning("{0} is not installed or can not be found".format(name_executable))
     return state
 
+def isRunningWithSudo():
+    # ATTENTION: Raspbian got a different behaviour on "expanduser" ... the file is not startet with root-privilegues
+    # in fact the file is startet AS root ... this means the expanded ~ is /root.
+    # to avoid this, we have to grab the sys-variable "SUDO_USER" ... but this can be None as well, if webradio
+    # was startet witout "sudo" ...
+    return True if os.getenv("SUDO_USER") else False
 
+def signedInUserName():
+    # ATTENTION: Raspbian got a different behaviour on "expanduser" ... the file is not startet with root-privilegues
+    # in fact the file is startet AS root ... this means the expanded ~ is /root.
+    # to avoid this, we have to grab the sys-variable "SUDO_USER" ... but this can be None as well, if webradio
+    # was startet witout "sudo" ...
+    return os.getenv("SUDO_USER") if os.getenv("SUDO_USER") else os.path.expanduser("~")
 
 if __name__ == "__main__":
     print("Check Online-Services...")

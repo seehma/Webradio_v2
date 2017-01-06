@@ -11,6 +11,8 @@
                 Bugsfix:
                *Playlist-Editor (Mediaplayer): Font wird bei manchen Auflösungen abgeschnitten. -> Fix
                *MPD-Settings werden nicht richtig erkannt, wenn Zeile in mpd.conf mit Leerzeichen beginnt -> Fix
+               *Automatisches Update der Datei-Rechte, falls das Programm mittels "sudo" gestartet wurde, ansonsten
+                kommt es zu einem Problem mit den Datei-Rechten sobald das Programm wieder ohne sudo aufgerufen wird. -> Fix
 
 0.2.7   06.11.2016  Feature-Update:
                *Speichert Variablen wie "Sprache", "Theme", "Geo-Location-Code", "Geo-Name", "Screensaver an/aus" in
