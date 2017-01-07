@@ -345,6 +345,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.virtualKeyboard3.spaceButton.setText(self.tr("Space"))
 
         self.cB_checkOnline.setText(self.tr("Include Online-Results"))
+        self.cB_timerAction.setItemText(0, self.tr("Shutdown"))
+        self.cB_timerAction.setItemText(1, self.tr("Standby"))
 
     def _readPossibleTranslations(self):
         '''

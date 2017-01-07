@@ -3,10 +3,11 @@
                 so kann man auf den ersten Blick sehen, wie viele MP3s in einem Ordner sind
                *Möglichkeit in Suchergebnisse aus dem Media-Player sog. "Online-Resourcen" für die
                 Suche mit ein zu binden (Youtube) und entsprechende Titel in die eigene Playliste zu übernehmen und
-                ab zu spielen.
+                ab zu spielen. Als Album Cover wird ein Screenshot des jeweiligen Videos gezeigt.
                *Bildschirmschoner mit Uhrzeit und Wetterinformationen nach bestimmter Zeit
                (kann aktiviert werden mittels "ScreensaverDelay=600" in den webradio-Konfigs (webradio.conf))
                *Abschalt-Timer erhält zusätzliche Aktions-Auswahl-Option (Herunterfahren + Standby)
+               *Russische Übersetzung kam hinzu
 
                 Bugsfix:
                *Playlist-Editor (Mediaplayer): Font wird bei manchen Auflösungen abgeschnitten. -> Fix
