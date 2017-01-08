@@ -1,4 +1,4 @@
-0.2.8   xx.xx.xxx   Feature-Update:
+0.2.8   08.01.2017   Feature-Update:
                *Die Suchergebnisse im Mediaplayer, zeigen nun die in einem Ordner enthaltenen Titel in Zahlen an
                 so kann man auf den ersten Blick sehen, wie viele MP3s in einem Ordner sind
                *Möglichkeit in Suchergebnisse aus dem Media-Player sog. "Online-Resourcen" für die
