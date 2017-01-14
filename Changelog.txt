@@ -1,3 +1,7 @@
+0.2.9   dev     Feature-Update:
+                *Es kam ein Design namens "grunge" dazu, welches von Juri beigesteuert wurde, der auch schon die
+                 russische Übersetzung übernommen hat! Danke dafür Juri!
+
 0.2.8   08.01.2017   Feature-Update:
                *Die Suchergebnisse im Mediaplayer, zeigen nun die in einem Ordner enthaltenen Titel in Zahlen an
                 so kann man auf den ersten Blick sehen, wie viele MP3s in einem Ordner sind

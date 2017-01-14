@@ -274,7 +274,7 @@ class Track(object):
                 #Debug only, delete after dev
                 #self.expiration = datetime.datetime.now() + datetime.timedelta(minutes=5)  # debug only!
             else:
-                logger.error("Youtube-dl returned: {0}...".format(ret[:60]))  #log only the first 30 letters
+                logger.error("Youtube-dl returned: {0}...".format(ret))  #log only the first 30 letters
                 ret = ""
 
         self.__streamlink = ret

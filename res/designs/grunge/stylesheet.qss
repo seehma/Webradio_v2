@@ -1,0 +1,208 @@
+/* stylesheet.qss (fallback) */
+QMainWindow {
+        /* background-image: url(':/grunge.jpg'); */
+        border-image: url(:/grunge.jpg) 0 0 0 0 stretch stretch;
+        background-repeat: repeat-xy;
+        background-position: top-left;
+        color: rgba(240, 240, 240,0);
+        }
+/* Settings - Tab */
+QComboBox{
+        color: white;
+        background: rgba(76, 76, 76,0);
+        selection-background-color: rgb(20, 15, 12);
+        border-style: solid;
+        border-color: black;
+        border-width: 5px;
+        border-radius: 10px;
+        padding: 1px 18px 1px 3px;
+        min-width: 6em;
+        }
+QComboBox::drop-down{
+        subcontrol-origin: padding;
+        subcontrol-position: top right;
+        width: 25px;
+        background-color: rgb(20, 15, 12);
+        border-left-width: 1px;
+        border-left-color: darkgray;
+        border-left-style: solid; /* just a single line */
+        border-top-right-radius: 3px; /* same radius as the QComboBox */
+        border-bottom-right-radius: 3px;
+        }
+QComboBox:!editable:on, QComboBox::drop-down:editable:on {
+        background: rgb(20, 15, 12);
+        }
+QComboBox QListView{
+        background: rgb(63, 43, 34);
+        selection-background-color: rgb(20, 15, 12);
+        color: black;
+        }
+QCheckBox{
+        color: white;
+        }
+QCheckBox::indicator {
+        width: 30px;
+        height: 30px;
+        }
+QCheckBox::indicator:checked {
+        image: url(:/checkbox_checked.png);
+        }
+QCheckBox::indicator:unchecked {
+        image: url(:/checkbox_unchecked.png);
+        }
+/* Color of Label Fonts */
+QLabel{
+       color: rgb(240, 240, 240);
+       }
+QLabel#lbl_next{                                                  /* Label, next Playing (Media-Player) */
+       color: rgba(240, 240, 240, 50%);
+}
+QLabel#lbl_previouse{                                             /* Label, previouse Playing (Media-Player) */
+       color: rgba(240, 240, 240, 50%);
+}
+QMessageBox {
+        background-color: rgba(76, 76, 76,0);
+        color: rgb(240, 240, 240);
+        }
+QPushButton{
+        background-color: rgba(76, 76, 76,0);
+        color: rgb(255, 255, 255);
+        border-style: double;
+        border-color: black;
+        border-width: 2px;
+        border-radius: 10px;
+        }
+QPushButton::pressed{
+        background: rgb(20, 15, 12);
+        }
+QListWidget{
+        background-color: rgba(76, 76, 76,0);
+        color: rgb(240, 240, 240);
+        }
+QListWidget::item:selected{
+        background-color: rgb(20, 15, 12);
+        }
+QListWidgetItem{
+        background-color: rgba(76, 76, 76,0);
+        color: rgb(240, 240, 240);
+        }
+/* not used any longer */
+/*QStatusbar{
+        background: rgba(76, 76, 76,0);
+        } */
+QTabWidget::pane{
+        border: 0;
+        }
+QTabBar::tab{
+        border: 2;
+        border-color: black;
+        width:60px;  /* This defines the icon-size in the Tabwidget */
+        }
+QTreeView{
+        background: rgba(76, 76, 76,0);
+        border: 2;
+        border-color: black;
+        }
+QTreeView::item:selected{                                                 /* File-View Media Player, SELECTED Item */
+        background-color: rgb(20, 15, 12);
+        color: rgb(240, 240, 240);
+        }
+QTreeView::item, QTreeView QLabel{                                        /* File-View Media Player, UNSELECTED Item */
+        background-color: rgba(76, 76, 76,0);
+        color: rgb(180, 180, 180);
+        }
+QTreeView::branch {
+        height: 62;
+        width: 65;
+        }
+QTreeView::branch:closed:has-children {
+        image: url(:/expand.png);
+        }
+QTreeView::branch:open:has-children {
+        image: url(:/collapse.png);
+        }
+QHeaderView::section{
+        background-color: rgba(76, 76, 76,0);
+        }
+QScrollBar:vertical {
+        border: none;
+        background: rgb(180, 180, 180);
+        width: 35px;
+        margin: 35px 0 35px 0;
+        }
+QScrollBar::handle:vertical {
+        background: rgb(42, 42, 42);
+        min-height: 35px;
+        }
+QScrollBar::add-line:vertical {
+        background: none;
+        height: 35px;
+        subcontrol-position: bottom;
+        subcontrol-origin: margin;
+        }
+QScrollBar::sub-line:vertical {
+        background: none;
+        height: 35px;
+        subcontrol-position: top left;
+        subcontrol-origin: margin;
+        position: absolute;
+        }
+QScrollBar:up-arrow:vertical {
+        width: 35px;
+        height: 35px;
+        background: rgb(42, 42, 42);
+        image: url(':/up.png');
+        }
+QScrollBar::down-arrow:vertical {
+        width: 35px;
+        height: 35px;
+        background: rgb(42, 42, 42);
+        image: url(':/down.png');
+        }
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+        background: none;
+        }
+QSlider::groove:horizontal {
+        border: 1px solid #bbb;
+        background: red;
+        height: 10px;
+        border-radius: 4px;
+        }
+QSlider::sub-page:horizontal {
+        background: qlineargradient(x1: 0, y1: 0.2, x2: 1, y2: 1, stop: 0 #4c4c4c, stop: 1 #ff6a00);
+        border: 1px solid #777;
+        height: 10px;
+        border-radius: 4px;
+        }
+QSlider::add-page:horizontal {
+        background: #fff;
+        border: 1px solid #777;
+        height: 10px;
+        border-radius: 4px;
+        }
+QSlider::handle:horizontal {
+        background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #ff6a00, stop:1 #4c4c4c);
+        border: 1px solid #777;
+        width: 13px;
+        margin-top: -2px;
+        margin-bottom: -2px;
+        border-radius: 4px;
+        }
+QSlider::handle:horizontal:hover {
+        background: orange;
+        border: 1px solid #444;
+        border-radius: 4px;
+        }
+QSlider::sub-page:horizontal:disabled {
+        background: orange;
+        border-color: #999;
+        }
+QSlider::add-page:horizontal:disabled {
+        background: black;
+        border-color: #999;
+        }
+QSlider::handle:horizontal:disabled {
+        background: gray;
+        border: 1px solid #aaa;
+        border-radius: 4px;
+        }

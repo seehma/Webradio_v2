@@ -230,7 +230,7 @@ except ImportError:  # load the GPIO simulator instead. The signals are the same
         raise EnvironmentError
     VARIABLE_DATABASE = global_vars.configuration.get("DEVELOPMENT").get("variable_database_name")
 
-__version__ = "0.2.8"
+__version__ = "0.2.9"
 
 BasenameFavoritesPlaylist = "favorites"
 LogoFolder = os.path.join(cwd, "Logos")
@@ -3309,6 +3309,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if isinstance(pathes[0], Track):  # first entry is a Track object from youtube
             url = pathes[0].streamLink   #it is a Track-object!
             firstIDinPlaylist = self.player.addid(url)
+            if url == "":
+                firstIDinPlaylist = False
             if firstIDinPlaylist:
                 self.playlisteditor.setTranslation(url, pathes[0])   #appen the Trackobject with the url as a key.
         else:
