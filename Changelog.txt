@@ -2,6 +2,11 @@
                 *Es kam ein Design namens "grunge" dazu, welches von Juri beigesteuert wurde, der auch schon die
                  russische Übersetzung übernommen hat! Danke dafür Juri!
 
+                Bugfix:
+                *UTF-8 Fehler bei Online-Suchergenissen gefixt
+                *Minimim-Höhe für Buttons der virtuellen Tastatur festgelegt, damit diese auch bei schmalen LCDs noch
+                 lesbar bleiben.
+
 0.2.8   08.01.2017   Feature-Update:
                *Die Suchergebnisse im Mediaplayer, zeigen nun die in einem Ordner enthaltenen Titel in Zahlen an
                 so kann man auf den ersten Blick sehen, wie viele MP3s in einem Ordner sind
@@ -13,7 +18,7 @@
                *Abschalt-Timer erhält zusätzliche Aktions-Auswahl-Option (Herunterfahren + Standby)
                *Russische Übersetzung kam hinzu
 
-                Bugsfix:
+                Bugfix:
                *Playlist-Editor (Mediaplayer): Font wird bei manchen Auflösungen abgeschnitten. -> Fix
                *MPD-Settings werden nicht richtig erkannt, wenn Zeile in mpd.conf mit Leerzeichen beginnt -> Fix
                *Automatisches Update der Datei-Rechte, falls das Programm mittels "sudo" gestartet wurde, ansonsten
