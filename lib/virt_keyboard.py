@@ -30,6 +30,7 @@ class KeyButton(QPushButton):
         self.connect(self, SIGNAL("clicked()"), self.emitKey)
         self.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
         self.setFocusPolicy(Qt.NoFocus)
+        self.setMinimumHeight(40) 
 
     def emitKey(self):
         self.emit(SIGNAL("sigKeyButtonClicked"), self._key)
