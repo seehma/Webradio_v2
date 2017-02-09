@@ -611,7 +611,7 @@ class LM_QTreeWidget(QTreeWidget):
 
             for key, playlistopj in self.onlineresults.iteritems():
                 parentOfPlaylist = self.parentFromAlbum["Online-Playlists"]
-                print(playlistopj.title)
+                #print(playlistopj.title)
                 entry1 = QTreeWidgetItem(parentOfPlaylist, [unicode(playlistopj.title),
                                                             "[{0}]".format(playlistopj.size)])
                 entry1.setData(0, Qt.UserRole, QVariant((playlistopj,)))
