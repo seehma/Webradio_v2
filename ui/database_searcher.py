@@ -12,13 +12,11 @@ import time
 import re
 import commands
 import logging
+from httplib2 import ServerNotFoundError
 
 logger = logging.getLogger("webradio")
 
 from lib.googleapiclient.discovery import build
-#import resources_database_search
-
-#pp = pprint.PrettyPrinter(indent=4)
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
 # Set DEVELOPER_KEY to the API key value from the APIs & auth > Registered apps
@@ -26,8 +24,12 @@ pp = pprint.PrettyPrinter(indent=4)
 DEVELOPER_KEY = "AIzaSyDs9UiXmNXM_kWtWZWCJTtbYAJ90WQmChE"
 YOUTUBE_API_SERVICE_NAME = "youtube"
 YOUTUBE_API_VERSION = "v3"
-youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
-                developerKey=DEVELOPER_KEY)
+try:
+    youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
+                    developerKey=DEVELOPER_KEY)
+except ServerNotFoundError:
+    logger.warning("Server can not reached, maybe no network is connected?")
+    youtube = None
 
 def iso_Date_to_seconds_int(timestring):
     '''

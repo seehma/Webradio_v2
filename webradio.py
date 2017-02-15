@@ -408,7 +408,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             kombi_widget = QWidget()
             kombi_layout = QVBoxLayout()
             self.cB_checkOnline = QCheckBox(self.tr("Include Online-Results"))
-            self.cB_checkOnline.setVisible(programm_exists("youtube-dl"))   #determine if youtube-dl is avilable on the system
+            if programm_exists("youtube-dl") and "internet" not in self.broken_connections:
+                self.cB_checkOnline.setVisible(True)   #determine if youtube-dl is avilable on the system
+            else:
+                logger.warning("Disable Youtube-Search Checkbox: Youtube-dl installed = {0}, "
+                               "brokenconnections= {1}".format(programm_exists("youtube-dl"), self.broken_connections))
+                self.cB_checkOnline.setVisible(False)   #deactivate if no internet is available
             self.cB_checkOnline.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
             kombi_layout.addWidget(self.cB_checkOnline)
             self.virtualKeyboard2.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -442,7 +447,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.splash = AnimatedSplashScreen(":/loading.gif")
             self.charm = FlickCharm()
 
-            self.screensaver = Screensaver_Overlay(cwd, self)
+            self.screensaver = Screensaver_Overlay(cwd,
+                                                   False if "weathercom" in self.broken_connections else True,
+                                                   self)
             self.screensaver.hide()
 
         def __define_widgets_presettings(self):
@@ -938,11 +945,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             size =  self.geometry()
             self.move((screen.width()-size.width())/2, (screen.height()-size.height())/2-27)
 
+
+
         if presetting:
             __define_widgets_presettings(self)
         else:
             __readSystemVars(self)
             __initial_variable_setup(self)
+            if not args.no_network_check:
+                logger.info("Checking Network")
+                #QTimer.singleShot(0, self.checkInternet)
+                self.checkInternet()
             __define_additional_widgets(self)
             __define_widgets_presettings(self)
             __setConnections(self)
@@ -950,10 +963,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             __loadFavorites(self)
             __loadGPIO_Presets(self)
             __moveCenter(self)
-
-        if not args.no_network_check:
-            logger.info("Checking Network")
-            QTimer.singleShot(0,self.checkInternet)
         __readSettings(self)
 
         self.stackedWidget.setCurrentIndex(0)
@@ -2701,8 +2710,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if GPIO_active:
             self.label_2.setText(u"{0:0.0f}°C {1:0.0f}% r.H.".format(int(temp), int(hum)))
         else:
-            self.label_2.setText(self.tr("Outside: ")+"{0:0.0f}".format(int(self.weatherWidget.lbl_cur_temp.text()))+ \
-                                 QChar(0xb0)+"C")
+            try:
+                self.label_2.setText(self.tr("Outside: ")+"{0:0.0f}".format(int(self.weatherWidget.lbl_cur_temp.text()))+ \
+                                     QChar(0xb0)+"C")
+            except ValueError:
+                self.label_2.setText("--")
 
     ###################################################################################################################
 

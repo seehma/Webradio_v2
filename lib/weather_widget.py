@@ -195,12 +195,13 @@ class weather_widget(QWidget, ui):
             self.lbl_night_2_temp.setText("--")
             self.lbl_night_2_rain.setText("--")
 
+            print("Failed COnnections: ", self.failedConnections)
             if self.failedConnections < 3:
-                QTimer.singleShot(10000, self.update_widget())
+                QTimer.singleShot(10000, self.update_widget)
             else:
                 self.failedConnections = 0
-                QTimer.singleShot(100000, self.update_widget())
-                #print("No Connection to weathersurver possible delay ")
+                QTimer.singleShot(100000, self.update_widget)
+            #    print("No Connection to weathersurver possible delay ")
 
         self.update()
 

@@ -6,6 +6,8 @@
                 *UTF-8 Fehler bei Online-Suchergenissen gefixt
                 *Minimim-Höhe für Buttons der virtuellen Tastatur festgelegt, damit diese auch bei schmalen LCDs noch
                  lesbar bleiben.
+                *Programm startet nicht, wenn kein Internet verfügbar ist. gefixt. Nun startet Programm allerdings
+                 nur Media-Player ist verfügbar (ohne youtube-player)
 
 0.2.8   08.01.2017   Feature-Update:
                *Die Suchergebnisse im Mediaplayer, zeigen nun die in einem Ordner enthaltenen Titel in Zahlen an

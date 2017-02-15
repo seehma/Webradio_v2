@@ -27,9 +27,10 @@ class Screensaver_Overlay(QWidget):
     Just like a Screensaver.
     '''
 
-    def __init__(self, cwd, parent=None):
+    def __init__(self, cwd, weather_active=True, parent=None):
         super(Screensaver_Overlay, self).__init__(parent)
         self.cwd = cwd
+        self.weather_active = weather_active
         self.setAttribute(Qt.WA_StyledBackground)    #want a styled Background
         self.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         self.setupUI()  # setup layout and widgets
@@ -145,11 +146,11 @@ class Screensaver_Overlay(QWidget):
         timerclock = QTimer(self)
         timerclock.timeout.connect(self.updateTime)
         timerclock.start(1000)  # every second update the time
-
-        timerclock2 = QTimer(self)
-        timerclock2.timeout.connect(self.updateWeather)
-        self.updateWeather() # initially make a call to the API to get the current condition
-        timerclock2.start(300000)  #every 5 Minutes update the weather icon  (this will cause an API call...)
+        if self.weather_active:
+            timerclock2 = QTimer(self)
+            timerclock2.timeout.connect(self.updateWeather)
+            self.updateWeather() # initially make a call to the API to get the current condition
+            timerclock2.start(300000)  #every 5 Minutes update the weather icon  (this will cause an API call...)
 
     def updateTime(self):
         '''
