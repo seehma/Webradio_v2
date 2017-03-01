@@ -159,7 +159,7 @@ class Screensaver_Overlay(QWidget):
         '''
         self.lbl_time.setText(self.tr(time.strftime("%H:%M")))
         self.lbl_day.setText(self.tr(date.today().strftime("%A")) + ", ")
-        self.lbl_date.setText(self.tr(date.today().strftime("%d.%b.%Y")))
+        self.lbl_date.setText(self.tr(date.today().strftime("%d.%b.%Y").decode("utf-8")))  # avoid uft-8 problem with "März"
 
     def updateWeather(self):
         '''

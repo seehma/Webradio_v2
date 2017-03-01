@@ -1,17 +1,17 @@
-#Webradio V2 - Ein MPD-gestützter Music-Player für den Raspberry Pi:
+# Webradio V2 - Ein MPD-gestützter Music-Player für den Raspberry Pi:
 
 Für eine Beschreibung und Installationsanleitung, siehe das **[Wiki](https://github.com/Acer54/Webradio_v2/wiki/startseite)**
 
 Vorstellung meines Webradios (Version1):
 
-[![Youtube-Video](http://img.youtube.com/vi/8zRfpBta6v8/0.jpg)](https://www.youtube.com/watch?v=8zRfpBta6v8) 
+[![Youtube-Video](http://img.youtube.com/vi/8zRfpBta6v8/0.jpg)](https://www.youtube.com/watch?v=8zRfpBta6v8)
 
 Vergleich Version2 (0.2.8) mit Version1:
 
 [![Youtube-Video](http://img.youtube.com/vi/oQ6oTWDCCFQ/0.jpg)](https://www.youtube.com/watch?v=oQ6oTWDCCFQ)
 
 ---
-###Im YouTube-Video ist die Version1 vorgeführt worden, welche über die im Video verlinkten Download-Bereiche heruntergeladen werden kann!
+### Im YouTube-Video ist die Version1 vorgeführt worden, welche über die im Video verlinkten Download-Bereiche heruntergeladen werden kann!
 
 <a href="http://my-darling.is-a-linux-user.org/?p=349">Besuche meinen Blog für mehr Informationen über Version2</a>
 
@@ -84,7 +84,7 @@ __**Zusatzfunktionen welche z.Z. in Arbeit sind von V1 zu V2:**__
     <td>Mehrsprachigkeit</td>
     <td>Das Programm soll in mehreren Sprachen vorliegen, damit auch Nutzer die nicht aus Deutschland stammen damit
     arbeiten können.</td>
-    <td>Momentan liegt das Programm in DE (Deutsch), EN (Englisch) und BY (Bayerisch) vor. 
+    <td>Momentan liegt das Programm in DE (Deutsch), EN (Englisch) und BY (Bayerisch) vor.
     Die Sprache wird automatisch mittels eingestellter Systemsprache gewählt. Eine
     eigenständige Auswahl kann jederzeit über den Einstellungs-Tab vorgenommen werden.</td>
   </tr>
@@ -106,7 +106,7 @@ __**Zusatzfunktionen welche z.Z. in Arbeit sind von V1 zu V2:**__
 </table>
 ---
 
-###Änderungen und Optimierungen die nebenher laufen:
+### Änderungen und Optimierungen die nebenher laufen:
 1. Wenn kein DHT11 Temperatur-/Luftfeuchte-Messer angeschlossen ist wird nun nicht mehr nur ein "Standardwert" angezeigt,
 sondern die aktuellen Temperaturdaten aus dem Wetterwidget in der Titelleiste angezeigt.
 
@@ -122,7 +122,7 @@ benötigt wird).
 
 6. Bildschirmschoner (Uhrzeit und Wettersituation) bei längerer Nichtbenutzung (aktivierbar über webradio.conf)
 
-###Es werden Übersetzer gesucht!
+### Es werden Übersetzer gesucht!
 Da nun die Unterstützung für weitere Sprachen fertig ist, wäre es wünschenswert mehr Sprachen zu
 unterstützen. Schön wäre, wenn hierzu jemand etwas an Übersetzungen beisteuern könnte!
 
