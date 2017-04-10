@@ -2211,6 +2211,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             logger.info("Received PlaylistInformation (last,current,next)".format(names))
             self.lbl_previouse.setText(names[0])
             self.lbl_current_playing.setText(names[1])
+            #self.lbl_current_playing.setText(names[1] if current_artist is not "" else current_artist + ": " + names[1])
             self.lbl_next.setText(names[2])
             self.lbl_current_seek.setText("")
             self.lbl_total_seek.setText("")
@@ -3082,6 +3083,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         dialog = ShutdownDialog(options=[self.tr("Shutdown"),
                                          self.tr("Standby"),
                                          self.tr("Reboot"),
+                                         self.tr("Close"),
                                          self.tr("Abort")], parent=self)
         dialog.exec_()
         if dialog.exitStatus is None:
@@ -3129,6 +3131,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # show again the initial state of the button (on)
             # have to use singleshot Timer because otherwise button is changed because of signal
             QTimer.singleShot(20, lambda : self.widget_Standby.setInitialState("on"))
+        elif dialog.exitStatus == self.tr("Close"):
+            self.close()
 
     def askQuestion(self, text1, btn1, text2=None, btn2=None):
         """
