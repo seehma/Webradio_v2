@@ -1,3 +1,7 @@
+0.3.0   12.07.2017   Bugfix
+                *Weather-Widget funktionierte nicht mehr, da es mit den neu verwendeten Cookies des Wetterdienstes nicht
+                 umgehen konnte. -> Fix
+
 0.2.9   dev     Feature-Update:
                 *Es kam ein Design namens "grunge" dazu, welches von Juri beigesteuert wurde, der auch schon die
                  russische Übersetzung übernommen hat! Danke dafür Juri!
