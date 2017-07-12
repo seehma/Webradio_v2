@@ -1,4 +1,8 @@
-0.3.0   12.07.2017   Bugfix
+0.3.0   12.07.2017   Feature-Update:
+                * Es gibt im Shut-Down-Menü nun neben der Funktion "Herunterfahren", "Neustarten" und "Standby" auch
+                  eine weitere Option "Schließen", die das Programm beendet, allerdings den Rechner nicht herunterfährt.
+
+                Bugfix
                 *Weather-Widget funktionierte nicht mehr, da es mit den neu verwendeten Cookies des Wetterdienstes nicht
                  umgehen konnte. -> Fix
 
