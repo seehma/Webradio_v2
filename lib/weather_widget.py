@@ -47,7 +47,8 @@ class weather_widget(QWidget, ui):
     def __service_available(self):
         #print("Check if service is available")
         try:                                                             # check internet-connection (call Google.com)
-            urllib2.urlopen('http://www.weather.com/',timeout=1)
+            #urllib2.urlopen('http://www.weather.com/', timeout=1)       #UPDATE 12.07.2017, Handling Cookies
+            urllib2.build_opener(urllib2.HTTPCookieProcessor).open('https://www.weather.com/', timeout=1)
             print("Yes it is...")
             return True
         except urllib2.URLError:                                         # if there is an error
