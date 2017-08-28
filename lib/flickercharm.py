@@ -8,7 +8,7 @@
 import copy
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from PyQt4.QtWebKit import *
+#from PyQt4.QtWebKit import *
 import sys
 
 class FlickData:
@@ -44,34 +44,21 @@ class FlickCharm(QObject):
         
     
     def activateOn(self, widget):
-        if isinstance(widget, QWebView):
-            frame = widget.page().mainFrame()
-            frame.setScrollBarPolicy(Qt.Vertical, Qt.ScrollBarAlwaysOff)
-            frame.setScrollBarPolicy(Qt.Horizontal, Qt.ScrollBarAlwaysOff)
-            widget.installEventFilter(self)
-            self.d.flickData[widget] = FlickData()
-            self.d.flickData[widget].widget = widget
-            self.d.flickData[widget].state = FlickData.Steady
-        else:
-            widget.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-            #widget.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-            viewport = widget.viewport()
-            viewport.installEventFilter(self)
-            widget.installEventFilter(self)
-            self.d.flickData[viewport] = FlickData()
-            self.d.flickData[viewport].widget = widget
-            self.d.flickData[viewport].state = FlickData.Steady
+        widget.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        #widget.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        viewport = widget.viewport()
+        viewport.installEventFilter(self)
+        widget.installEventFilter(self)
+        self.d.flickData[viewport] = FlickData()
+        self.d.flickData[viewport].widget = widget
+        self.d.flickData[viewport].state = FlickData.Steady
 
     
     def deactivateFrom(self, widget):
-        if isinstance(widget, QWebView):
-            widget.removeEventFilter(self)
-            del(self.d.flickData[widget])
-        else:
-            viewport = widget.viewport()
-            viewport.removeEventFilter(self)
-            widget.removeEventFilter(self)
-            del(self.d.flickData[viewport])
+        viewport = widget.viewport()
+        viewport.removeEventFilter(self)
+        widget.removeEventFilter(self)
+        del(self.d.flickData[viewport])
 
     
     def eventFilter(self, object, event):
@@ -201,23 +188,14 @@ class FlickCharm(QObject):
     
     
 def scrollOffset(widget):
-    if isinstance(widget, QWebView):
-        frame = widget.page().mainFrame()
-        x = frame.evaluateJavaScript("window.scrollX").toInt()[0]
-        y = frame.evaluateJavaScript("window.scrollY").toInt()[0]
-    else:
-        x = widget.horizontalScrollBar().value()
-        y = widget.verticalScrollBar().value()
+    x = widget.horizontalScrollBar().value()
+    y = widget.verticalScrollBar().value()
     return QPoint(x, y)
 
 
 def setScrollOffset(widget, p):
-    if isinstance(widget, QWebView):
-        frame = widget.page().mainFrame()
-        frame.evaluateJavaScript("window.scrollTo(%d,%d);" % (p.x(), p.y()))
-    else:
-        widget.horizontalScrollBar().setValue(p.x())
-        widget.verticalScrollBar().setValue(p.y())
+    widget.horizontalScrollBar().setValue(p.x())
+    widget.verticalScrollBar().setValue(p.y())
 
 
 def deaccelerate(speed, a=1, maxVal=8):
