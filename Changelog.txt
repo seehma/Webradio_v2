@@ -1,3 +1,8 @@
+0.3.1   29.08.2017   Bug-Fix:
+                * das Modul "QT-Webkit" wird ab Debian8 bzw. "Stretch" nicht mehr ausgeliefert bzw. ist nicht mehr verfügbar.
+                  da das Modul in diesem Fall nicht unbedingt verwendet werden muss, wurde der Code von "flickercharm.py"
+                  entsprechend angepasst.
+
 0.3.0   12.07.2017   Feature-Update:
                 * Es gibt im Shut-Down-Menü nun neben der Funktion "Herunterfahren", "Neustarten" und "Standby" auch
                   eine weitere Option "Schließen", die das Programm beendet, allerdings den Rechner nicht herunterfährt.

@@ -230,7 +230,7 @@ except ImportError:  # load the GPIO simulator instead. The signals are the same
         raise EnvironmentError
     VARIABLE_DATABASE = global_vars.configuration.get("DEVELOPMENT").get("variable_database_name")
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 BasenameFavoritesPlaylist = "favorites"
 LogoFolder = os.path.join(cwd, "Logos")
