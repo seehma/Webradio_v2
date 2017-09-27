@@ -230,7 +230,7 @@ except ImportError:  # load the GPIO simulator instead. The signals are the same
         raise EnvironmentError
     VARIABLE_DATABASE = global_vars.configuration.get("DEVELOPMENT").get("variable_database_name")
 
-__version__ = "0.3.1"
+__version__ = "0.3.2"
 
 BasenameFavoritesPlaylist = "favorites"
 LogoFolder = os.path.join(cwd, "Logos")
@@ -2074,7 +2074,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 if trigger_for_switching_to_radio:
                     self.tabWidget_main.setCurrentIndex(0)
 
-            elif url.lower().endswith((".mp3", ".ogg", ".oga", ".mp4")):   # 20161003 ogg and oga added, url.lower() implemented
+            elif url.lower().endswith((".mp3", ".ogg", ".oga", ".mp4", ".flac")):   # 20170927: added flac support
                 logger.info("Received url which looks like a filename ({0}) .Ignoring it for changeStation".format(url))
                 if self.mode is not "media":
                     logger.info("Switch to media mode, because im in Radio Mode..")
@@ -2200,7 +2200,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         :return:
         """
         #if "/external/audio/media/" in current_url:
-        if "http://192.168." in current_url and current_url.endswith((".mp3", ".ogg", ".oga", ".mp4")):   # url is a UPnP from the local network ?
+        if "http://192.168." in current_url and current_url.endswith((".mp3", ".ogg", ".oga", ".mp4", ".flac")):   # url is a UPnP from the local network ?
             if self.mode != "media":
                 self.switchModeTo(self.mode, "media")
                 self.tabWidget_main.setCurrentIndex(1)
@@ -3356,7 +3356,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.model.setRootPath(MusicFolder)
         self.model.setIconProvider(self.myProvider)
         self.model.setFilter(QDir.AllEntries|QDir.NoDotAndDotDot|QDir.AllDirs|QDir.Name)
-        self.model.setNameFilters(['*.mp3', '*.MP3', '*.ogg', '*.OGG', '*.oga', '*.OGA'])
+        self.model.setNameFilters(['*.mp3', '*.MP3', '*.ogg', '*.OGG', '*.oga', '*.OGA', '*.flac', '*.FLAC'])
 
         #self.model.setSorting(QDir.Name|QDir.DirsFirst)
         self.treeView.setModel(self.model)

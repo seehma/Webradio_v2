@@ -37,6 +37,7 @@ class LM_QFileSystemModel(QFileSystemModel):
         for i in xrange(self.rowCount(QModelIndex)):
             child = self.index(i,0, QModelIndex)
             if self.filePath(child).endsWith('.mp3', cs=Qt.CaseInsensitive) \
+                    or self.filePath(child).endsWith('.flac', cs=Qt.CaseInsensitive)\
                     or self.filePath(child).endsWith('.ogg', cs=Qt.CaseInsensitive)\
                     or self.filePath(child).endsWith('.oga', cs=Qt.CaseInsensitive):   # added flag "caseinsensitive"
                 childlist.append(child)
@@ -202,7 +203,7 @@ class Simulator_Mainwindow(QMainWindow):
         self.model = LM_QFileSystemModel()
         self.model.setRootPath("/home/matthias/Musik")
         self.model.setFilter(QDir.NoDotAndDotDot|QDir.AllEntries|QDir.AllDirs)
-        self.model.setNameFilters(['*.mp3', '*.MP3', '*.ogg', '*.OGG', '*.oga', '*.OGA'])
+        self.model.setNameFilters(['*.mp3', '*.MP3', '*.ogg', '*.OGG', '*.oga', '*.OGA', '*.flac', '*.FLAC'])
         self.proxy = LM_QSortFilterProxyModel()
         self.proxy.setSourceModel(self.model)
 

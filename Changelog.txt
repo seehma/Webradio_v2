@@ -1,3 +1,6 @@
+0.3.2   27.09.2017   Feature Update:
+                * FLAC Support includiert! Danke dafür an Paul Ritz!
+
 0.3.1   29.08.2017   Bug-Fix:
                 * das Modul "QT-Webkit" wird ab Debian8 bzw. "Stretch" nicht mehr ausgeliefert bzw. ist nicht mehr verfügbar.
                   da das Modul in diesem Fall nicht unbedingt verwendet werden muss, wurde der Code von "flickercharm.py"

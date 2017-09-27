@@ -40,6 +40,7 @@ class LM_QFileSystemModel(QFileSystemModel):
         for i in xrange(self.rowCount(QModelIndex)):
             child = self.index(i,0, QModelIndex)
             if self.filePath(child).endsWith('.mp3', cs=Qt.CaseInsensitive) \
+                    or self.filePath(child).endsWith('.flac', cs=Qt.CaseInsensitive)\
                     or self.filePath(child).endsWith('.ogg', cs=Qt.CaseInsensitive)\
                     or self.filePath(child).endsWith('.oga', cs=Qt.CaseInsensitive):   # added flag "caseinsensitive"
                 childlist.append(child)
