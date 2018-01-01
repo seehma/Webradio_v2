@@ -1284,8 +1284,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         newDesign = unicode(self.cB_design.itemText(index))
         if newDesign != "":
             logger.info("Setting new Design: {0}".format(newDesign))
-            res.qCleanupResources() # the current resources are loaded under the name "res"
+            res.qCleanupResources()   # the current resources are loaded under the name "res"
             if os.path.isfile(os.path.join(cwd, "res", "designs", newDesign, "res.py")):
+                modname = "res.designs.{0}.res".format(global_vars.configuration.get("GENERAL").get("design"))
+                del sys.modules[modname]
+                for mod in sys.modules.values():
+                    try:
+                        delattr(mod, modname)
+                    except AttributeError:
+                        pass
                 try:
                     res = importlib.import_module(".res", package="res.designs.{0}".format(newDesign))
                     global_vars.configuration.get("GENERAL").update({"design": newDesign})
@@ -1310,7 +1317,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 else:
                     # assure that right stylesheet is loaded if the user-design has failed to load...
                     global_vars.configuration.get("GENERAL").update({"design": "fallback"})
-            reload(res)  # register new module in sys.modules
+            #reload(res)  # register new module in sys.modules
+            #print res
+            #reload(sys.modules["res.designs.{0}.res".format(newDesign)])
+            #res = reload(res)  # seg Fault
+            #res.qCleanupResources()  # keine Icons kein Hintergrund
+            #__import__("res")  # es geht nur einmal genauso wenn hier nichts getan wird
+            #reload(sys.modules["res"]) # geht nur einmal
             logger.info("Loading Stylesheet: {0}".format(os.path.join(cwd, "res", "designs", global_vars.configuration.get("GENERAL").get("design"),
                                        "stylesheet.qss")))
             try:
