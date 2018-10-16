@@ -13,9 +13,9 @@ Vergleich Version2 (0.2.8) mit Version1:
 ---
 ### Im YouTube-Video ist die Version1 vorgeführt worden, welche über die im Video verlinkten Download-Bereiche heruntergeladen werden kann!
 
-<a href="http://my-darling.is-a-linux-user.org/?p=349">Besuche meinen Blog für mehr Informationen über Version2</a>
+<a href="https://my-darling-is-a-linux-user.org/?p=349">Besuche meinen Blog für mehr Informationen über Version2</a>
 
-__**Zusatzfunktionen welche z.Z. in Arbeit sind von V1 zu V2:**__
+__**Zusatzfunktionen welche hinzukamen von V1 zu V2:**__
 <table style="undefined;table-layout: fixed; width: 864px">
 <colgroup>
 <col style="width: 199px">
@@ -114,16 +114,16 @@ sondern die aktuellen Temperaturdaten aus dem Wetterwidget in der Titelleiste an
 dem jeweiligen Theme geladen und sind somit variabel und für den Nutzer anpassbar (z.B. wenn eine spezielle Farbe
 benötigt wird).
 
-3. Erweiterung der Dateiunterstützung für lokale Medien von der Dateiendung *.mp3 um *.ogg und *.oga
+3. Erweiterung der Dateiunterstützung für lokale Medien von der Dateiendung *.mp3 um *.ogg, *.oga und *.flac
 
 4. Unterstützung für UPnP über mpd-Addon "upmpdcli" (siehe <a href="https://github.com/Acer54/Webradio_v2/wiki/UPnP--Streaming-Support">Wiki</a>)
 
 5. Youtube-Player in Media-Player integriert
 
-6. Bildschirmschoner (Uhrzeit und Wettersituation) bei längerer Nichtbenutzung (aktivierbar über webradio.conf)
+6. Bildschirmschoner (Uhrzeit und Wettersituation) bei längerer Nichtbenutzung (aktivierbar über Programm-Einstellungen)
 
 ### Es werden Übersetzer gesucht!
 Da nun die Unterstützung für weitere Sprachen fertig ist, wäre es wünschenswert mehr Sprachen zu
 unterstützen. Schön wäre, wenn hierzu jemand etwas an Übersetzungen beisteuern könnte!
 
-Bei Interesse einfach über <a href="http://my-darling.is-a-linux-user.org">my-darling.is-a-linux-user.org</a> Kontakt mit mir aufnehmen !
+Bei Interesse einfach über <a href="https://my-darling-is-a-linux-user.org">my-darling-is-a-linux-user.org</a> Kontakt mit mir aufnehmen !
