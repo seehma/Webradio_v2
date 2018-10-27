@@ -25,7 +25,7 @@ from PyQt4.QtCore import QString, QSize, Qt, SIGNAL, QSettings, QTime, QTimer, Q
     QThread, QLocale, QTranslator, QLibraryInfo, QChar, QVariant, pyqtSignal
 from PyQt4.QtGui import QIcon, QMainWindow, QFont, QAbstractItemView, QCursor, QDesktopWidget, QPixmap, \
     QListWidgetItem, QMessageBox, QSplashScreen, QPushButton, QMovie, QApplication, QVBoxLayout, QFileIconProvider, \
-    QDialog, QWidget, QCheckBox, QSizePolicy
+    QDialog, QWidget, QCheckBox, QSizePolicy, QImage
 
 from lib import global_vars
 from lib.LM_Widgets_scaled_contents import Scaling_QLabel
@@ -230,7 +230,17 @@ except ImportError:  # load the GPIO simulator instead. The signals are the same
         raise EnvironmentError
     VARIABLE_DATABASE = global_vars.configuration.get("DEVELOPMENT").get("variable_database_name")
 
-__version__ = "0.3.2"
+try:    # try to import lib for extracting IDv3 Images from MP3 Files (needs to be installed with pip install eyeD3)
+    import eyed3
+    EYED3_active = True
+    logger.info("eyed3 is available, use it for extracting album-art from MP3 Files if there are any.")
+except ImportError:    # if eyeD3 is not available, this option will be ignored ... dont care.
+    EYED3_active = False
+    logger.warning("eyed3 is not available on this system! It is used to extract IDv3 embedded Album-Art from MP3 "
+                   "Files if available. You can install it via Terminal with 'pip install eyeD3'.")
+
+
+__version__ = "0.3.3"    # for revision history see "Changelog.txt"
 
 BasenameFavoritesPlaylist = "favorites"
 LogoFolder = os.path.join(cwd, "Logos")
@@ -489,6 +499,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.listWidget.setFont(font)
             self.listWidget.setIconSize(QSize(35,35))
             self.charm.activateOn(self.listWidget)
+            self.lbl_previouse.setTextFormat(Qt.RichText)    #using Rich-Text
+            self.lbl_current_playing.setTextFormat(Qt.RichText)
+            self.lbl_next.setTextFormat(Qt.RichText)
 
             #TODO: Transfer this to the stylesheets (Themes...)
             self.checkBox_screensaver.setStyleSheet("QCheckBox::indicator {width: 30px; height: 30px;}")
@@ -1554,7 +1567,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             self.playlisteditor = Playlisteditor(self.listWidget, self.player)
 
-            self.player.updateDatabase(VARIABLE_DATABASE)
+            #self.player.updateDatabase(VARIABLE_DATABASE)
+            self.player.updateDatabase()     #TODO: Verify this: Change in 0.3.3
 
             self.playlisteditor = Playlisteditor(self.listWidget, self.player, self)
 
@@ -1836,7 +1850,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 else:
                     item = self.listWidget.selectedIndexes()[0] if len(self.listWidget.selectedIndexes()) > 0 else None
                     if item is not None:
-                        ID_to_play, pos = item.data(Qt.UserRole).toStringList()
+                        ID_to_play, pos, artist = item.data(Qt.UserRole).toStringList()
                         self.player.play_title_with_ID(ID_to_play)
                     else:
                         self.player.play()
@@ -2221,11 +2235,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if self.mode == "media":
             logger.info("Media Local Changed to: {0}".format(current_url[:10]))
             names = self.playlisteditor.tellMeWhatsPlaying()
-            logger.info("Received PlaylistInformation (last,current,next)".format(names))
-            self.lbl_previouse.setText(names[0])
-            self.lbl_current_playing.setText(names[1])
-            #self.lbl_current_playing.setText(names[1] if current_artist is not "" else current_artist + ": " + names[1])
-            self.lbl_next.setText(names[2])
+            logger.info("Received PlaylistInformation (last,current,next): {0}".format(names))
+            self.lbl_previouse.setText("<h1>"+names[0]+"</h1>"
+                                       "<span>"+names[1]+"</span>")
+            self.lbl_current_playing.setText("<h1>"+names[2]+"</h1>"
+                                             "<span>"+names[3]+"</span>")
+            self.lbl_next.setText("<h1>"+names[4]+"</h1>"
+                                  "<span>"+names[5]+"</span>")
             self.lbl_current_seek.setText("")
             self.lbl_total_seek.setText("")
             self.slide_seek.setEnabled(False)
@@ -2233,6 +2249,38 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             if current_url == "HOME" and current_song == "HOME" and self.lbl_albumArt.pixmap():
                 return
+
+            #Wenn sich der Player im Modus "Media" befindet, prüfe, ob die current_url mit *.mp3 endet,
+            # (Ansonsten könnte es auch ein UPnP request sein...) und ob eyed3 erfolgreich importiert werden konnte.
+
+            if not "http://192.168." in current_url and current_url.endswith((".mp3", ".MP3")) and EYED3_active:
+                #Wenn JA: Konstruiere absoluten Pfad aus current_url und "Musicfolder"
+                absolute_filepath = os.path.join(MusicFolder, current_url)   #TODO: ASCII ERROR beim umlaut
+                logger.info("Scanning Filepath for embedded Album-Art: {0}".format(absolute_filepath))
+                if os.path.isfile(absolute_filepath):    # und prüfe ob der konstruierte Pfad auf eine Datei deutet.
+                    logger.info("Access to file is possible")
+                    #Prüfe (mittels eyed3) ob die Datei einen IDv3 Tag mit einem FRONT_COVER entält
+                    audio = eyed3.load(absolute_filepath.decode("utf-8"))   # load file ... if failed, audio will be NoneType
+                    if audio.tag is not None and len(audio.tag.images) > 0:   # if MP3 is containing embedded pictures
+                        logger.info("MP3 File is including {0} embedded Pictures".format(len(audio.tag.images)))
+                        for art in audio.tag.images:
+                            covertype = { 3 : "FRONT_COVER",
+                                          4 : "BACK_COVER",
+                                          0 : "OTHER"}
+                            #print("Found: {0}".format(covertype.get(art.picture_type)))
+                            if covertype.get(art.picture_type) == "FRONT_COVER":
+                                logger.info("Found embedded Front-Cover! Loading...")
+                                try:
+                                    qimg = QImage.fromData(art.image_data)
+                                    albumart = QPixmap.fromImage(qimg)
+                                    self.lbl_albumArt.setPixmap(albumart.scaled(self.lbl_albumArt.width(),
+                                                                        self.lbl_albumArt.height(),
+                                                                        Qt.KeepAspectRatio, Qt.SmoothTransformation))
+                                    #Wenn der export erfolgreich war, dieses Bild verwenden und Evaluierung abschließen
+                                    logger.info("Loading... Successful")
+                                    return
+                                except:
+                                    logger.error("Something went wrong while loading Album-Art!")
 
             if current_artist != "" and current_album != "":
                 app.processEvents()
@@ -3500,7 +3548,7 @@ class Playlisteditor(object):
 
             item = QListWidgetItem(itemname)
             item.setTextAlignment(Qt.AlignRight)
-            item.setData(Qt.UserRole, [entry["id"], entry["pos"]])
+            item.setData(Qt.UserRole, [entry["id"], entry["pos"], (entry.get("artist") or "").decode("utf-8")])
             #item.setSizeHint(QSize(10, 35))    # removed: user reports that font gets cut on some resolutions
             #item.setFont(font)
             if entry["id"] == songID:
@@ -3524,7 +3572,7 @@ class Playlisteditor(object):
         item = self.view.selectedIndexes()[0] if len(self.view.selectedIndexes()) > 0 else None
         if item is not None:
             selectionBackup = item.row()
-            ID_to_move, pos = item.data(Qt.UserRole).toStringList()
+            ID_to_move, pos, artist = item.data(Qt.UserRole).toStringList()
             if (int(pos) -1) == -1: return False
             #print("Moving id '{0}' up to position '{1}'".format(ID_to_move, int(pos) -1))
             self.service.client.moveid(int(ID_to_move), int(pos) -1)
@@ -3539,7 +3587,7 @@ class Playlisteditor(object):
         item = self.view.selectedIndexes()[0] if len(self.view.selectedIndexes()) > 0 else None
         if item is not None:
             selectionBackup = item.row()
-            ID_to_move, pos = item.data(Qt.UserRole).toStringList()
+            ID_to_move, pos, artist = item.data(Qt.UserRole).toStringList()
             if (int(pos)+1) == self.view.count(): return False
             #print("Moving id '{0}' down to position '{1}'".format(ID_to_move, int(pos) +1))
             self.service.client.moveid(int(ID_to_move), int(pos) +1)
@@ -3555,7 +3603,7 @@ class Playlisteditor(object):
             return
         for item in items:
             selectionBackup = item.row()
-            ID_to_delete, pos = item.data(Qt.UserRole).toStringList()
+            ID_to_delete, pos, artist = item.data(Qt.UserRole).toStringList()
             self.service.client.deleteid(ID_to_delete)
             item_to_pop = self.view.itemFromIndex(item)
             self.view.removeItemWidget(item_to_pop)
@@ -3576,20 +3624,26 @@ class Playlisteditor(object):
         currentID = self.service.status("songid")
         nextID = self.service.status("nextsongid")
         previouse = ""
+        previouse_artist = ""
         current = ""
+        current_artist = ""
         next = ""
+        next_artist = ""
         playlist_ID_POS = {}
         playlist_POS_ID = {}
         playlist_POS_TITLE = {}
+        playlist_ID_ARTIST = {}
         #print("Current ID is:", currentID)
         #print("Next ID is:", nextID)
         for i in range(self.view.count()):
             songtitle = self.view.item(i).text()
             ID = self.view.item(i).data(Qt.UserRole).toStringList()[0]
             pos = self.view.item(i).data(Qt.UserRole).toStringList()[1]
+            artist = self.view.item(i).data(Qt.UserRole).toStringList()[2]
             playlist_ID_POS[ID] = pos
             playlist_POS_ID[pos] = ID
             playlist_POS_TITLE[pos] = songtitle
+            playlist_ID_ARTIST[ID] = artist
 
         if currentID != "":
             previouse_pos = int(playlist_ID_POS[QString(currentID)]) -1
@@ -3599,17 +3653,22 @@ class Playlisteditor(object):
                 previouse_pos = self.view.item(self.view.count()-1).data(Qt.UserRole).toStringList()[1]
                 #print("new previos position:", previouse_pos)
                 previouse = playlist_POS_TITLE[previouse_pos]
+                previouse_artist = playlist_ID_ARTIST[QString(playlist_POS_ID[QString(str(previouse_pos))])]
             elif previouse_pos >= 0:
                 previouse = playlist_POS_TITLE[QString(str(previouse_pos))]
+                previouse_artist = playlist_ID_ARTIST[QString(playlist_POS_ID[QString(str(previouse_pos))])]
             else:
-                previouse=QString("")
+                previouse = QString("")
+                previouse_artist = QString("")
 
             current = playlist_POS_TITLE[playlist_ID_POS[QString(currentID)]]
+            current_artist = playlist_ID_ARTIST[QString(currentID)]
         if nextID != "":
             next = playlist_POS_TITLE[playlist_ID_POS[QString(nextID)]]
+            next_artist = playlist_ID_ARTIST[QString(nextID)]
 
-        #print("sending song infos", previouse, current, next)
-        return [previouse, current, next]
+        #print("sending song infos", previouse, previouse_artist, current, current_artist, next, next_artist)
+        return [previouse, previouse_artist, current, current_artist, next, next_artist]
 
     def setTranslation(self, key, value="unknown"):
         '''
