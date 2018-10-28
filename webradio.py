@@ -502,6 +502,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.lbl_previouse.setTextFormat(Qt.RichText)    #using Rich-Text
             self.lbl_current_playing.setTextFormat(Qt.RichText)
             self.lbl_next.setTextFormat(Qt.RichText)
+            self.lbl_previouse.setWordWrap(True)
+            self.lbl_current_playing.setWordWrap(True)
+            self.lbl_next.setWordWrap(True)
 
             #TODO: Transfer this to the stylesheets (Themes...)
             self.checkBox_screensaver.setStyleSheet("QCheckBox::indicator {width: 30px; height: 30px;}")
@@ -2236,11 +2239,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             logger.info("Media Local Changed to: {0}".format(current_url[:10]))
             names = self.playlisteditor.tellMeWhatsPlaying()
             logger.info("Received PlaylistInformation (last,current,next): {0}".format(names))
-            self.lbl_previouse.setText("<h1>"+names[0]+"</h1>"
+            self.lbl_previouse.setText("<h3 style='font-size:smaller;'>"+names[0]+"</h3>"
                                        "<span>"+names[1]+"</span>")
             self.lbl_current_playing.setText("<h1>"+names[2]+"</h1>"
                                              "<span>"+names[3]+"</span>")
-            self.lbl_next.setText("<h1>"+names[4]+"</h1>"
+            self.lbl_next.setText("<h3 style='font-size:smaller;'>"+names[4]+"</h3>"
                                   "<span>"+names[5]+"</span>")
             self.lbl_current_seek.setText("")
             self.lbl_total_seek.setText("")
