@@ -509,7 +509,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             #TODO: Transfer this to the stylesheets (Themes...)
             self.checkBox_screensaver.setStyleSheet("QCheckBox::indicator {width: 30px; height: 30px;}")
 
-            self.lbl_albumArt.setScaledContents(True)
+            #self.lbl_albumArt.setScaledContents(True)  # Scaled Contents hebelt "KeepAspektRatio" aus.
 
             # the tabsize (width) is defined in the specific stylesheet, read the width and adjust the Icons
             tabsize_per_stylesheet = self.tabWidget_main.tabBar().sizeHint().width()
@@ -2238,6 +2238,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if self.mode == "media":
             logger.info("Media Local Changed to: {0}".format(current_url[:10]))
             names = self.playlisteditor.tellMeWhatsPlaying()
+            fallback = QPixmap(":/albumart_fallback.png")
             logger.info("Received PlaylistInformation (last,current,next): {0}".format(names))
             self.lbl_previouse.setText("<h3 style='font-size:smaller;'>"+names[0]+"</h3>"
                                        "<span>"+names[1]+"</span>")
@@ -2247,10 +2248,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                   "<span>"+names[5]+"</span>")
             self.lbl_current_seek.setText("")
             self.lbl_total_seek.setText("")
+            self.slide_seek.setMinimum(0)
+            self.slide_seek.setValue(0)
             self.slide_seek.setEnabled(False)
             self.onAutoRepeat("1", True if self.player.status('repeat') == "1" else False)
 
             if current_url == "HOME" and current_song == "HOME" and self.lbl_albumArt.pixmap():
+                if self.lbl_current_playing.text() == "<h1></h1><span></span>":   #show fallback if nothing is playing
+                    self.lbl_albumArt.setPixmap(fallback.scaled(self.lbl_albumArt.width(), self.lbl_albumArt.height(),
+                                                                    Qt.KeepAspectRatio, Qt.SmoothTransformation))
                 return
 
             #Wenn sich der Player im Modus "Media" befindet, prüfe, ob die current_url mit *.mp3 endet,
@@ -2389,7 +2395,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                                                         Qt.KeepAspectRatio, Qt.SmoothTransformation))
                             return
 
-            fallback = QPixmap(":/albumart_fallback.png")
+
             self.lbl_albumArt.setPixmap(fallback.scaled(self.lbl_albumArt.width(), self.lbl_albumArt.height(),
                                                                     Qt.KeepAspectRatio, Qt.SmoothTransformation))
 
