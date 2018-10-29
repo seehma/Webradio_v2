@@ -2507,7 +2507,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             logger.info("Show only Screensaver")
             self.screensaver.show()
 
-
     @pyqtSlot()
     def onSelectAll(self):
 
