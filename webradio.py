@@ -31,6 +31,7 @@ from lib import global_vars
 from lib.LM_Widgets_scaled_contents import Scaling_QLabel
 from lib.flickercharm import FlickCharm
 from lib.screensaver import Screensaver_Overlay
+import lib.speed_test as speed_test
 
 _ = lambda x : x
 
@@ -117,7 +118,7 @@ def setupLogger(console=True, File=False, Variable=False, Filebackupcount=0):
     if File:
         # create file handler which logs even debug messages and hold a backup of old logs
         fh = logging.handlers.RotatingFileHandler( LOG_FILENAME, backupCount=int(Filebackupcount)) # create a backup of the log
-        fh.setLevel(logging.DEBUG) if args.debug else fh.setLevel(logging.INFO)  #TODO:Change this to ERROR after dev
+        fh.setLevel(logging.DEBUG) if args.debug else fh.setLevel(logging.INFO)
         fh.setFormatter(formatter)
         logger.addHandler(fh)
     if Variable:
@@ -804,6 +805,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.pB_autorepeat.clicked.connect(lambda : self.onAutoRepeat("1"))
             self.pB_autorepeat_2.clicked.connect(lambda : self.onAutoRepeat("2"))
             self.pB_markAll.clicked.connect(self.onSelectAll)
+            self.listWidget.currentItemChanged.connect(self.onSelectionPlaylisteditorChanged)
 
             ##################################################################################### Sleep-Timer
             self.widget_sleep_timer.sleepTimerelapsed.connect(self.onSleepTimerElapsed)
@@ -868,7 +870,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             '''
             logger.info('Reading Settings')
             settings = QSettings("Laumer", "RapiRadio")
-            print("DEBUG_ SYS", global_vars.configuration.get("GENERAL"))
+            logger.info("DEBUG_ SYS", global_vars.configuration.get("GENERAL"))
             #Add "screensaver" (bool)
             if global_vars.configuration.get("GENERAL").get("screensaver") is None:  # if this is not forced due to conf
                 screensaver = settings.value("screensaver_bool", QVariant("1")).toInt()[0]  # default is "screensaver on" == 1
@@ -1428,7 +1430,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 #self.connect(self.virtualKeyboard, SIGNAL("sigInputString"))
 
             except:
-                print("can not disconnect media because they are not connected")
+                #print("can not disconnect media because they are not connected")
                 pass
 
 
@@ -1568,12 +1570,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.mpd_listener.startNotifier()
 
 
-            self.playlisteditor = Playlisteditor(self.listWidget, self.player)
+            #self.playlisteditor = Playlisteditor(self.listWidget, self.player)
 
-            #self.player.updateDatabase(VARIABLE_DATABASE)
-            self.player.updateDatabase()     #TODO: Verify this: Change in 0.3.3
+            self.player.updateDatabase(VARIABLE_DATABASE)
+            #self.player.updateDatabase()     #tried this Change in 0.3.3. leads into horrible loading times with huge db.
 
             self.playlisteditor = Playlisteditor(self.listWidget, self.player, self)
+
 
             self.pB_move_down_2.clicked.connect(self.playlisteditor.moveItemUp)
             self.pB_move_down.clicked.connect(self.playlisteditor.moveItemDown)
@@ -1845,47 +1848,72 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.pB_Audio_forward.clicked.connect(lambda : self.mediaPlayerControl  ("next"))
         :param command: play, stop, back, next,
         """
+        currentState = self.player.status("state")
         if command == "play":
-
             if self.player is not None:
-                if not specific:
-                    self.player.play()
+                if not specific:   #command came from MP3-Player view, not from Playlist-Editor
+                    if currentState != "play":
+                        self.player.play()
+                    else:  #if the player is playing and user presses "play" once again, he wants it to pause.
+                        self.player.pause()
                 else:
                     item = self.listWidget.selectedIndexes()[0] if len(self.listWidget.selectedIndexes()) > 0 else None
                     if item is not None:
                         ID_to_play, pos, artist = item.data(Qt.UserRole).toStringList()
-                        self.player.play_title_with_ID(ID_to_play)
+                        status = self.player.status("state")
+                        if status == "play" or status == "pause":
+                            if "songid" in self.player.client.status():
+                                current_songID = self.player.status("songid")
+                                if ID_to_play == current_songID:
+                                    if status == "play":
+                                        self.player.pause()
+                                    else:   # if "pause"
+                                        self.player.play()
+                                else:    # user selects a different song
+                                    self.player.play_title_with_ID(ID_to_play)
+                        else:    #player is in stop mode (not playing, not in pause)
+                            self.player.play_title_with_ID(ID_to_play)
                     else:
-                        self.player.play()
+                        if currentState != "play":
+                            self.player.play()
+                        else:  # if the player is playing and user presses "play" once again, he wants it to pause.
+                            self.player.pause()
                 if not self.stackedWidget_2.currentIndex() == 1:
                     self.stackedWidget_2.setCurrentIndex(1)
 
 
         elif command == "stop":          # I do not use "stop" ... I simulate it using "pause" and scroll to 0 sec. .
+            #otherwise it is not possible to switch to the next or previouse track when player is "stopped"
+            #UPDATE 07.11.2018: Have to use "stop" mode, because otherwise I wouldnt recognize the "real" pause-function
             if self.player is not None:
-                currentState = self.player.status("state")
-                if not currentState == "pause":
-                    self.player.pause()
-                    pos = self.player.status("song")
-                    self.player.client.seek(pos, "0")
+                #if not currentState == "pause":
+                #    self.player.pause()
+                #    pos = self.player.status("song")
+                #    self.player.client.seek(pos, "0")
+                if not currentState == "stop":
+                    self.player.stop()
+
 
         elif command == "back":
             if self.player is not None:
-                currentState = self.player.status("state")
-                self.player.previous()
-                if currentState == "pause":  # if the player was paused, and a different track was selected,
-                    self.player.pause()      # pause after choosing a different track to avoid that the player starts
-                    pos = self.player.status("song")  # playing without any user interaction
-                    self.player.client.seek(pos, "0") # seek to position 0,
-
-        elif command == "next":
-            if self.player is not None:
-                currentState = self.player.status("state")
-                self.player.next()
-                if currentState == "pause":
+                self.player.play()            #make sure that player is playing ...
+                self.player.previous()        #jump to previous track
+                if currentState != "play":    #but pause if player was in "stop" or "pause" position
                     self.player.pause()
                     pos = self.player.status("song")
                     self.player.client.seek(pos, "0")
+
+        elif command == "next":
+            if self.player is not None:
+                if currentState != "play":    #but pause if player was in "stop" or "pause" position
+                    if currentState == "stop":
+                        self.player.play()  # make sure that player is playing ...
+                    self.player.next()  # jump to next track
+                    self.player.pause()
+                    pos = self.player.status("song")
+                    self.player.client.seek(pos, "0")
+                else:
+                    self.player.next()  # jump to next track
 
         else:
             logger.warning("Command not known:".format(command))   # more commands can be added using elif here...
@@ -1956,6 +1984,35 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #self.stackedWidget.setCurrentIndex(6)
         self.emit(SIGNAL("stop_loading"))
 
+    @pyqtSlot(QObject)  # Connected to self.listWidget                                              .currentItemChanged
+    def onSelectionPlaylisteditorChanged(self, QListWidgetItem):
+        """
+        This function is called, when the listWidget in my PlaylistEditor is filled with Items and if the user
+        changes the selection by hand.
+        It only sets the correct icon to self.pB_Audio_play_pause_2, which can be used as "Play" and "Pause".
+        If the user selects an item which is currently not played or paused. The button will become a "play"button
+        Otherwise it will be a pause Button
+        Args:
+            QListWidgetItem:
+        Returns: Nothing
+        """
+        if QListWidgetItem is not None:
+            ID_selected, pos, artist = QListWidgetItem.data(Qt.UserRole).toStringList()
+            status = self.player.status("state")
+            songID = None
+            if status == "play" or status == "pause":
+                if "songid" in self.player.client.status():
+                    songID = self.player.status("songid")
+
+            if songID == ID_selected:   #if user selects the Item which is in "play" or "pause" mode
+                if status == "play":
+                    self.pB_Audio_play_pause_2.setIcon(QIcon(":/pause.png"))
+                else:
+                    self.pB_Audio_play_pause_2.setIcon(QIcon(":/play.png"))
+            else:
+                self.pB_Audio_play_pause_2.setIcon(QIcon(":/play.png"))
+
+
 ######################################## Bindings to custom signals ##################################################
 
     @pyqtSlot(str)  # Connected to self.virtualKeyboard,                                       SIGNAL("sigInputString")
@@ -1965,7 +2022,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         the overloaded signal (with a string) is Empty if abbrechen was clicked ... and got a string if ok was clicked.
         :param QString: Searchstring supplied by onScreenKeyboard
         """
-        print("START ON CUSTOM SEARCH OK")
+        #print("START ON CUSTOM SEARCH OK")
         if QString == "":                           # if cancel was clicked ...
             self.stackedWidget.setCurrentIndex(1)   # return to page 2
             return                                  # stop here...
@@ -2135,12 +2192,35 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if newStatus == "play":
             self.widget_Standby.setInitialState("on")
             self.widget_Mute.unmute()
+            #change icon of "playButton" to "pause"
+            self.pB_Audio_play_pause.setIcon(QIcon(":/pause.png"))
+            self.pB_Audio_play_pause_2.setIcon(QIcon(":/pause.png"))
+
         elif newStatus == "stop":
             if not self.player is None:
                 if self.mode == "radio":
                     self.widget_Standby.standby_off()
+                elif self.mode == "media":
+                    # seeker needs to be set to 0
+                    self.lbl_current_seek.setText("")
+                    self.lbl_total_seek.setText("")
+                    self.slide_seek.setMinimum(0)
+                    self.slide_seek.setValue(0)
+                    self.slide_seek.setEnabled(False)
+                    # make sure that icon of "playButton" is set to "play"
+                    self.pB_Audio_play_pause.setIcon(QIcon(":/play.png"))
+                    self.pB_Audio_play_pause_2.setIcon(QIcon(":/play.png"))
+
+        elif newStatus == "pause":
+            if not self.player is None:
+                if self.mode == "media":
+                    # seeker needs to be be disabled
+                    self.slide_seek.setEnabled(False)
+                    # change icon of "playButton" to "play"
+                    self.pB_Audio_play_pause.setIcon(QIcon(":/play.png"))
+                    self.pB_Audio_play_pause_2.setIcon(QIcon(":/play.png"))
         else:
-            logger.warning("Pause... Not handled yet")
+            logger.warning("{0}... Not handled yet".format(newStatus))
 
     @pyqtSlot()  # Connected to markAsFavorite(self, _bool=None):                       SIGNAL("sig_favorites_changed")
     def onFavoritesChanged(self):
@@ -2236,9 +2316,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.tabWidget_main.setCurrentIndex(1)
                 self.stackedWidget_2.setCurrentIndex(1)
         if self.mode == "media":
+            currentState = self.player.status("state")
             logger.info("Media Local Changed to: {0}".format(current_url[:10]))
             names = self.playlisteditor.tellMeWhatsPlaying()
-            fallback = QPixmap(":/albumart_fallback.png")
+
             logger.info("Received PlaylistInformation (last,current,next): {0}".format(names))
             self.lbl_previouse.setText("<h3 style='font-size:smaller;'>"+names[0]+"</h3>"
                                        "<span>"+names[1]+"</span>")
@@ -2246,158 +2327,309 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                              "<span>"+names[3]+"</span>")
             self.lbl_next.setText("<h3 style='font-size:smaller;'>"+names[4]+"</h3>"
                                   "<span>"+names[5]+"</span>")
-            self.lbl_current_seek.setText("")
-            self.lbl_total_seek.setText("")
-            self.slide_seek.setMinimum(0)
-            self.slide_seek.setValue(0)
-            self.slide_seek.setEnabled(False)
             self.onAutoRepeat("1", True if self.player.status('repeat') == "1" else False)
+
+            if currentState != "play" and currentState != "pause":
+                self.lbl_current_seek.setText("")
+                self.lbl_total_seek.setText("")
+                self.slide_seek.setMinimum(0)
+                self.slide_seek.setValue(0)
+                self.slide_seek.setEnabled(False)
 
             if current_url == "HOME" and current_song == "HOME" and self.lbl_albumArt.pixmap():
                 if self.lbl_current_playing.text() == "<h1></h1><span></span>":   #show fallback if nothing is playing
-                    self.lbl_albumArt.setPixmap(fallback.scaled(self.lbl_albumArt.width(), self.lbl_albumArt.height(),
-                                                                    Qt.KeepAspectRatio, Qt.SmoothTransformation))
+                    self._setAlbumArt()    #set Fallback
                 return
 
             #Wenn sich der Player im Modus "Media" befindet, prüfe, ob die current_url mit *.mp3 endet,
             # (Ansonsten könnte es auch ein UPnP request sein...) und ob eyed3 erfolgreich importiert werden konnte.
 
             if not "http://192.168." in current_url and current_url.endswith((".mp3", ".MP3")) and EYED3_active:
+                #first of all, check for an existing Album-Art
+                app.processEvents()
+                logger.info("Searching for Albumart with {0} and {1}".format(current_album, current_artist))
+                # check if Albumart for this album is already downloaded and can be re-used
+                filename = self._checkForAlbumArt(current_album if current_album != "" else current_url)
+                if not filename:
+                    pass # if no filename was provided (False) just go on, and try to download it.
+                else:
+                    #if yes, and a Album-Cover is already existing for this Album, set it as Album-Art and exit
+                    logger.info("File is existing at: {0}".format(filename))
+                    return self._setAlbumArt(filename)
+
                 #Wenn JA: Konstruiere absoluten Pfad aus current_url und "Musicfolder"
-                absolute_filepath = os.path.join(MusicFolder, current_url)   #TODO: ASCII ERROR beim umlaut
+                absolute_filepath = os.path.join(MusicFolder, current_url)
                 logger.info("Scanning Filepath for embedded Album-Art: {0}".format(absolute_filepath))
-                if os.path.isfile(absolute_filepath):    # und prüfe ob der konstruierte Pfad auf eine Datei deutet.
+                #Loading a complete MP3 just for the Album Art is damn slow when operating on a network (NAS)
+                if self._checkLatency(absolute_filepath):
+                    #wenn sich die datei an einem Ort mit schwacher Datenübertragung befindet, dann lassen wir das,
+                    #da es zu lange dauern wird!
                     logger.info("Access to file is possible")
                     #Prüfe (mittels eyed3) ob die Datei einen IDv3 Tag mit einem FRONT_COVER entält
-                    audio = eyed3.load(absolute_filepath.decode("utf-8"))   # load file ... if failed, audio will be NoneType
-                    if audio.tag is not None and len(audio.tag.images) > 0:   # if MP3 is containing embedded pictures
-                        logger.info("MP3 File is including {0} embedded Pictures".format(len(audio.tag.images)))
-                        for art in audio.tag.images:
-                            covertype = { 3 : "FRONT_COVER",
-                                          4 : "BACK_COVER",
-                                          0 : "OTHER"}
-                            #print("Found: {0}".format(covertype.get(art.picture_type)))
-                            if covertype.get(art.picture_type) == "FRONT_COVER":
-                                logger.info("Found embedded Front-Cover! Loading...")
-                                try:
-                                    qimg = QImage.fromData(art.image_data)
-                                    albumart = QPixmap.fromImage(qimg)
-                                    self.lbl_albumArt.setPixmap(albumart.scaled(self.lbl_albumArt.width(),
-                                                                        self.lbl_albumArt.height(),
-                                                                        Qt.KeepAspectRatio, Qt.SmoothTransformation))
-                                    #Wenn der export erfolgreich war, dieses Bild verwenden und Evaluierung abschließen
-                                    logger.info("Loading... Successful")
-                                    return
-                                except:
-                                    logger.error("Something went wrong while loading Album-Art!")
+                    thread = WorkerThread(self._collectAlbumArtFromMP3, absolute_filepath,
+                                        current_album if current_album != "" else current_url)  # Request API using string
+                    self._setAlbumArt()   #set Fallback first
+                    thread.start()
+                    while not thread.isFinished():
+                        app.processEvents()
+                    status, fileToImport = thread.result()
+
+                    if status and os.path.isfile(fileToImport):    #if not, fallback will be set at the end of this function
+                        return self._setAlbumArt(fileToImport)
+
 
             if current_artist != "" and current_album != "":
                 app.processEvents()
                 logger.info("Searching for Albumart with {0} and {1}".format(current_album, current_artist))
-                m = hashlib.md5()                            #create MD5 hash from given String
-                m.update("{0}".format(current_album))
-                extentions = ["jpg", "jpeg", "png"]
-                possibleFiles = []
-                for extention in extentions:
-                    fileToCheck = os.path.join(AlbumArtFolder, "{0}.{1}".format(m.hexdigest(), extention))
-                    possibleFiles.append(fileToCheck)
-                DownloadTrigger = True
-                for filename in possibleFiles:
-                    if os.path.isfile(filename):
-                        logger.info("File is existing at: {0}".format(filename))
-                        albumart = QPixmap(filename)
-                        self.lbl_albumArt.setPixmap(albumart.scaled(self.lbl_albumArt.width(),
-                                                                    self.lbl_albumArt.height(),
-                                                                    Qt.KeepAspectRatio, Qt.SmoothTransformation))
-                        DownloadTrigger = False
-                        return
+                # check if Albumart for this album is already downloaded and can be re-used
+                filename = self._checkForAlbumArt(current_album)
+                if not filename:
+                    pass # if no filename was provided (False) just go on, and try to download it.
+                else:
+                    #if yes, and a Album-Cover is already existing for this Album, set it as Album-Art and exit
+                    logger.info("File is existing at: {0}".format(filename))
+                    return self._setAlbumArt(filename)
 
-                if DownloadTrigger:
-                    logger.info("Try to download Link:")
-                    try:
-                        urlGrabber = LastFMDownloader(current_album, current_artist)
-                        urlResult = urlGrabber.search_for_image()
-                    except:
-                        urlResult = None
+                thread = WorkerThread(self._collectAlbumArtFromLastFM, current_album, current_artist, AlbumArtFolder,
+                                                               self._md5_encrypted(current_album))  # Request API using string
+                self._setAlbumArt()   #set Fallback first
+                thread.start()
+                while not thread.isFinished():
+                    app.processEvents()
+                status, fileToImport = thread.result()
 
-                    logger.info("Searchresult: {0}".format(urlResult))
-                    if urlResult is not None:
-                        logger.info("Downloading url {0}".format(urlResult))
-                        urlResult = str(urlResult)
-                        if urlResult.endswith(".jpg"):
-                            extention = "jpg"
-                        elif urlResult.endswith(".jpeg"):
-                            extention = "jpeg"
-                        elif urlResult.endswith(".png"):
-                            extention = "png"
-                        else:
-                            extention = "png"
+                if status and os.path.isfile(fileToImport):    #if not, fallback will be set at the end of this function
+                    return self._setAlbumArt(fileToImport)
 
-                        fileToImport = os.path.join(AlbumArtFolder, "{0}.{1}".format(m.hexdigest(), extention))
-                        url = str(urlResult)
-                        urllib.urlretrieve(url, fileToImport)
-                        if os.path.isfile(fileToImport):
-                            albumart = QPixmap(fileToImport)
-                            self.lbl_albumArt.setPixmap(albumart.scaled(self.lbl_albumArt.width(),
-                                                                        self.lbl_albumArt.height(),
-                                                                    Qt.KeepAspectRatio, Qt.SmoothTransformation))
-                            return
             # if the provided url looks like a youtube link
             elif current_url.startswith("http://r") or current_url.startswith("https://r"):
                 app.processEvents()
                 logger.info("Downloading Album Art for Youtube-Song")
-                m = hashlib.md5()  # create MD5 hash from given String
-                m.update("{0}".format(names[1]))
-                extentions = ["jpg", "jpeg", "png"]
-                possibleFiles = []
-                for extention in extentions:
-                    fileToCheck = os.path.join(AlbumArtFolder, "{0}.{1}".format(m.hexdigest(), extention))
-                    possibleFiles.append(fileToCheck)
-                DownloadTrigger = True
-                for filename in possibleFiles:
-                    if os.path.isfile(filename):
-                        logger.info("File is existing at: {0}".format(filename))
-                        albumart = QPixmap(filename)
-                        self.lbl_albumArt.setPixmap(albumart.scaled(self.lbl_albumArt.width(),
-                                                                    self.lbl_albumArt.height(),
-                                                                    Qt.KeepAspectRatio, Qt.SmoothTransformation))
-                        DownloadTrigger = False
-                        return
+                filename = self._checkForAlbumArt(names[2])
+                if not filename:
+                    pass # if no filename was provided (False) just go on, and try to download it.
+                else:
+                    #if yes, and a Album-Cover is already existing for this Album, set it as Album-Art and exit
+                    logger.info("File is existing at: {0}".format(filename))
+                    self._setAlbumArt(filename)
+                    return
 
-                if DownloadTrigger:
-                    logger.info("Try to download Thumbnail:")
-                    try:
-                        track_obj = self.playlisteditor.youtubeTranslate.get(current_url)
-                        urlResult = track_obj.thumb_HQ_link
-                    except:
-                        urlResult = None
+                thread = WorkerThread(self._collectAlbumArtFromYouTube, current_url, AlbumArtFolder,
+                                                                self._md5_encrypted(names[2]))  # Request API using string
+                self._setAlbumArt()   #set Fallback first
+                thread.start()
+                while not thread.isFinished():
+                    app.processEvents()
+                status, fileToImport = thread.result()
 
-                    logger.info("Searchresult: {0}".format(urlResult))
-                    if urlResult is not None:
-                        logger.info("Downloading url {0}".format(urlResult))
-                        urlResult = str(urlResult)
-                        if urlResult.endswith(".jpg"):
-                            extention = "jpg"
-                        elif urlResult.endswith(".jpeg"):
-                            extention = "jpeg"
-                        elif urlResult.endswith(".png"):
-                            extention = "png"
-                        else:
-                            extention = "png"
+                if status and os.path.isfile(fileToImport):
+                    return self._setAlbumArt(fileToImport)
 
-                        fileToImport = os.path.join(AlbumArtFolder, "{0}.{1}".format(m.hexdigest(), extention))
-                        url = str(urlResult)
-                        urllib.urlretrieve(url, fileToImport)
-                        if os.path.isfile(fileToImport):
-                            albumart = QPixmap(fileToImport)
-                            self.lbl_albumArt.setPixmap(albumart.scaled(self.lbl_albumArt.width(),
-                                                                        self.lbl_albumArt.height(),
-                                                                        Qt.KeepAspectRatio, Qt.SmoothTransformation))
-                            return
+            self._setAlbumArt()   #set Fallback first
+
+    def _checkLatency(self, abs_filepath):
+        """
+        Check for accessability and latency of a given filepath.
+        Args:
+            abs_filepath:
+        Returns: True OR False, depending of both. Accessability and latency
+
+        """
+        #TODO: Include Latency Test prozedure.
+        try:
+            neededTime = speed_test.latencyTest(abs_filepath)
+            logger.info("Latency-Check OK with {0:0.3f} ms".format(neededTime))
+            return True
+        except speed_test.TimeoutException as e:
+            logger.warning(e)
+            return False
+
+    def _collectAlbumArtFromMP3(self, filepath_of_MP3, target_name):
+        """
+        Load a MP3-File from a given path, search for included IDv3 Images of tye "FRONT_Cover" or "Other" and extract
+        it to a local file
+        Args:
+            filepath_of_MP3: absolute filepath
+            target_name: basename of file (in AlbumArtFolder)
+        Returns: True + Absolute File Path of stored image OR False + ""
+
+        """
+        audio = eyed3.load(filepath_of_MP3.decode("utf-8"))   # load file ... if failed, audio will be NoneType
+        if audio.tag is not None and len(audio.tag.images) > 0:   # if MP3 is containing embedded pictures
+            logger.info("MP3 File is including {0} embedded Pictures".format(len(audio.tag.images)))
+            for art in audio.tag.images:
+                covertype = { 3 : "FRONT_COVER",
+                              4 : "BACK_COVER",
+                              0 : "OTHER"}
+                #print("Found: {0}".format(covertype.get(art.picture_type)))
+                if covertype.get(art.picture_type) in ["FRONT_COVER", "OTHER"]:
+                    logger.info("Found embedded Front-Cover! Loading...")
+                    extention = "jpg" if art.mime_type == "image/jpeg" else "png"
+                    return self._downloadFromMP3File(art, self._md5_encrypted(target_name), extention)
+
+        return False, ""
+
+    def _downloadFromMP3File(self, MP3_obj, target_name, extention):
+        """
+        Give me a eyed3 audio-obj, loaded from an MP3 and this function will extract the image-data and save it
+        to the Album-Art folder under a given basename and extention
+        Args:
+            MP3_obj:
+            target_name: e.g. 6456545646
+            extention: e.g. "jpg"
+
+        Returns:
+
+        """
+        try:
+            fileToDownload = os.path.join(AlbumArtFolder, "{0}.{1}".format(target_name, extention))
+            qimg = QImage.fromData(MP3_obj.image_data)
+            logger.debug("Stored file to: {0}".format(fileToDownload))
+            qimg.save(fileToDownload)
+            logger.info("Loading... Successful")
+            return True, fileToDownload
+        except:
+            logger.error("Something went wrong while loading Album-Art!")
+            return False, ""
+
+    def _collectAlbumArtFromLastFM(self, album_name, artist_name, target_path, target_name):
+        """
+        Give me an album name and an artist name and this function will search LastFM Database of Album-Arts for this
+        Args:
+            youtube_url: url (to youtube only!)
+            target_path: Where should the result be stored
+            target_name: What should the basename (without extention) of the file be
+
+        Returns: True + AbsoluteFilePath OR False + ""  (via self._downloadFromURL)
+
+        """
+        logger.info("Searching LastFM for Album-Cover:")
+        try:
+            urlGrabber = LastFMDownloader(album_name, artist_name)
+            urlResult = urlGrabber.search_for_image()
+        except:
+            urlResult = None
+
+        logger.info("Searchresult: {0}".format("Found!" if urlResult is not None else "No Cover found. Sorry"))
+        if urlResult is not None:
+            return self._downloadFromURL(urlResult, target_path, target_name)   #download and return absolute filepath
+        else:
+            return False, ""
+
+    def _collectAlbumArtFromYouTube(self, youtube_url, target_path, target_name):
+        """
+        Give me a youtube-link of a musik-video and this function will download the thumbnail, which normally can be
+        used as Album-Art.
+        Args:
+            youtube_url: url (to youtube only!)
+            target_path: Where should the result be stored
+            target_name: What should the basename (without extention) of the file be
+
+        Returns: True + AbsoluteFilePath OR False + ""  (via self._downloadFromURL)
+
+        """
+        logger.info("Searching Youtube for Album-Cover:")
+        try:
+            track_obj = self.playlisteditor.youtubeTranslate.get(youtube_url)
+            urlResult = track_obj.thumb_HQ_link
+        except:
+            urlResult = None
+
+        logger.info("Searchresult: {0}".format("Found!" if urlResult is not None else "No Cover found. Sorry"))
+        if urlResult is not None:
+            return self._downloadFromURL(urlResult, target_path, target_name)   #download and return absolute filepath
+        return False, ""
+
+    def _downloadFromURL(self, url, target_path, target_name):
+        """
+        Download a Image-File from a given url
+        Args:
+            url: stringlike url
+            target_path: where should the result be stored?
+            target_name: what should be the basename (without extention) of the file
+
+        Returns: True + AbsoluteFilePath OR False + ""
+
+        """
+        logger.info("Downloading Cover from url {0}".format(url))
+        urlResult = str(url)
+        if urlResult.endswith(".jpg"):
+            extention = "jpg"
+        elif urlResult.endswith(".jpeg"):
+            extention = "jpeg"
+        elif urlResult.endswith(".png"):
+            extention = "png"
+        else:
+            extention = "png"
+
+        fileToDownload = os.path.join(target_path, "{0}.{1}".format(target_name, extention))
+        url = str(urlResult)
+        try:
+            urllib.urlretrieve(url, fileToDownload)
+        except:
+            return False, ""
+        return True, fileToDownload
+
+    def _checkForAlbumArt(self, search_string):
+        """
+        Give me a string, and this function will search in the AlbumArtFolder for an Album-Cover with the md5 encrypted
+        search string.
+        Args:
+            search_string: stringlike search-word
+
+        Returns: Absulte FilePath OR False
+
+        """
+        logger.debug("Searching for Albumart: {0}".format(search_string))
+        descr = self._md5_encrypted(search_string)
+        extentions = ["jpg", "jpeg", "png"]
+        possibleFiles = []
+        logger.debug("MD5 Encoded-Basename is: {0}".format(descr))
+        for extention in extentions:
+            fileToCheck = os.path.join(AlbumArtFolder, "{0}.{1}".format(descr, extention))
+            possibleFiles.append(fileToCheck)
+        for filename in possibleFiles:
+            if os.path.isfile(filename):
+                logger.debug("Found File with: {0}".format(filename))
+                return filename
+
+        return False
+
+    def _setAlbumArt(self, filepath_of_Image=None):
+        """
+        This function will load a QPixmap from a given absolute Filepath and set it as Album Art for the Media-Player.
+        If no filepath_of_Image was provided, a Fallback will be used instead
+        Args:
+            filepath_of_Image: Absolute FilePath
+
+        Returns: True
+
+        """
+        if filepath_of_Image is not None:
+            try:
+                albumart = QPixmap(filepath_of_Image)
+            except:
+                albumart = QPixmap(":/albumart_fallback.png")
+        else:    # fallback
+            albumart = QPixmap(":/albumart_fallback.png")
 
 
-            self.lbl_albumArt.setPixmap(fallback.scaled(self.lbl_albumArt.width(), self.lbl_albumArt.height(),
-                                                                    Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        self.lbl_albumArt.setPixmap(albumart.scaled(self.lbl_albumArt.width(),
+                                                    self.lbl_albumArt.height(),
+                                                    Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        return True
+
+    def _md5_encrypted(self, string):
+        """
+        Return a MD5 String from a given string
+        Args:
+            string: string
+        Returns: MD5 Encrypded string of input
+
+        """
+        m = hashlib.md5()                            #create MD5 hash from given String
+        m.update("{0}".format(string))
+        return m.hexdigest()\
 
     @pyqtSlot(str, str)  # Connected to mpd_listener,                         SIGNAL("sig_mpd_timeElapsed_information")
     def update_seek_slider(self, current, total):
@@ -2666,7 +2898,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     @pyqtSlot(QObject)  # Connected to                                     itemPressed.connect(self.onHometownSelected)
     def onHometownSelected(self, _QListWidgetItem):
-        print("You selected an Item")
+        #print("You selected an Item")
         home_code = _QListWidgetItem.data(Qt.UserRole)
         home_code = home_code.toString()
         home_name = _QListWidgetItem.text().split(",")[0]
@@ -2743,7 +2975,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     self.player.removeAllPlaylistEntrysStartingWithFilePath(VARIABLE_DATABASE)
 
                     if self.usb_manager.ismounted():
-                        print("Webradio: umount usb stick ")
+                        logger.info("umount usb stick")
                         self.usb_manager.umount()
                     self.player.updateDatabase(VARIABLE_DATABASE)
 
@@ -3502,6 +3734,11 @@ class Playlisteditor(object):
                 songID = self.service.status("songid")
             else:
                 songID = None
+        elif status == "pause":
+            if "songid" in self.service.client.status():
+                songID = self.service.status("songid")
+            else:
+                songID = None
         else:
             status = None
             songID = None
@@ -3540,7 +3777,7 @@ class Playlisteditor(object):
                         #print obj.title
                         #if obj.streamLink != entry[key]:
                         if obj.isExpired() or obj.streamLink != entry[key]:   # isExpired is a fast function...
-                            print("Streamlink is expired!", entry["id"], entry["pos"])
+                            #print("Streamlink is expired!", entry["id"], entry["pos"])
                             #self.replace_yt_link_in_playlist(entry["id"], entry["pos"], obj.streamLink, copy.deepcopy(obj))
                             thread = WorkerThread(self.replace_yt_link_in_playlist, entry["id"],
                                                   entry["pos"], copy.deepcopy(obj))
@@ -3560,7 +3797,7 @@ class Playlisteditor(object):
             #item.setSizeHint(QSize(10, 35))    # removed: user reports that font gets cut on some resolutions
             #item.setFont(font)
             if entry["id"] == songID:
-                item.setIcon(QIcon(":/play.png"))
+                item.setIcon(QIcon(":/play.png") if status == "play" else QIcon(":/pause.png"))
             self.view.addItem(item)
         if selection_to_restore is not None:
             self.view.setCurrentRow(selection_to_restore)
@@ -3587,7 +3824,8 @@ class Playlisteditor(object):
             self.grapCurrentPlaylist()
             self.view.setCurrentRow(selectionBackup -1)
         else:
-            print("No Item selected")
+            pass
+            #print("No Item selected")
 
     @pyqtSlot()                                # Connect here the function button "down"
     def moveItemDown(self):
@@ -3602,7 +3840,8 @@ class Playlisteditor(object):
             self.grapCurrentPlaylist()
             self.view.setCurrentRow(selectionBackup +1)
         else:
-            print("No Item selected")
+            pass
+            #print("No Item selected")
 
     @pyqtSlot()                                 # Connect here the function button "delete"
     def deleteItem(self):
@@ -3788,7 +4027,7 @@ class FileIconProvider(QFileIconProvider):
 
     def icon(self, arg):
         #print("ARG", arg.completeSuffix())
-        #QFileInfo.isSymLink()
+        #arg.isSymLink()
         if arg.completeSuffix() == "mp3" or arg.completeSuffix() == "MP3":
             return QIcon(":/mp3.png")
         elif arg.isDir():
@@ -3812,6 +4051,7 @@ class FileIconProvider(QFileIconProvider):
                 else:
                     #print("is not Mounted")
                     return QIcon(":/disconnected.png")
+            #print("return folder...")
             return  QIcon(":/folder.png")
         else:
             return QIcon(":/mp3.png")

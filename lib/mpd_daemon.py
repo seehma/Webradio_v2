@@ -149,7 +149,7 @@ class MPD_Eventlistener(QObject):
             #print("My Status is:", current_status)
             #print("My Station is:", current_station)
             #print("Playing the song:", current_song)
-            if current_status == "play" or current_status == "pause":
+            if current_status == "play":   # or current_status == "pause":
                 try:
                     timeinfromation = client.status()["time"]
                     timeplayed = timeinfromation.split(":")[0]
@@ -164,11 +164,15 @@ class MPD_Eventlistener(QObject):
 
             if current_status != last_status and last_status != "Initial":
                 logger.info("((1))Radio Station changed from {0} to {1}".format(last_station, current_station))
-                if current_status == "stop" and last_status == "stop":
+                if current_status == "stop":
                     # 4 seconds long, the status was stop.... so it was not only stopped for the next track....
+                    self.emit(SIGNAL("sig_mpd_statusChanged"), current_status)
+                if current_status == "pause":
+                    # 4 seconds long, the status was pause.... so it was not only paused for the next track....
                     self.emit(SIGNAL("sig_mpd_statusChanged"), current_status)
                 if current_status == "play":
                     self.emit(SIGNAL("sig_mpd_stationChanged"), current_station, current_url)
+                    self.emit(SIGNAL("sig_mpd_statusChanged"), current_status)
 
             if current_vol != last_vol:
                 logger.info("Emit new Volume-Information: {0}".format(current_vol))
