@@ -1,4 +1,4 @@
-0.3.3   09.11.2018   Feature-Update:
+0.3.3   12.11.2018   Feature-Update:
                 * Verwendung von evtl. vorhandene IDv3 Embedded Front-Covers für die Anzeige von Albumart im MP3-Player
                   anstelle von Online-Downloads wenn die jeweilige MP3 Datei lokal abgelegt ist.
                   Benötigt wird eine zusatz-lib (sudo pip install eyeD3).
