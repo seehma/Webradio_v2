@@ -2199,7 +2199,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         elif newStatus == "stop":
             if not self.player is None:
                 if self.mode == "radio":
-                    self.widget_Standby.standby_off()
+                    #self.widget_Standby.standby_off()   #UPDATE 12.11.2018: if this is active, shutdown menu will appear
+                    # each time a new player is constructed. TODO: Veriy this change with 0.3.3
+                    pass
                 elif self.mode == "media":
                     # seeker needs to be set to 0
                     self.lbl_current_seek.setText("")
@@ -3381,6 +3383,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         but suggerates the user, the webradio is "off" now... maybe this should be made in a different way....
         """
         ## NEU #############################################################################################
+        logger.info("Standby-Called")
         dialog = ShutdownDialog(options=[self.tr("Shutdown"),
                                          self.tr("Standby"),
                                          self.tr("Reboot"),
