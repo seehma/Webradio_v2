@@ -241,7 +241,7 @@ except ImportError:    # if eyeD3 is not available, this option will be ignored 
                    "Files if available. You can install it via Terminal with 'pip install eyeD3'.")
 
 
-__version__ = "0.3.3"    # for revision history see "Changelog.txt"
+__version__ = "0.3.4"    # for revision history see "Changelog.txt"
 
 BasenameFavoritesPlaylist = "favorites"
 LogoFolder = os.path.join(cwd, "Logos")
@@ -2037,6 +2037,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         searchresult = thread.result()
         if len(searchresult) > 0:                                                   # if there is at least one hit...
             for dicts in searchresult:                                              # populate Index6 with Items
+                if isinstance(dicts, unicode):
+                    if dicts == "errorCode":
+                        logger.error("There was an API Error: {0}".format(searchresult))
+                        self.emit(SIGNAL("stop_loading"))
+                        app.processEvents()
+                        self.askQuestion(self.tr("'%1' did result in an error:%2").arg(unicode(QString), unicode(searchresult)),
+                                        self.tr("Try another"),
+                                        self.tr("Try another search keyword"))
+                        break
                 app.processEvents()
                 newItem = QListWidgetItem(self.lW_stationen_nach_cat)
                 newItem.setText(dicts["name"])

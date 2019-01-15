@@ -1,3 +1,6 @@
+0.3.4   22.11.2018   Bug-Fix:
+                * Code Robustheit optimiert
+
 0.3.3   12.11.2018   Feature-Update:
                 * Verwendung von evtl. vorhandene IDv3 Embedded Front-Covers für die Anzeige von Albumart im MP3-Player
                   anstelle von Online-Downloads wenn die jeweilige MP3 Datei lokal abgelegt ist.
