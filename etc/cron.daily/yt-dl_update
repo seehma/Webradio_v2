@@ -1,0 +1,7 @@
+#!/bin/sh
+
+#update youtube-dl as long as it is installed
+if [ ! -x /usr/local/bin/youtube-dl ]; then
+    echo $(date) >> /var/log/yt-dl_update.log
+    /usr/local/bin/youtube-dl --update >> /var/log/yt-dl_update.log
+fi

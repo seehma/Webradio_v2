@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Categories=Audio
+Name=Webradio-py
+Icon=/usr/share/icons/hicolor/scalable/apps/webradio_logo.png
+Terminal=false
+Exec=sudo systemctl start webradio.service
+Hidden=false

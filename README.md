@@ -1,129 +1,50 @@
-# Webradio V2 - Ein MPD-gestützter Music-Player für den Raspberry Pi:
+# Webradio-py - A MPD-aided Music and Webradio Player for your Raspberry Pi:
 
-Für eine Beschreibung und Installationsanleitung, siehe das **[Wiki](https://github.com/Acer54/Webradio_v2/wiki/startseite)**
+The Python Script "webradio.py" for the Raspberry-Pi (Raspbian) or equivalent is a Python-Script used as a 
+"Frontend" for the "MPD (Music-Player-Daemon)" with multiple advantages and additional features like:
 
-Vorstellung meines Webradios (Version1):
+- Search and manage webradio-stations with a GUI
+- Listen to your local MP3-Music-Collection
+- Search your MP3-Collection
+- Automated Album-Cover download
+- Use of embedded Album-Covers from your MP3's
+- support for multiple File-Formats like .mp3, .ogg, .oga, and .flac
+- Stream Music from Youtube
+- Check the Weather-Forecast for you location
+- Multiple and self-designable Themes
+- Shutdown-Timer / Sleep-Timer
+- GPIO integration (use Buttons for changing webradio-stations, shutdown, mount-/umount USB-Sticks aso.)
+- Onscreen settings
+- Screensaver-Mode
+
+For a nearer description, please see the **[Wiki](https://github.com/Acer54/Webradio_v2/wiki/Home)**
+
+On youtube, you can find a detailed video-presentation of an early Version1 (german only!):
 
 [![Youtube-Video](http://img.youtube.com/vi/8zRfpBta6v8/0.jpg)](https://www.youtube.com/watch?v=8zRfpBta6v8)
 
-Vergleich Version2 (0.2.8) mit Version1:
+Comparsion between Version2 (0.2.8) and Version1:
 
 [![Youtube-Video](http://img.youtube.com/vi/oQ6oTWDCCFQ/0.jpg)](https://www.youtube.com/watch?v=oQ6oTWDCCFQ)
 
----
-### Im YouTube-Video ist die Version1 vorgeführt worden, welche über die im Video verlinkten Download-Bereiche heruntergeladen werden kann!
+# Installation & Update
+### 1. Add a new source to your system:
+    wget https://raw.githubusercontent.com/Acer54/repository/master/release/release.key && sudo apt-key add release.key && rm release.key
+    wget "https://raw.githubusercontent.com/Acer54/repository/master/release/acer54_repository.list" && sudo mv acer54_repository.list /etc/apt/sources.list.d/
+### 2. Update your sources:
+    sudo apt update
+### 3. Install webradio-py:
+    sudo apt install webradio-py
 
-<a href="https://my-darling-is-a-linux-user.org/?p=349">Besuche meinen Blog für mehr Informationen über Version2</a>
+### 4. Initialize your MPD-Database:
+    mpc update
 
-__**Zusatzfunktionen welche hinzukamen von V1 zu V2:**__
-<table style="undefined;table-layout: fixed; width: 864px">
-<colgroup>
-<col style="width: 199px">
-<col style="width: 665px">
-</colgroup>
-  <tr>
-    <th>Zusatzfeature:</th>
-    <th>Beschreibung:</th>
-    <th>Status:</th>
-  </tr>
-  <tr>
-    <td>Skalierbarkeit des Programmfensters</td>
-    <td>Bei der Version1 war es Aufgrund des damals von mir verwendeten Displays nie geplant eine andere Auflösung zu
-    verwenden als die benutzte "1024x600". Als sich allerdings die ersten Leute auf YouTube an einen Nachbau gewagt
-    hatten, wurde es bei abweichenden Displayauflösungen problematisch. Daher wurde in der Version2 darauf geachtet,
-    dass das Programmfenster möglichst variabel skallierbar ist. Momentan sind folgende Limits allerdings zu
-    berücksichtigen:
-    MINIMUM: 640x480
-    OPTIMUM: 1024x600
-    Alles was darüber hinausgeht, funktioniert natürlich auch, allerdings erscheint das Fenster dann etwas verloren.</td>
-    <td>Fertig!</td>
-  </tr>
-  <tr>
-    <td>einfache Konfigurierbarkeit</td>
-    <td>Für die konfiguration des Programmes war es bisher notwendig mehr oder weniger tief im Code zu editieren.
-    In der Version2 war es daher angedacht, die Benutzerspezifischen Einstellungen an einer Zentralen Stelle editieren
-    zu können. Im ersten Schritt erfolgt die Konfiguration nun über die Datei "webradio.conf", allerdings ist geplant
-    hierzu noch ein GUI-basiertes Hilfsprogramm zu erstellen.</td>
-    <td>Konfiguration über webradio.conf</td>
-  </tr>
-  <tr>
-    <td>Menü für den Standby-Button</td>
-    <td>Da nicht jeder Nutzer einen Hardware Button verwendet um die verschiedenen Zustände zu schalten, wurde der
-    Wunsch geäußert, ein zusätzliches Menü hinter dem "Standby-Button" zu bekommen in dem mehrere Funktionen
-    dargestellt werden können.
-    Momentan ist eine Menü verfügbar welches:
-    1. Herunterfahren
-    2. Neustarten
-    3. Standby
-    4. Abbrechen
-    kann.</td>
-    <td>Fertig!</td>
-  </tr>
-  <tr>
-    <td>Sleep-Timer</td>
-    <td>Es wurde der Wunsch geäußert, einen Sleep-Timer zu haben, der den Webradio automatisiert nach einer bestimmten
-    Zeit selbstständig herunterfährt!</td>
-    <td>Fertig!</td>
-  </tr>
-  <tr>
-    <td>Einstellungen</td>
-    <td>Manche Einstellungen wollen Nutzer aus dem laufenden Programm heraus ändern können ("on the fly") ohne das
-    Programm vorher schließen und neu starten zu müssen. Daher wird ein Einstellungs-Tab erstellt, welcher div. Funktionen
-    abbilden kann. Unter anderem ist geplant verschiedenen "Themes" wählen zu können, die Sprache verändern zu können
-    aber auch die Position für die Wetteranzeige abändern zu können.</td>
-    <td>Einstellungen wie "Design-Theme", "Sprache", "Bildschirmschoner", "Heimatstadt" können im laufenden Betrieb
-    geändert werden!</td>
-  </tr>
-  <tr>
-    <td>Wetter-Location</td>
-    <td>Die Wetter-Location, also der Code der ausdrückt wo man gerade lebt musste über eine dritte Webseite herausgefunden
-    werden und manuell eingetragen werden. Diese soll nun aus dem Programm heraus gesucht und verändert werden können.</td>
-    <td>Heimatstadt kann nun direkt über das GUI gesucht und eingestellt werden!</td>
-  </tr>
-  <tr>
-    <td>Mehrsprachigkeit</td>
-    <td>Das Programm soll in mehreren Sprachen vorliegen, damit auch Nutzer die nicht aus Deutschland stammen damit
-    arbeiten können.</td>
-    <td>Momentan liegt das Programm in DE (Deutsch), EN (Englisch) und BY (Bayerisch) vor.
-    Die Sprache wird automatisch mittels eingestellter Systemsprache gewählt. Eine
-    eigenständige Auswahl kann jederzeit über den Einstellungs-Tab vorgenommen werden.</td>
-  </tr>
-  <tr>
-    <td>Alternative Anzeige im Standby-Mode</td>
-    <td>Viele Nutzer benutzen kein Relais oder Schaltung um das LCD ab zu schalten, oder zumindest die
-    Hintergrundbeleuchtung ab zu dunkeln, daher entstand der Wunsch, dass alternativ zum GPIO-Signal eine Art
-    "Bildschirmschoner angezeigt wird". Angezeigt soll werden: Eine Uhr, das Datum, der Wochentag die aktuelle
-    Aussentemperatur und ein Symbol für die aktuelle Wetterlage am eingestellten Ort.</td>
-    <td>Fertig!</td>
-  </tr>
-  <tr>
-    <td>YouTube-Player (Audio)</td>
-    <td>Als Erweiterung zum Media-Player werden nun Suchergebnisse von YouTube mit in den Suchergebnissen gelistet,
-    welche wie jeder andere Track in die Playliste eingereiht werden kann. Als Album-Cover wird ein Vorschaubild
-    von Youtube angezeigt, der Link kann zur späteren Wiederverwendung in der Playliste verbleiben.</td>
-    <td>Fertig!</td>
-  </tr>
-</table>
----
+### 5. Start webradio.py by:
+* clicking on the radio-icon in your system menu \
+or
+* launch "sudo systemctl start webradio.service" from a terminal 
 
-### Änderungen und Optimierungen die nebenher laufen:
-1. Wenn kein DHT11 Temperatur-/Luftfeuchte-Messer angeschlossen ist wird nun nicht mehr nur ein "Standardwert" angezeigt,
-sondern die aktuellen Temperaturdaten aus dem Wetterwidget in der Titelleiste angezeigt.
 
-2. Implementierung von sog. "Themes", mit welchen man das Erscheinungsbild beeinflussen kann. Stylesheets werden aus
-dem jeweiligen Theme geladen und sind somit variabel und für den Nutzer anpassbar (z.B. wenn eine spezielle Farbe
-benötigt wird).
 
-3. Erweiterung der Dateiunterstützung für lokale Medien von der Dateiendung *.mp3 um *.ogg, *.oga und *.flac
-
-4. Unterstützung für UPnP über mpd-Addon "upmpdcli" (siehe <a href="https://github.com/Acer54/Webradio_v2/wiki/UPnP--Streaming-Support">Wiki</a>)
-
-5. Youtube-Player in Media-Player integriert
-
-6. Bildschirmschoner (Uhrzeit und Wettersituation) bei längerer Nichtbenutzung (aktivierbar über Programm-Einstellungen)
-
-### Es werden Übersetzer gesucht!
-Da nun die Unterstützung für weitere Sprachen fertig ist, wäre es wünschenswert mehr Sprachen zu
-unterstützen. Schön wäre, wenn hierzu jemand etwas an Übersetzungen beisteuern könnte!
-
-Bei Interesse einfach über <a href="https://my-darling-is-a-linux-user.org">my-darling-is-a-linux-user.org</a> Kontakt mit mir aufnehmen !
+Tested with \
+ - "Raspbian Stretch", "Ubuntu 18.04";
