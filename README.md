@@ -27,7 +27,14 @@ Comparsion between Version2 (0.2.8) and Version1:
 
 [![Youtube-Video](http://img.youtube.com/vi/oQ6oTWDCCFQ/0.jpg)](https://www.youtube.com/watch?v=oQ6oTWDCCFQ)
 
-# Installation & Update
+# Installation without receiving Updates
+### 1. Download the current deb-package
+from [releases](https://github.com/Acer54/Webradio_v2/releases)
+### 2. Install it from a Terminal with
+    sudo apt install ./webradio*
+***
+
+# Alternative Installation with Updates
 ### 1. Add a new source to your system:
     wget https://raw.githubusercontent.com/Acer54/repository/master/release/release.key && sudo apt-key add release.key && rm release.key
     wget "https://raw.githubusercontent.com/Acer54/repository/master/release/acer54_repository.list" && sudo mv acer54_repository.list /etc/apt/sources.list.d/
@@ -46,5 +53,5 @@ or
 
 
 
-Tested with \
+Tested with 
  - "Raspbian Stretch", "Ubuntu 18.04";
