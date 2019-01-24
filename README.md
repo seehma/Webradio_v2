@@ -43,14 +43,17 @@ from [releases](https://github.com/Acer54/Webradio_v2/releases)
 ### 3. Install webradio-py:
     sudo apt install webradio-py
 
-### 4. Initialize your MPD-Database:
+## After Installation initialize your MPD-Database:
     mpc update
 
-### 5. Start webradio.py by:
+## Start webradio.py by:
 * clicking on the radio-icon in your system menu \
 or
-* launch "sudo systemctl start webradio.service" from a terminal 
+* launch "sudo systemctl start webradio.service" from a terminal \
+or 
+* configure autostart
 
+For a detailed description, please see ["Installation of webradio-py in my Wiki](https://github.com/Acer54/Webradio_v2/wiki/3_Installation-webradio-py)
 
 
 Tested with 
