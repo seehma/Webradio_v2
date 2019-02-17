@@ -289,7 +289,7 @@ except ImportError:    # if eyeD3 is not available, this option will be ignored 
                    "Files if available. You can install it via Terminal with 'pip install eyeD3'.")
 
 
-__version__ = "0.3.5"    # for revision history see "Changelog.txt"
+__version__ = "0.3.6"    # for revision history see "Changelog.txt"
 
 
 
@@ -3315,7 +3315,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             extention = "png"
 
         fileToImport = os.path.join(LogoFolder, "{0}.{1}".format(stationID, extention))
-        fallback = os.path.join(LogoFolder, "fallback.png")
+        fallback = QPixmap(":/albumart_fallback.png")
 
         if os.path.isfile(fileToImport):
             self.lbl_Senderlogo.setPixmap(QPixmap(fileToImport).scaled(self.lbl_Senderlogo.width(),
@@ -3344,13 +3344,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     if i > 3:
                         logger.error("Unable to download Station Logo.... damn")
                         logger.error("No file '{0}' found for Logo ".format(fileToImport))
-                        if os.path.isfile(fallback):
-                            logger.info("Setting Fallbacklogo: {0}".format(fallback))
-                            self.lbl_Sendername.setPixmap(QPixmap(fallback).scaled(self.lbl_Senderlogo.width(),
+                        logger.info("Setting Fallbacklogo")
+                        self.lbl_Sendername.setPixmap(fallback.scaled(self.lbl_Senderlogo.width(),
                                                                        self.lbl_Senderlogo.height(),
                                                                        Qt.KeepAspectRatio, Qt.SmoothTransformation))
-                        else:
-                            logger.error("No fallback-logo, named 'fallback.png' in '%s'" % LogoFolder)
                         break
 
             return True

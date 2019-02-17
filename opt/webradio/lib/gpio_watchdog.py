@@ -45,14 +45,18 @@ try:
     import Adafruit_DHT
     tempsensor = Adafruit_DHT.DHT11
 except ImportError:
-    logging.warning("Adafruit DHT is not installed or can not be loaded. No Hardware-tempsensing available!")
-try:
-    GPIO_TEMP = int(global_vars.configuration.get("DHT11").get("gpio_temp")) # give the GPIO not the Pin-No
-    delay_tempmeasurement = int(global_vars.configuration.get("DHT11").get("delay_tempmeasurement"))
-except (ValueError, TypeError), e:
-    logger.warning(u"Der GPIO oder die Sekundenangabe für den Delay ist ungültig! {0}".format(e))
-    GPIO_TEMP = None
+    GPIO_TEMP= None
     delay_tempmeasurement = 180
+    #TODO: Following warning will not be displayed. Fix this.
+    logging.warning("Adafruit DHT is not installed or can not be loaded. No Hardware-tempsensing available!")
+else:
+    try:
+        GPIO_TEMP = int(global_vars.configuration.get("DHT11").get("gpio_temp")) # give the GPIO not the Pin-No
+        delay_tempmeasurement = int(global_vars.configuration.get("DHT11").get("delay_tempmeasurement"))
+    except (ValueError, TypeError), e:
+        logger.warning(u"Der GPIO oder die Sekundenangabe für den Delay ist ungültig! {0}".format(e))
+        GPIO_TEMP = None
+        delay_tempmeasurement = 180
 
 
 class Gpio_Watchdog(QObject):
