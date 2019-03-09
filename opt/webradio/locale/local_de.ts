@@ -1,101 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0" language="de_DE" sourcelanguage="">
+<!DOCTYPE TS>
+<TS version="2.0" language="de_DE">
 <context>
     <name>Form</name>
     <message>
         <location filename="../ui/ui_raw/weather_widget_flex_scaling.ui" line="179"/>
-        <source>&#xc2;&#xb0;C , feels like</source>
-        <translation type="unfinished">°C , gefühlt wie</translation>
+        <source>Â°C , feels like</source>
+        <translation>°C , gefühlt wie</translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/weather_widget_flex_scaling.ui" line="318"/>
         <source>km/h Wind from</source>
-        <translation type="unfinished">km/h Wind aus</translation>
+        <translation>km/h Wind aus</translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/weather_widget_flex_scaling.ui" line="444"/>
         <source>Monday</source>
-        <translation type="unfinished">Montag</translation>
+        <translation>Montag</translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/weather_widget_flex_scaling.ui" line="1352"/>
         <source>Day</source>
-        <translation type="unfinished">Tag</translation>
+        <translation>Tag</translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/weather_widget_flex_scaling.ui" line="1545"/>
         <source>Night</source>
-        <translation type="unfinished">Nacht</translation>
+        <translation>Nacht</translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/weather_widget_flex_scaling.ui" line="31"/>
         <source>Current:</source>
-        <translation type="unfinished">Aktuell:</translation>
+        <translation>Aktuell:</translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/weather_widget_flex_scaling.ui" line="262"/>
         <source>% Rain probability</source>
-        <translation type="unfinished">% Regenwahrscheinlichkeit</translation>
+        <translation>% Regenwahrscheinlichkeit</translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/weather_widget_flex_scaling.ui" line="877"/>
         <source>Tuesday</source>
-        <translation type="unfinished">Dienstag</translation>
+        <translation>Dienstag</translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/weather_widget_flex_scaling.ui" line="1310"/>
         <source>Wednesday</source>
-        <translation type="unfinished">Mittwoch</translation>
-    </message>
-    <message>
-        <location filename="../ui/ui_raw/weather_widget_flex_scaling.ui" line="1644"/>
-        <source>&#xc2;&#xb0;C </source>
-        <translation type="unfinished">°C</translation>
+        <translation>Mittwoch</translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/weather_widget_flex_scaling.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/weather_widget_flex_scaling.ui" line="191"/>
         <source>16</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../ui/ui_raw/weather_widget_flex_scaling.ui" line="1644"/>
+        <source>Â°C </source>
+        <translation>°C</translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/weather_widget_flex_scaling.ui" line="247"/>
         <source>23</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/weather_widget_flex_scaling.ui" line="303"/>
         <source>55</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/weather_widget_flex_scaling.ui" line="330"/>
         <source>&quot;S&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/weather_widget_flex_scaling.ui" line="354"/>
         <source>7:22</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/weather_widget_flex_scaling.ui" line="386"/>
         <source>21:55</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/weather_widget_flex_scaling.ui" line="1681"/>
         <source>12</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/weather_widget_flex_scaling.ui" line="1696"/>
         <source>%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -103,590 +104,612 @@
     <message>
         <location filename="../ui/ui_raw/installation_guide.ui" line="26"/>
         <source>Installation Guide</source>
-        <translation type="obsolete">Installationsassistent</translation>
+        <translation>Installationsassistent</translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/installation_guide.ui" line="278"/>
         <source>Title</source>
-        <translation type="obsolete">Titel</translation>
+        <translation>Titel</translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/installation_guide.ui" line="328"/>
         <source>Welcome to the guided installation of &quot;webradio.py&quot; </source>
-        <translation type="obsolete">Willkommen zur geführten Installation von &quot;webradio.py&quot;</translation>
+        <translation>Willkommen zur geführten Installation von &quot;webradio.py&quot;</translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/installation_guide.ui" line="348"/>
         <source>Version: </source>
-        <translation type="obsolete">Version:</translation>
+        <translation>Version:</translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/installation_guide.ui" line="405"/>
         <source>Abort</source>
-        <translation type="obsolete">Abbrechen</translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/installation_guide.ui" line="434"/>
         <source>Previouse</source>
-        <translation type="obsolete">Zurück</translation>
+        <translation>Zurück</translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/installation_guide.ui" line="450"/>
         <source>Next</source>
-        <translation type="obsolete">Weiter</translation>
+        <translation>Weiter</translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/installation_guide.ui" line="485"/>
         <source>Finished!</source>
-        <translation type="obsolete">Fertig!</translation>
+        <translation>Fertig!</translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/installation_guide.ui" line="63"/>
         <source>Introduction</source>
-        <translation type="obsolete">Willkommen</translation>
+        <translation>Willkommen</translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/installation_guide.ui" line="85"/>
         <source>Install dependencies</source>
-        <translation type="obsolete">Installation Abhängigkeiten</translation>
+        <translation>Installation Abhängigkeiten</translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/installation_guide.ui" line="104"/>
         <source>Setup MPD</source>
-        <translation type="obsolete">Setup MPD</translation>
+        <translation>Setup MPD</translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/installation_guide.ui" line="123"/>
         <source>setup USB behaviour</source>
-        <translation type="obsolete">Setup USB Verhalten</translation>
+        <translation>Setup USB Verhalten</translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/installation_guide.ui" line="142"/>
         <source>Connect NAS</source>
-        <translation type="obsolete">NAS verbinden</translation>
+        <translation>NAS verbinden</translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/installation_guide.ui" line="161"/>
         <source>Setup GPIOs</source>
-        <translation type="obsolete">Setup GPIOs</translation>
+        <translation>Setup GPIOs</translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/installation_guide.ui" line="180"/>
         <source>Setup webradio.py</source>
-        <translation type="obsolete">Setup webradio.py</translation>
+        <translation>Setup webradio.py</translation>
+    </message>
+    <message>
+        <location filename="../ui/ui_raw/installation_guide.ui" line="212"/>
+        <source>Logo</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../ui/ui_raw/installation_guide.ui" line="363"/>
+        <source>
+This is the automated installation-guide for the Python-Programm &quot;webradio.py&quot; it will basically configure the file &quot;webradio.conf&quot; which is located in the folder where you have stored the installation.pack of webradio.py.
+You can change your setting when ever you want just by calling this script once again. If you are sure about your needed changes you can also open the webradio.conf file with a text-editor of your choice. Just change and safe the file and restart &quot;webradio.py&quot;.
+
+During the next few slides you will be asked for specific details and setting. Depending on your input mpd will be configured, desktop-files are created and necessary python-packages getting installed.
+Please be patient while an installation-processs is running and do not kill the process while installing to avoid damage to the system.
+
+If you want to support the project and help developing than visit the project-site at github.com</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../setup.py" line="189"/>
+        <source>Welcome!</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../setup.py" line="203"/>
+        <source>Install necessary dependencies</source>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../webradio.py" line="374"/>
+        <location filename="../webradio.py" line="317"/>
         <source>currently playing...</source>
         <translation>spielt gerade...</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="377"/>
+        <location filename="../webradio.py" line="320"/>
         <source>Choose station by category</source>
         <translation>Stationsauswahl nach Kategorie</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="378"/>
+        <location filename="../webradio.py" line="321"/>
         <source>Search stations...</source>
         <translation>Stationen suchen...</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="379"/>
+        <location filename="../webradio.py" line="322"/>
         <source>Station by &quot;Genre&quot;</source>
         <translation>Stationen nach &quot;Genre&quot;</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="380"/>
+        <location filename="../webradio.py" line="323"/>
         <source>Station by &quot;Theme&quot;</source>
         <translation>Stationen nach &quot;Thema&quot;</translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/flexi3.ui" line="1537"/>
         <source>Wetter</source>
-        <translation type="unfinished">Weather</translation>
+        <translation>Weather</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="1310"/>
+        <location filename="../webradio.py" line="1246"/>
         <source>Sleep-Timer</source>
         <translation>Zeitschaltuhr</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="375"/>
+        <location filename="../webradio.py" line="318"/>
         <source>Stations near of you</source>
         <translation>Stationen in deiner Nähe</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="376"/>
+        <location filename="../webradio.py" line="319"/>
         <source>Station proposals</source>
         <translation>Vorschläge für Sie</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="381"/>
+        <location filename="../webradio.py" line="324"/>
         <source>Station by &quot;Country&quot;</source>
         <translation>Stationen nach &quot;Land&quot;</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="382"/>
+        <location filename="../webradio.py" line="325"/>
         <source>Station by &quot;Town&quot;</source>
         <translation>Stationen nach &quot;Stadt&quot;</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="383"/>
+        <location filename="../webradio.py" line="326"/>
         <source>Station by &quot;Language&quot;</source>
         <translation>Stationen nach &quot;Sprache&quot;</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="533"/>
+        <location filename="../webradio.py" line="476"/>
         <source>Welcome !</source>
         <translation>Willkommen !</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="534"/>
+        <location filename="../webradio.py" line="477"/>
         <source>please &apos;search&apos; to be able to play a station</source>
         <translation>bitte &apos;suchen&apos; um einen Sender ab zu spielen</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="1051"/>
+        <location filename="../webradio.py" line="987"/>
         <source>Clock: %1</source>
         <translation>%1 Uhr</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="1289"/>
+        <location filename="../webradio.py" line="1225"/>
         <source>Searching for...</source>
         <translation>Suche nach...</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="1290"/>
+        <location filename="../webradio.py" line="1226"/>
         <source>Results for &apos;near of you&apos;:</source>
         <translation>Ergebnisse für &apos;in deiner Nähe&apos;:</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="1291"/>
+        <location filename="../webradio.py" line="1227"/>
         <source>Station-Proposals for you:</source>
         <translation>Sender-Vorschläge für Sie:</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="1292"/>
+        <location filename="../webradio.py" line="1228"/>
         <source>Searching for Category:</source>
         <translation>Suche nach Kategorie:</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="1294"/>
+        <location filename="../webradio.py" line="1230"/>
         <source>Favourites</source>
         <translation>Favoriten</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="1302"/>
+        <location filename="../webradio.py" line="1238"/>
         <source>Enter your keyword:</source>
         <translation>Geben Sie Ihr Suchwort ein:</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="1298"/>
+        <location filename="../webradio.py" line="1234"/>
         <source>Add Title</source>
         <translation>Titel hinzufügen</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="1301"/>
+        <location filename="../webradio.py" line="1237"/>
         <source>Searchresults:</source>
         <translation>Suchergebnisse:</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="1306"/>
+        <location filename="../webradio.py" line="1242"/>
         <source>Weatherforecast</source>
         <translation>Wettervorhersage</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="1713"/>
+        <location filename="../webradio.py" line="1632"/>
         <source>Searching for:</source>
         <translation>Suche nach:</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="1806"/>
+        <location filename="../webradio.py" line="1725"/>
         <source>genre</source>
         <translation>Genre</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="1807"/>
+        <location filename="../webradio.py" line="1726"/>
         <source>topic</source>
         <translation>Thema</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="1808"/>
+        <location filename="../webradio.py" line="1727"/>
         <source>country</source>
         <translation>Land</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="1809"/>
+        <location filename="../webradio.py" line="1728"/>
         <source>city</source>
         <translation>Stadt</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="1810"/>
+        <location filename="../webradio.py" line="1729"/>
         <source>language</source>
         <translation>Sprache</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="1811"/>
+        <location filename="../webradio.py" line="1730"/>
         <source>Searching for %1:</source>
         <translation>Suche nach %1:</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="2920"/>
+        <location filename="../webradio.py" line="2554"/>
         <source>Your Webradio will shutdown now!</source>
         <translation>Der Webradio wird nun heruntergefahren!</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="2929"/>
+        <location filename="../webradio.py" line="2563"/>
         <source>Abort!</source>
         <translation>Abbrechen!</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="2924"/>
+        <location filename="../webradio.py" line="2558"/>
         <source>Continue...</source>
         <translation>Fortfahren...</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="3087"/>
+        <location filename="../webradio.py" line="2721"/>
         <source>Outside: </source>
         <translation>Temp.: </translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="1214"/>
+        <location filename="../webradio.py" line="1150"/>
         <source>Can not establish an online-connection</source>
         <translation>Es kann keine Internetverbindung hergestellt werden</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="1214"/>
+        <location filename="../webradio.py" line="1150"/>
         <source>Try again</source>
         <translation>Erneut versuchen</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="1214"/>
+        <location filename="../webradio.py" line="1150"/>
         <source>Radio, Weatherforecast as well as onlinefuncitons will get deactivated.</source>
         <translation>Radio, Wettervorhersage und Onlinefuktionen werden deaktiviert.</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="1214"/>
+        <location filename="../webradio.py" line="1150"/>
         <source>Ok, de-activate</source>
         <translation>Ja, de-aktivieren</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="3446"/>
+        <location filename="../webradio.py" line="3080"/>
         <source>now playing ...</source>
         <translation>spielt jetzt...</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="2035"/>
+        <location filename="../webradio.py" line="1929"/>
         <source>%1 Results for %2</source>
         <translation>%1 Ergebnisse für %2</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="2965"/>
+        <location filename="../webradio.py" line="2599"/>
         <source>&apos;%1&apos; did not give any searchresults</source>
         <translation>&apos;%1&apos; ergab keine Treffer</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="2965"/>
+        <location filename="../webradio.py" line="2599"/>
         <source>Try another</source>
         <translation>Erneut versuchen</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="2965"/>
+        <location filename="../webradio.py" line="2599"/>
         <source>Try another search keyword</source>
         <translation>Versuche ein anders Suchwort</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="3160"/>
+        <location filename="../webradio.py" line="2794"/>
         <source>A problem with MPD was detected!</source>
         <translation>Ein Problem mit MPD wurde festgestellt!</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="3160"/>
+        <location filename="../webradio.py" line="2794"/>
         <source>Ok</source>
         <translation>Ok</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="3160"/>
+        <location filename="../webradio.py" line="2794"/>
         <source>Try to restart MPD, or just reboot the system</source>
         <translation>Versuche MPD neu zu starten oder einen Reboot durchzuführen</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="3465"/>
+        <location filename="../webradio.py" line="3098"/>
         <source>Shutdown</source>
         <translation>Herunterfahren</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="3471"/>
+        <location filename="../webradio.py" line="3104"/>
         <source>Standby</source>
         <translation>Standby</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="3498"/>
+        <location filename="../webradio.py" line="3131"/>
         <source>Reboot</source>
         <translation>Neustart</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="3504"/>
+        <location filename="../webradio.py" line="3137"/>
         <source>Abort</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="1313"/>
+        <location filename="../webradio.py" line="1249"/>
         <source>Settings</source>
         <translation>Einstellungen</translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="372"/>
+        <location filename="../webradio.py" line="315"/>
         <source>Raspi Web Radio</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="373"/>
+        <location filename="../ui/ui_raw/flexi3.ui" line="57"/>
+        <source>16:35 Uhr</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../webradio.py" line="316"/>
         <source>Raspi - Web Radio Tuner</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../webradio.py" line="1288"/>
-        <source>Web Radio Tuner</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../webradio.py" line="1299"/>
-        <source>Media Player</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../webradio.py" line="1300"/>
-        <source>Playlisteditor</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../webradio.py" line="403"/>
-        <source>Delete</source>
-        <translation>Entfernen</translation>
-    </message>
-    <message>
-        <location filename="../webradio.py" line="404"/>
-        <source>Space</source>
-        <translation>Leerzeichen</translation>
-    </message>
-    <message>
-        <location filename="../webradio.py" line="384"/>
-        <source>Design-Template:</source>
-        <translation>Design-Vorlage:</translation>
-    </message>
-    <message>
-        <location filename="../webradio.py" line="385"/>
-        <source>Language:</source>
-        <translation>Sprache:</translation>
-    </message>
-    <message>
-        <location filename="../webradio.py" line="386"/>
-        <source>Screensaver during Standby:</source>
-        <translation>Bildschirmschoner im Standby:</translation>
-    </message>
-    <message>
-        <location filename="../webradio.py" line="387"/>
-        <source>Hometown:</source>
-        <translation>Heimatstadt:</translation>
-    </message>
-    <message>
-        <location filename="../webradio.py" line="389"/>
-        <source>Show Screensaver</source>
-        <translation>zeige Bildschirmschoner</translation>
-    </message>
-    <message>
-        <location filename="../webradio.py" line="388"/>
-        <source>Change...</source>
-        <translation>Ändern...</translation>
-    </message>
-    <message>
-        <location filename="../webradio.py" line="469"/>
-        <source>Include Online-Results</source>
-        <translation>Online-Ergebnisse einbeziehen</translation>
-    </message>
-    <message>
-        <location filename="../webradio.py" line="2922"/>
-        <source>Your Webradio will standby now!</source>
-        <translation>Dein Webradio wird gleich in den Standby versetzt!</translation>
-    </message>
-    <message>
-        <location filename="../webradio.py" line="3508"/>
-        <source>Close</source>
-        <translation>Schließen</translation>
-    </message>
-    <message>
-        <location filename="../webradio.py" line="2098"/>
-        <source>&apos;%1&apos; did result in an error:%2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/ui_raw/flexi3.ui" line="57"/>
-        <source>16:35 Uhr</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../ui/ui_raw/flexi3.ui" line="123"/>
         <source>Web-Radio</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/flexi3.ui" line="201"/>
         <source>Senderlogo</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/flexi3.ui" line="238"/>
         <source>fav</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/flexi3.ui" line="275"/>
         <source>Rock Antenne</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/flexi3.ui" line="352"/>
         <source>Musiktitel</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/flexi3.ui" line="699"/>
         <source>MP3 Player</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/flexi3.ui" line="731"/>
         <source>reload</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/flexi3.ui" line="1523"/>
         <source>Add to Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/flexi3.ui" line="802"/>
         <source>Album Art</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/flexi3.ui" line="842"/>
         <source>Previouse Song</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/flexi3.ui" line="883"/>
         <source>Current Song</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/flexi3.ui" line="925"/>
         <source>Next Song</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/flexi3.ui" line="967"/>
         <source>cur</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/flexi3.ui" line="987"/>
         <source>total</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/flexi3.ui" line="1237"/>
         <source>autorepeat</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/flexi3.ui" line="1265"/>
         <source>Back</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/flexi3.ui" line="1290"/>
         <source>Stop</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/flexi3.ui" line="1315"/>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/flexi3.ui" line="1340"/>
         <source>Forward</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/flexi3.ui" line="1394"/>
         <source>up</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/flexi3.ui" line="1413"/>
         <source>add</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/flexi3.ui" line="1432"/>
         <source>del</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/flexi3.ui" line="1451"/>
         <source>down</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/flexi3.ui" line="1486"/>
         <source>MarkAll</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/ui_raw/flexi3.ui" line="1917"/>
-        <source>Hometown (for Weather-Info):</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/ui_raw/flexi3.ui" line="1944"/>
-        <source>Berlin</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/flexi3.ui" line="2040"/>
         <source>Home</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/flexi3.ui" line="2080"/>
         <source>Suchen</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/flexi3.ui" line="2120"/>
         <source>Fav</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message encoding="UTF-8">
-        <location filename="../ui/ui_raw/flexi3.ui" line="2160"/>
-        <source>Zurück</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/flexi3.ui" line="2257"/>
         <source>-</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/flexi3.ui" line="2295"/>
         <source>+</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../webradio.py" line="1224"/>
+        <source>Web Radio Tuner</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../webradio.py" line="1235"/>
+        <source>Media Player</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../webradio.py" line="1236"/>
+        <source>Playlisteditor</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../webradio.py" line="346"/>
+        <source>Delete</source>
+        <translation>Entfernen</translation>
+    </message>
+    <message>
+        <location filename="../webradio.py" line="347"/>
+        <source>Space</source>
+        <translation>Leerzeichen</translation>
+    </message>
+    <message>
+        <location filename="../webradio.py" line="327"/>
+        <source>Design-Template:</source>
+        <translation>Design-Vorlage:</translation>
+    </message>
+    <message>
+        <location filename="../webradio.py" line="328"/>
+        <source>Language:</source>
+        <translation>Sprache:</translation>
+    </message>
+    <message utf8="true">
+        <location filename="../ui/ui_raw/flexi3.ui" line="2160"/>
+        <source>Zurück</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../webradio.py" line="329"/>
+        <source>Screensaver during Standby:</source>
+        <translation>Bildschirmschoner im Standby:</translation>
+    </message>
+    <message>
+        <location filename="../webradio.py" line="330"/>
+        <source>Hometown:</source>
+        <translation>Heimatstadt:</translation>
+    </message>
+    <message>
+        <location filename="../webradio.py" line="332"/>
+        <source>Show Screensaver</source>
+        <translation>zeige Bildschirmschoner</translation>
+    </message>
+    <message>
+        <location filename="../ui/ui_raw/flexi3.ui" line="1917"/>
+        <source>Hometown (for Weather-Info):</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../ui/ui_raw/flexi3.ui" line="1944"/>
+        <source>Berlin</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../webradio.py" line="331"/>
+        <source>Change...</source>
+        <translation>Ändern...</translation>
+    </message>
+    <message>
+        <location filename="../webradio.py" line="412"/>
+        <source>Include Online-Results</source>
+        <translation>Online-Ergebnisse einbeziehen</translation>
+    </message>
+    <message>
+        <location filename="../webradio.py" line="2556"/>
+        <source>Your Webradio will standby now!</source>
+        <translation>Dein Webradio wird gleich in den Standby versetzt!</translation>
+    </message>
+    <message>
+        <location filename="../webradio.py" line="3141"/>
+        <source>Close</source>
+        <translation>Schließen</translation>
     </message>
 </context>
 <context>
@@ -710,7 +733,7 @@
 <context>
     <name>self.parent</name>
     <message>
-        <location filename="../webradio.py" line="3863"/>
+        <location filename="../webradio.py" line="3491"/>
         <source>Unknown - Please delete</source>
         <translation>Unbekannt - Bitte löschen</translation>
     </message>
