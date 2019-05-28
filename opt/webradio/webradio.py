@@ -289,7 +289,7 @@ except ImportError:    # if eyeD3 is not available, this option will be ignored 
                    "Files if available. You can install it via Terminal with 'pip install eyeD3'.")
 
 
-__version__ = "0.3.6"    # for revision history see "Changelog.txt"
+__version__ = "0.3.7"    # for revision history see "Changelog.txt"
 
 
 
