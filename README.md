@@ -57,4 +57,4 @@ For a detailed description, please see ["Installation of webradio-py in my Wiki]
 
 
 Tested with 
- - "Raspbian Stretch", "Ubuntu 18.04";
+ - "Raspbian Stretch", "Raspbian Buster";
