@@ -289,7 +289,7 @@ except ImportError:    # if eyeD3 is not available, this option will be ignored 
                    "Files if available. You can install it via Terminal with 'pip install eyeD3'.")
 
 
-__version__ = "0.3.7"    # for revision history see "Changelog.txt"
+__version__ = "0.3.8"    # for revision history see "Changelog.txt"
 
 
 
@@ -2174,7 +2174,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         trigger_for_switching_to_radio = False
         if url != "":                                                  # if there is an url sent
             #print("Evaluating:", url)
-            if url.startswith("http://") and not "http://192.168." in url and not url.startswith("http://r") \
+            if url.startswith("http://") or url.startswith("https://") and not "http://192.168." in url and not url.startswith("http://r") \
                     and not url.startswith("https://r"): # check if the url is a url or a filename
                 #TODO: Does this cause problems with streaming Links which are starting with a "r"?? maybe a regex here?
                 logger.debug("Received changed Station, but without name...")
