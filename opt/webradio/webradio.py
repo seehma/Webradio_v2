@@ -4120,11 +4120,11 @@ class ShutdownDialog(QDialog):
     def __init__(self, text="", options=[], parent=None):
         super(ShutdownDialog, self).__init__(parent)
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog)
-        self.setStyleSheet("QDialog {"
-                               #"background-image: url(:/webradio-main.png);"
-                               "background-color: rgb(76, 76, 76);"
-                               "color: rgb(240, 240, 240);"
-                               "}")
+#        self.setStyleSheet("QDialog {"
+#                               #"background-image: url(:/webradio-main.png);"
+#                               "background-color: rgb(76, 76, 76);"
+#                               "color: rgb(240, 240, 240);"
+#                               "}")
         # estimate available size on the screen:
         if parent is None:
             screensize = QDesktopWidget().screenGeometry()
