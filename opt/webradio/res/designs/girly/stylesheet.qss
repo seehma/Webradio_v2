@@ -5,6 +5,12 @@ QMainWindow {
         background-position: top-left;
         color: rgb(200, 0, 200);
         }
+/* QDialog is used to present shutdown options */
+QDialog {
+        /* background-image: url(:/webradio-main.png); */
+        background-color: rgb(200, 200, 200);
+        color: rgb(200, 0, 200);
+        }
 /* Settings - Tab */
 QComboBox{
         color: rgb(200,0,200);
