@@ -111,7 +111,7 @@ QTreeView{
         border-color: black;
         }
 QTreeView::item:selected{                                                 /* File-View Media Player, SELECTED Item */
-        background-color: rgb(100, 0, 100);
+        background-color: rgb(240, 200, 240);
         color: rgb(200, 0, 200);
         }
 QTreeView::item, QTreeView QLabel{                                        /* File-View Media Player, UNSELECTED Item */
@@ -173,7 +173,7 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
         }
 QSlider::groove:horizontal {
         border: 1px solid #bbb;
-        background: rgb(200,0,200);
+        background: rgba(240,240,240, 0%);
         height: 10px;
         border-radius: 4px;
         }
@@ -184,7 +184,7 @@ QSlider::sub-page:horizontal {
         border-radius: 4px;
         }
 QSlider::add-page:horizontal {
-        background: #fff;
+        background: rgba(240, 240, 240, 0%);
         border: 1px solid #777;
         height: 10px;
         border-radius: 4px;
