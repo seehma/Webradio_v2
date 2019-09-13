@@ -64,10 +64,10 @@ QMessageBox {
         color: rgb(200, 0, 200);
         }
 QPushButton{
-        background-color: rgb(240, 240, 240);
+        background-color: rgba(240, 240, 240, 50%);
         color: rgb(200, 0, 200);
         border-style: solid;
-        border-color: rgb(200,0,200);
+        border-color: rgba(200,0,200, 10%);
         border-width: 5px;
         border-radius: 10px;
         }
@@ -79,11 +79,11 @@ QListWidget{
         color: rgb(200, 0, 200);
         }
 QListWidget::item:selected{
-        background-color: rgb(100, 0, 100);
+        background-color: rgb(240, 200, 240);
         color: rgb(200, 0, 200);
         }
 QListWidgetItem{
-        background-color: rgb(240, 240, 240);
+        background-color: rgba(40, 40, 40, 50%);
         color: rgb(200, 0, 200);
         }
 /* not used any longer */
