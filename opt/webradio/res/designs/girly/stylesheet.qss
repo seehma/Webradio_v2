@@ -111,6 +111,7 @@ QTabBar::tab:selected{
         background-color: none;
         width:70px;  /* This defines the icon-size in the Tabwidget */
         }
+/* Displays the MPD music folder hierarchy */
 QTreeView{
         background-color: rgba(240, 240, 240, 50%);
         border: 2;
@@ -121,7 +122,7 @@ QTreeView::item:selected{                                                 /* Fil
         color: rgb(200, 0, 200);
         }
 QTreeView::item, QTreeView QLabel{                                        /* File-View Media Player, UNSELECTED Item */
-        background-color: rgb(240, 240, 240);
+        background-color: rgbs(240, 240, 240, 0%);
         color: rgb(180, 0, 180);
         }
 QTreeView::branch {
