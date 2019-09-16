@@ -3,11 +3,14 @@
 # tested with PyQt4.4 and Python 2.5
 # also tested with PyQt4.5 and Python 3.0
 # vegaseat
-import sys 
+import sys, importlib
 # too lazy to keep track of QtCore or QtGui
-from PyQt4.QtCore import Qt, QByteArray, QSize, SIGNAL
+from PyQt4.QtCore import Qt, QByteArray, QSize, SIGNAL, QSettings
 from PyQt4.QtGui import QWidget, QVBoxLayout, QLabel, QMovie, QPixmap, QApplication
-import res
+import res1   # load fallback first
+res = importlib.import_module(".res", package="res.designs.{0}".format(QSettings("Laumer",
+                                                                                 "RapiRadio").value("design_str",
+                                                                                 "fallback").toString()))
 
 
 CustomSize = QSize(72, 72)
