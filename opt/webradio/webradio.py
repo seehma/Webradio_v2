@@ -1440,7 +1440,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.widget_Standby.ON_logo = QPixmap(":/standby_on.png")
             self.widget_Standby.OFF_logo = QPixmap(":/standby_off.png")
             self.widget_Standby.setInitialState("on")
-            #self.widget_Mute = lib.button_labels.MuteButtonLabel()
             if self.widget_Mute.muted == False:
                 self.widget_Mute.show_unmute()
 
