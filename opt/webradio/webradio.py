@@ -289,7 +289,7 @@ except ImportError:    # if eyeD3 is not available, this option will be ignored 
                    "Files if available. You can install it via Terminal with 'pip install eyeD3'.")
 
 
-__version__ = "0.3.8"    # for revision history see "Changelog.txt"
+__version__ = "0.3.9"    # for revision history see "Changelog.txt"
 
 
 
@@ -552,6 +552,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.lbl_previouse.setWordWrap(True)
             self.lbl_current_playing.setWordWrap(True)
             self.lbl_next.setWordWrap(True)
+            # stretch content to lower edge to get more space for content at smaller display sizes , see #23
+            self.tabWidget_main.setStyleSheet(_fromUtf8("QStackedWidget{margin:0,-10,0,0;}"))
 
             #TODO: Transfer this to the stylesheets (Themes...)
             self.checkBox_screensaver.setStyleSheet("QCheckBox::indicator {width: 30px; height: 30px;}")
@@ -1435,6 +1437,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.pB_del_from_playlist.setIcon(QIcon(":/del.png"))
             self.pB_add_on_playlist.setIcon(QIcon(":/add.png"))
             self.pB_move_down.setIcon(QIcon(":/down.png"))
+            self.widget_Standby.ON_logo = QPixmap(":/standby_on.png")
+            self.widget_Standby.OFF_logo = QPixmap(":/standby_off.png")
+            self.widget_Standby.setInitialState("on")
+            #self.widget_Mute = lib.button_labels.MuteButtonLabel()
+            if self.widget_Mute.muted == False:
+                self.widget_Mute.show_unmute()
 
             #if everything was OK, update Value in current conf accordingly.
             self.writeSettings()  # design settings are stored in Systemsettings.
@@ -4120,11 +4128,13 @@ class ShutdownDialog(QDialog):
     def __init__(self, text="", options=[], parent=None):
         super(ShutdownDialog, self).__init__(parent)
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog)
-        self.setStyleSheet("QDialog {"
-                               #"background-image: url(:/webradio-main.png);"
-                               "background-color: rgb(76, 76, 76);"
-                               "color: rgb(240, 240, 240);"
-                               "}")
+        #self.setStyleSheet("QDialog {"
+        #                       #"background-image: url(:/webradio-main.png);"
+        #                       "background-color: rgb(76, 76, 76);"
+        #                       "color: rgb(240, 240, 240);"
+        #                       "}")
+        # see pull-request #24, Style is now editable via stylesheet.qss from the used theme.
+
         # estimate available size on the screen:
         if parent is None:
             screensize = QDesktopWidget().screenGeometry()
@@ -4236,8 +4246,10 @@ if __name__ == "__main__":
                        u"setting default Screenresolution according Display-Size".format(sizeString))
 
         screen_resolution = app.desktop().screenGeometry()
-        width, height = screen_resolution.width(), screen_resolution.height()
-        #if width / height is too large or to small, mainwindow will fallback to 1024x600 max and 640x480 min
+        width, height = screen_resolution.width() + 8, screen_resolution.height() + 8
+        #0.3.9 : see issue #21 (edges arround window), add additional 4 pixels on each side of the application window to avoid
+        #visible window-decoration
+        #if width / height is to small, mainwindow will fallback to 640x480 min
         sizeString = "{0}x{1}".format(width, height)
     else:
         logger.info(u"Force screen-Resolution according to Config-File: {0}".format(sizeString))
