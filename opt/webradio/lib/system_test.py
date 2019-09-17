@@ -28,9 +28,9 @@ def test_onlineServices():
     try:                                                                    # check internet-connection
         urllib2.urlopen(INTERNET, timeout=1)
         service_internet = True
-    except urllib2.URLError:                                                # if there is an error
+    except urllib2.URLError, ue:                                                # if there is an error
         print("Internet:", service_internet)
-        logger.error("No Network-Connection found!")
+        logger.error("No Network-Connection found: {}".format(ue) )
         return False, result
 
     if service_internet:
