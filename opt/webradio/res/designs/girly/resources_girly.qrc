@@ -44,5 +44,8 @@
 <file alias="carbon.jpg">girly/carbon.jpg</file>
 <file alias="checkbox_unchecked.png">girly/checkbox_unchecked.png</file>
 <file alias="checkbox_checked.png">girly/checkbox_checked.png</file>
-</qresource>
+<file alias="standby_off.png">girly/standby_off.png</file>
+<file alias="standby_on.png">girly/standby_on.png</file>
+<file alias="mute.gif">girly/mute.gif</file>
+<file alias="unmute.gif">girly/unmute.gif</file></qresource>
 </RCC>

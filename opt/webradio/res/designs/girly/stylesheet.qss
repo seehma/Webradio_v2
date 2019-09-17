@@ -8,7 +8,7 @@ QMainWindow {
 /* QDialog is used to present shutdown options */
 QDialog {
         /* background-image: url(:/webradio-main.png); */
-        background-color: rgb(200, 200, 200);
+        background-color: rgb(200, 100, 200);
         color: rgb(200, 0, 200);
         }
 /* Settings - Tab */
