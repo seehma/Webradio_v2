@@ -6,7 +6,7 @@ from PyQt4.QtGui import QGridLayout, QHBoxLayout, QLineEdit, QPushButton, QSizeP
 from PyQt4.QtCore import QSize, SIGNAL, QString, Qt, QTimer
 
 font = QFont()          #font for LineEdit ...
-font.setPointSize(26)
+font.setPointSize(20)
 
 class InputState:
     LOWER = 0

@@ -205,3 +205,7 @@ QSlider::handle:horizontal:disabled {
         border: 1px solid #aaa;
         border-radius: 4px;
         }
+QDialog {
+        background-color: rgb(76, 76, 76);
+        color: rgb(240, 240, 240);
+        }

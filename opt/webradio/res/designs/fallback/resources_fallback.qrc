@@ -44,5 +44,9 @@
 <file alias="carbon.jpg">fallback/carbon.jpg</file>
 <file alias="checkbox_unchecked.png">fallback/checkbox_unchecked.png</file>
 <file alias="checkbox_checked.png">fallback/checkbox_checked.png</file>
+<file alias="standby_off.png">fallback/standby_off.png</file>
+<file alias="standby_on.png">fallback/standby_on.png</file>
+<file alias="mute.gif">fallback/mute.gif</file>
+<file alias="unmute.gif">fallback/unmute.gif</file>
 </qresource>
 </RCC>
