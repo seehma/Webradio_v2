@@ -7,7 +7,7 @@ import sys, importlib
 # too lazy to keep track of QtCore or QtGui
 from PyQt4.QtCore import Qt, QByteArray, QSize, SIGNAL, QSettings
 from PyQt4.QtGui import QWidget, QVBoxLayout, QLabel, QMovie, QPixmap, QApplication
-import res1   # load fallback first
+#import res1   # load fallback first
 res = importlib.import_module(".res", package="res.designs.{0}".format(QSettings("Laumer",
                                                                                  "RapiRadio").value("design_str",
                                                                                  "fallback").toString()))
