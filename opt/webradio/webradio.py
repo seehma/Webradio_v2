@@ -91,15 +91,15 @@ def read_conf(filepath, extention=".ini"):
                         tempopt = None
 
                     target[section][option] = tempopt
-                except Exception, ex:
+                except:
                     e = sys.exc_info()[0]
-                    logger.error(_("exception on {0} with {1}! Will override this with 'None-Type', {2}").format(option, e, ex))
+                    logger.error(_("exception on {0} with {1}! Will override this with 'None-Type'").format(option, e))
                     target[section][option] = None
         logger.info(_("Reading Configurations-File complete."))
         return target
-    except Exception, ex:
+    except:
         e = sys.exc_info()[0]
-        logger.error(_("Configuration {0} can not be read! Error: {1}, {2}").format(filepath, e, ex))
+        logger.error(_("Configuration {0} can not be read! Error: {1}").format(filepath, e))
         raise IOError
 
 def setupLogger(console=True, File=False, Variable=False, Filebackupcount=0):
@@ -196,8 +196,8 @@ for path in [user_dir, LogoFolder, AlbumArtFolder]:
             try:
                 print("Changing File Permissions of: {0}".format(path))
                 os.chown(path, user.pw_uid, user.pw_gid)
-            except Exception, e:
-                print("was not able to change File-Permission for {0}: {1}".format(orig_user, e))
+            except:
+                print("was not able to change File-Permission for {0}".format(orig_user))
 
 if not os.path.exists(PathFavoritesPlaylist):
     open(PathFavoritesPlaylist, 'a').close()
@@ -218,12 +218,12 @@ else:
             try:
                 logger.info("Changing File Permissions of: {0}".format(os.path.join(user_dir, "webradio.conf")))
                 os.chown(os.path.join(user_dir, "webradio.conf"), user.pw_uid, user.pw_gid)
-            except Exception, e:
-                logger.error("was not able to change File-Permission for {0}: {1}".format(orig_user, e))
+            except:
+                logger.error("was not able to change File-Permission for {0}".format(orig_user))
 
         global_vars.configuration = read_conf(os.path.join(user_dir, "webradio.conf"), ".conf")
-    except Exception, e:
-        raise ImportError("Configuration File cannot be created! Check webradio.conf in {0}: {1}".format(user_dir, e))
+    except:
+        raise ImportError("Configuration File cannot be created! Check webradio.conf in {0}".format(user_dir))
 
 logger.info(u"Running with Screen-Resolution {0}".format(global_vars.configuration.get("GENERAL").get("screen_resolution")))
 
@@ -244,12 +244,9 @@ from lib.system_test import test_programm_exists as programm_exists
 
 from ui.database_searcher import Track
 # import the resource-file load fallback if there is nothing specified... (initially, for correct Splash-Screen...)
-try:
-    res = importlib.import_module(".res", package="res.designs.{0}".format(
-        QSettings("Laumer", "RapiRadio").value("design_str", "fallback").toString()    # default = Fallback
-    ))
-except ImportError, e:
-    logger.error("Could not import design: ".format(e))
+res = importlib.import_module(".res", package="res.designs.{0}".format(
+QSettings("Laumer", "RapiRadio").value("design_str", "fallback").toString()    # default = Fallback
+))
 
 from lib.lastFM_AlbumArtGrabber import LastFMDownloader
 from lib.gpio_simulator import GPIO_Simulator
@@ -326,8 +323,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         '''
         try:
             lang = self.cB_language.itemData(newid, Qt.UserRole).toString()
-        except Exception, e:
-            logger.error("Error setting Language with ID {0}: {1}".format(newid, e))
+        except:
+            logger.error("Error setting Language with ID {0}".format(newid))
             return False
         lang = str(lang)
         if self.language_txt == lang:  # do nothing if language is already set...
@@ -343,7 +340,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             global_vars.configuration.get("GENERAL").update({"language": str(lang)})
             self.writeSettings()  # Language-Setting is stored in Systemsettings.
         else:
-            logger.error("Language-Change to '{}' failed because Translation can not be loaded.".format(lang))
+            logger.error("Language-Change failed because Translation can not be loaded.")
 
     def setTranslation(self, qTranslator, lang_txt):
         '''
@@ -522,17 +519,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                        "stylesheet.qss")) as style:
                     stylenew = style.read()
                 self.setStyleSheet(stylenew)
-            except Exception, e:
-                logger.error("Stylesheet can not be loaded ({}), loading fallback.".format(e))
-                # load fallback
-                try:
-                    with open(os.path.join(cwd, "res", "designs", "fallback",
-                                           "stylesheet.qss")) as style:
-                        stylenew = style.read()
-                    self.setStyleSheet(stylenew)
-                except Exception, e:
-                    logger.error("Fallback stylesheet can not be loaded ({}), giving up.".format(e))
-                    raise ImportError
+            except:
+                logger.error("Stylesheet can not be loaded! Aborting.")
+                raise ImportError
 
             self.lbl_Senderlogo.setText("")
             self.label.setText("")
@@ -927,8 +916,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             '''
             Load additional Variables from the system-vars, and add to global-conf.
             '''
+            logger.info('Reading Settings')
             settings = QSettings("Laumer", "RapiRadio")
-            logger.info("Loading Qt settings from {}".format(settings.fileName()))
             logger.info("DEBUG_ SYS", global_vars.configuration.get("GENERAL"))
             #Add "screensaver" (bool)
             if global_vars.configuration.get("GENERAL").get("screensaver") is None:  # if this is not forced due to conf
@@ -955,8 +944,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         res = importlib.import_module(".res",
                                 package="res.designs.{0}".format(global_vars.configuration.get("GENERAL").get("design")))
                         pass
-                    except ImportError, e:
-                        logger.error("Error: Design can not be loaded ({})!, Loading Fallback!".format(e))
+                    except ImportError:
+                        logger.error("Error: Design can not be loaded!, Loading Fallback!")
                         global_vars.configuration.get("GENERAL").update({"design": "fallback"})
 
 
@@ -985,8 +974,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             Restarts Webradio like it was closed last time.
             '''
 
+            logger.info('Reading Settings')
             settings = QSettings("Laumer", "RapiRadio")
-            logger.info("Loading Qt settings from {}".format(settings.fileName()))
 
             #Add "Language" (String)
             if global_vars.configuration.get("GENERAL").get("language") is None:
@@ -1045,11 +1034,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.stackedWidget.setCurrentIndex(0)
         self.usb_manager.startup_notifier()
         if args.touchscreen:
-            logger.info("in touchscreen mode")
             app.setOverrideCursor(QCursor(Qt.BlankCursor))     # new - testing
             self.setCursor(QCursor(Qt.BlankCursor))            # new - testing
         else:
-            logger.info("in mousescreen mode")
             app.restoreOverrideCursor()
             self.unsetCursor()
 
@@ -1105,11 +1092,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 try:
                     logger.info("Changing File Permissions of: {0}".format(filename))
                     os.chown(filename, user.pw_uid, user.pw_gid)
-                except Exception, e:
-                    logger.error("was not able to change File-Permission for {0}: {1}".format(orig_user, e))
+                except:
+                    logger.error("was not able to change File-Permission for {0}".format(orig_user))
 
-        except IOError, e:
-            logger.error("was not able to store favorites, maybe dont have got the file-permissions needed: {}".format(e))
+        except IOError:
+            logger.error("was not able to store favorites, maybe dont have got the file-permissions needed")
             return (False, [])
         logger.info("Stored Favorites to: {0}".format(filename))
         return (True, favlist)
@@ -1135,10 +1122,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 try:
                     logger.info("Changing File Permissions of: {0}".format(filename))
                     os.chown(filename, user.pw_uid, user.pw_gid)
-                except Exception, e:
-                    logger.error("was not able to change File-Permission for {0}: {1}".format(orig_user, e))
-        except IOError, e:
-            logger.error("was not able to store presets, maybe dont have got the file-permissions needed: {}".format(e))
+                except:
+                    logger.error("was not able to change File-Permission for {0}".format(orig_user))
+        except IOError:
+            logger.error("was not able to store presets, maybe dont have got the file-permissions needed")
             return False
         logger.info("Stored Presets to: {0}".format(filename))
         return True
@@ -1165,10 +1152,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 try:
                     logger.info("Changing File Permissions of: {0}".format(filename))
                     os.chown(filename, user.pw_uid, user.pw_gid)
-                except Exception, e:
-                    logger.error("was not able to change File-Permission for {0}: {1}".format(orig_user, e))
-        except Exception, e:
-            logger.error("Could not store playlist in {}: {}".format(filename, e))
+                except:
+                    logger.error("was not able to change File-Permission for {0}".format(orig_user))
+        except:
             return False
         return True
 
@@ -1328,8 +1314,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         try:
             if headers[firstIndex][secondIndex] is not None:
                 self.lbl_Ueberschrift.setText(headers[firstIndex][secondIndex])
-        except KeyError, e:
-            logger.error("No Header defined for tabindex{0}: {}".format(self.tabWidget_main, e))
+        except KeyError:
+            logger.error("No Header defined for tabindex{0}".format(self.tabWidget_main))
+        #print(headers[firstIndex][secondIndex])
 
     def checkVisible(self):
         """
@@ -1363,16 +1350,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         newDesign = unicode(self.cB_design.itemText(index))
         if newDesign != "":
             logger.info("Setting new Design: {0}".format(newDesign))
-            try: # we've seen a configured but then removed design creates havoc at runtime
-                res.qCleanupResources()   # the current resources are loaded under the name "res"
-            except NameError:
-                pass # if res was not set before, it does not consume resources so it's ok
+            res.qCleanupResources()   # the current resources are loaded under the name "res"
             if os.path.isfile(os.path.join(cwd, "res", "designs", newDesign, "res.py")):
                 modname = "res.designs.{0}.res".format(global_vars.configuration.get("GENERAL").get("design"))
-                try: # we've seen a configured but then removed design creates havoc at runtime
-                    del sys.modules[modname]
-                except KeyError:
-                    pass # if the module did not exist it is as good as unloaded
+                del sys.modules[modname]
                 for mod in sys.modules.values():
                     try:
                         delattr(mod, modname)
@@ -1381,13 +1362,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 try:
                     res = importlib.import_module(".res", package="res.designs.{0}".format(newDesign))
                     global_vars.configuration.get("GENERAL").update({"design": newDesign})
-                except ImportError, e1:
-                    logger.error("Error: Design '{}' can not be loaded ({}), Loading Fallback!".format(newDesign, e1))
+                except ImportError:
+                    logger.error("Error: Design can not be loaded!, Loading Fallback!")
                     try:
                         res = importlib.import_module(".res",
                                                       package="res.designs.fallback")
-                    except ImportError, e2:
-                        logger.error("Fallback can not be loaded ({})! Aborting.".format(e2))
+                    except ImportError:
+                        logger.error("Fallback can not be loaded! Aborting.")
                         raise ImportError
                     else:
                         # assure that right stylesheet is loaded if the user-design has failed to load...
@@ -1397,8 +1378,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 try:
                     res = importlib.import_module(".res",
                                                   package="res.designs.fallback")
-                except ImportError, e:
-                    logger.error("Fallback can not be loaded! Aborting. {}".format(e))
+                except ImportError:
+                    logger.error("Fallback can not be loaded! Aborting.")
                 else:
                     # assure that right stylesheet is loaded if the user-design has failed to load...
                     global_vars.configuration.get("GENERAL").update({"design": "fallback"})
@@ -1416,8 +1397,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                        "stylesheet.qss")) as style:
                     stylenew = style.read()
                 self.setStyleSheet(stylenew)
-            except Exception, e:
-                logger.error("Stylesheet can not be loaded! Aborting: {}".format(e))
+            except:
+                logger.error("Stylesheet can not be loaded! Aborting.")
                 raise ImportError
 
             # updating all used icons.
@@ -1501,8 +1482,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 #
                 #self.connect(self.virtualKeyboard, SIGNAL("sigInputString"))
 
-            except Exception, e:
-                logger.warn("can not disconnect media because they are not connected: {}".format(e))
+            except:
+                #print("can not disconnect media because they are not connected")
                 pass
 
 
@@ -1588,8 +1569,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.pBHome.clicked.disconnect()
                 self.pBFavoriten.clicked.disconnect()
                 #self.disconnect(self.virtualKeyboard, SIGNAL("sigInputString"))
-            except Exception, e:
-                logger.warning("can not disconnect radio because they are not connected: {}".format(e))
+            except:
+                logger.warning("can not disconnect radio because they are not connected")
                 pass
 
             self.pBZurueck.clicked.connect(self.onCustomSearch_media)
@@ -2345,8 +2326,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     if self.player is not None:
                         try:
                             self.player.volume(level=self.volume)
-                        except Exception, e:
-                            logger.critical("Can not set Volume to MPD! Problem with player: {}".format(e))
+                        except:
+                            logger.critical("Can not set Volume to MPD! Problem with player!")
                             self.askQuestion(self.tr("A problem with MPD was detected!"), self.tr("Ok"),
                                              self.tr("Try to restart MPD, "
                                                      "or just reboot the system"))
@@ -2369,8 +2350,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if self.player is not None:
                 try:
                     self.player.volume(level=newVolume)
-                except Exception, e:
-                    logger.critical("Can not set Volume to MPD! Problem with player: {}".format(e))
+                except:
+                    logger.critical("Can not set Volume to MPD! Problem with player!")
                     self.askQuestion(self.tr("A problem with MPD was detected!"), self.tr("Ok"),
                                              self.tr("Try to restart MPD, "
                                                      "or just reboot the system"))
@@ -2573,8 +2554,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             qimg.save(fileToDownload)
             logger.info("Loading... Successful")
             return True, fileToDownload
-        except Exception, e:
-            logger.error("Something went wrong while loading Album-Art: {}".format(e))
+        except:
+            logger.error("Something went wrong while loading Album-Art!")
             return False, ""
 
     def _collectAlbumArtFromLastFM(self, album_name, artist_name, target_path, target_name):
@@ -2592,8 +2573,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         try:
             urlGrabber = LastFMDownloader(album_name, artist_name)
             urlResult = urlGrabber.search_for_image()
-        except Exception, e:
-            logger.warn("Could not load Album-Cover from LastFM: {}".format(e))
+        except:
             urlResult = None
 
         logger.info("Searchresult: {0}".format("Found!" if urlResult is not None else "No Cover found. Sorry"))
@@ -2618,8 +2598,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         try:
             track_obj = self.playlisteditor.youtubeTranslate.get(youtube_url)
             urlResult = track_obj.thumb_HQ_link
-        except Exception, e:
-            logger.warn("Could nto load Album-Cover from Youtube: {}".format(e))
+        except:
             urlResult = None
 
         logger.info("Searchresult: {0}".format("Found!" if urlResult is not None else "No Cover found. Sorry"))
@@ -2653,8 +2632,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         url = str(urlResult)
         try:
             urllib.urlretrieve(url, fileToDownload)
-        except Exception, e:
-            logger.warn("Could not download {}: {}".format(url, e))
+        except:
             return False, ""
         return True, fileToDownload
 
@@ -2696,8 +2674,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if filepath_of_Image is not None:
             try:
                 albumart = QPixmap(filepath_of_Image)
-            except Exception, e:
-                logger.warn("Cannot load album art for {}: {}".format(filepath_of_Image, e))
+            except:
                 albumart = QPixmap(":/albumart_fallback.png")
         else:    # fallback
             albumart = QPixmap(":/albumart_fallback.png")
@@ -3157,8 +3134,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     try:
                         logger.info("Player is none, will create a new one...")
                         self.player = MPC_Player(self.myCurrentStation.url)
-                    except Exception, e:
-                        logger.critical("Can not create MPD-Player instance! Inform user: {}".format(e))
+                    except:
+                        logger.critical("Can not create MPD-Player instance! Inform user")
                         self.askQuestion(self.tr("A problem with MPD was detected!"), self.tr("Ok"),
                                              self.tr("Try to restart MPD, "
                                                      "or just reboot the system"))
@@ -3172,8 +3149,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     try:
                         logger.info("Player is none, will create a new one...")
                         self.player = MPC_Player(self.myCurrentStation.url)
-                    except Exception, e:
-                        logger.critical("Can not create MPD-Player instance! Inform user: {}".format(e))
+                    except:
+                        logger.critical("Can not create MPD-Player instance! Inform user")
                         self.askQuestion(self.tr("A problem with MPD was detected!"), self.tr("Ok"),
                                              self.tr("Try to restart MPD, "
                                                      "or just reboot the system"))
@@ -3303,16 +3280,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 LogoUrl = QString(station["pictureBaseURL"]+station["picture1Name"])
                 logger.info("Logo is not stored locally, downloading")
                 self.setStationLogoByURL(LogoUrl, station_id)
-            except Exception, e:
-                logger.info("Station Logo does not exist an cant be downloaded ({}), setting Fallback".format(e))
+            except:
+                logger.info("Station Logo does not exist an cant be downloaded, setting Fallback")
 
 
         #self.player = GStreamerPlayer(self.RadioDeAPI.parse_playlist(station["streamUrls"][0]["streamUrl"]))
         logger.info("Creating new PLayer for: {0}".format(self.myCurrentStation.url))
         #try:
         self.player = MPC_Player(self.myCurrentStation.url)
-        #except Exception, e:
-        #    logger.critical("Can not create MPD-Player instance! Inform user: {}".format(e))
+        #except:
+        #    logger.critical("Can not create MPD-Player instance! Inform user")
         #    self.askQuestion("Ein Problem mit MPD wurde entdeckt!", "Ok",
         #                                     "Versuchen Sie MPD neu zu starten, oder einen Reboot durch zu führen")
 
@@ -3359,8 +3336,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             while (downloadloop is True):
                 try:
                     urllib.urlretrieve(str(LogoUrl), filename=fileToImport)
-                except Exception, e:
-                    logger.error("Error downloading Logo: {0}".format(e))
+                except: # IOError, e:
+                    logger.error("Error downloading Logo: {0}".format(""))
                     return False
 
                 if os.path.isfile(fileToImport):
@@ -3609,8 +3586,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 logger.info("Reset GPIOs")
                 self.on_audio_amp_off()
                 #self.gpio_watchdog.reset_gpios()
-            except Exception, e:
-                logger.critical("Reset GPIOs FAILED: {}".format(e))
+            except:
+                logger.critical("Reset GPIOs FAILED")
         #print("Now accept event...")
         QCloseEvent.accept()
 
@@ -3622,16 +3599,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             try:
                 logger.info("Changing File Permissions of: {0}".format(LOG_FILENAME))
                 os.chown(LOG_FILENAME, user.pw_uid, user.pw_gid)
-            except Exception, e:
-                logger.error("was not able to change File-Permission for {0}: {1}".format(orig_user, e))
+            except:
+                logger.error("was not able to change File-Permission for {0}".format(orig_user))
             if os.path.isfile(LOG_FILENAME + ".1"):
                 #do the same for the rollback file
                 rollback = LOG_FILENAME + ".1"
                 try:
                     logger.info("Changing File Permissions of: {0}".format(rollback))
                     os.chown(rollback, user.pw_uid, user.pw_gid)
-                except Exception, e:
-                    logger.error("was not able to change File-Permission for {0}: {1}".format(orig_user, e))
+                except:
+                    logger.error("was not able to change File-Permission for {0}".format(orig_user))
 
         if self.shutdowntrigger:
             #print("Now shutdown")
@@ -3682,8 +3659,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 pathes.append(path)
             if len(pathes) == 0:
                 return False
-        except Exception, e:
-            logger.error("No file selected... aborting: {}".format(e))
+        except:
+            logger.error("No file selected... aborting")
             return False
 
         #print("TYPE111:", type(pathes[0])) # str
@@ -3773,8 +3750,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return None
         try:
             first_dict = global_vars.configuration.get(sectionkey)
-        except Exception, e:
-            logger.warn("could not find config value {}/{}: {}".format(sectionkey, valuekey, e))
+        except:
             return None
         if first_dict is not None:
             return first_dict.get(valuekey)
@@ -4030,10 +4006,10 @@ class Playlisteditor(object):
                 try:
                     logger.info("Changing File Permissions of: {0}".format(filename))
                     os.chown(filename, user.pw_uid, user.pw_gid)
-                except Exception, e:
-                    logger.error("was not able to change File-Permission for {0}: {1}".format(orig_user, e))
-        except IOError, io:
-            logger.error("was not able to store yt-translations, maybe dont have got the file-permissions needed: {}".format(io))
+                except:
+                    logger.error("was not able to change File-Permission for {0}".format(orig_user))
+        except IOError:
+            logger.error("was not able to store yt-translations, maybe dont have got the file-permissions needed")
             return False
         logger.info("Stored Translations to: {0}".format(filename))
         return True
