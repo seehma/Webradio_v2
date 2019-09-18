@@ -1,8 +1,9 @@
 /* stylesheet.qss (girly) */
 QMainWindow {
-        background-image: url(':/carbon.jpg');
-        background-repeat: repeat-xy;
-        background-position: top-left;
+        /* background-image: url(':/carbon.jpg'); */
+        border-image: url(':/carbon.jpg');
+        /* background-repeat: repeat-xy; */
+        /* background-position: top-left; */
         color: rgb(200, 0, 200);
         }
 /* QDialog is used to present shutdown options */

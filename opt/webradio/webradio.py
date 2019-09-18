@@ -553,12 +553,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.lbl_current_playing.setWordWrap(True)
             self.lbl_next.setWordWrap(True)
             # stretch content to lower edge to get more space for content at smaller display sizes , see #23
-            self.tabWidget_main.setStyleSheet(_fromUtf8("QStackedWidget{margin:0,-10,0,0;}"))
+            self.tabWidget_main.setStyleSheet(_fromUtf8("QStackedWidget{margin:0,-8,0,0;}"))  #max margin = -8
 
             #TODO: Transfer this to the stylesheets (Themes...)
             self.checkBox_screensaver.setStyleSheet("QCheckBox::indicator {width: 30px; height: 30px;}")
 
             #self.lbl_albumArt.setScaledContents(True)  # Scaled Contents hebelt "KeepAspektRatio" aus.
+            self.lbl_albumArt.setAlignment(Qt.AlignTop) # keep Album-Art on top of label to prevent overlap for small displays
 
             # the tabsize (width) is defined in the specific stylesheet, read the width and adjust the Icons
             tabsize_per_stylesheet = self.tabWidget_main.tabBar().sizeHint().width()
