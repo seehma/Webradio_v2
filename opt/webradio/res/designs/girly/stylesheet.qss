@@ -59,11 +59,20 @@ QCheckBox::indicator:unchecked {
 QLabel{
        color: rgb(200, 0, 200);
        }
+QLabel:disabled{
+       color: rgb(80, 80, 80);
+       }
 QLabel#lbl_next{                                                  /* Label, next Playing (Media-Player) */
        color: rgba(200, 0, 200, 50%);
 }
+QLabel#lbl_next:disabled{                                                  /* Label, next Playing (Media-Player) */
+       color: rgba(80, 80, 80, 50%);
+}
 QLabel#lbl_previouse{                                             /* Label, previouse Playing (Media-Player) */
        color: rgba(100, 100, 100, 50%);
+}
+QLabel#lbl_previouse:disabled{                                             /* Label, previouse Playing (Media-Player) */
+       color: rgba(80, 80, 80, 50%);
 }
 QMessageBox {
         background-color: rgb(240, 240, 240, 50%);
@@ -178,6 +187,14 @@ QScrollBar::down-arrow:vertical {
 QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
         background: none;
         }
+QSlider {
+        background-color: rgbs(240, 240, 240, 0%);
+        color: rgb(200, 0, 200);
+        }
+QSlider:disabled {
+        background-color: rgbs(240, 240, 240, 0%);
+        color: rgb(80, 80, 80);
+        }
 QSlider::groove:horizontal {
         border: 1px solid #bbb;
         background: rgba(240,240,240, 0%);
@@ -210,11 +227,11 @@ QSlider::handle:horizontal:hover {
         border-radius: 4px;
         }
 QSlider::sub-page:horizontal:disabled {
-        background: orange;
+        background: darkgray;
         border-color: #999;
         }
 QSlider::add-page:horizontal:disabled {
-        background: black;
+        background: rgba(240, 240, 240, 0%);
         border-color: #999;
         }
 QSlider::handle:horizontal:disabled {
