@@ -63,7 +63,7 @@ QLabel#lbl_next{                                                  /* Label, next
        color: rgba(200, 0, 200, 50%);
 }
 QLabel#lbl_previouse{                                             /* Label, previouse Playing (Media-Player) */
-       color: rgba(200, 0, 200, 50%);
+       color: rgba(100, 100, 100, 50%);
 }
 QMessageBox {
         background-color: rgb(240, 240, 240, 50%);
@@ -82,15 +82,15 @@ QPushButton::pressed{
         }
 QListWidget{
         background-color: rgba(240, 240, 240, 50%);
-        color: rgb(200, 0, 200);
+        color: rgb(0, 0, 0);
         }
 QListWidget::item:selected{
         background-color: rgb(240, 200, 240);
-        color: rgb(200, 0, 200);
+        color: rgb(0, 0, 0);
         }
 QListWidgetItem{
         background-color: rgba(40, 40, 40, 50%);
-        color: rgb(200, 0, 200);
+        color: rgb(0, 0, 0);
         }
 /* not used any longer */
 /*QStatusbar{
@@ -119,11 +119,11 @@ QTreeView{
         }
 QTreeView::item:selected{                                                 /* File-View Media Player, SELECTED Item */
         background-color: rgb(240, 200, 240);
-        color: rgb(200, 0, 200);
+        color: rgb(0, 0, 0);
         }
 QTreeView::item, QTreeView QLabel{                                        /* File-View Media Player, UNSELECTED Item */
         background-color: rgbs(240, 240, 240, 0%);
-        color: rgb(180, 0, 180);
+        color: rgb(0, 0, 0);
         }
 QTreeView::branch {
         height: 62;
