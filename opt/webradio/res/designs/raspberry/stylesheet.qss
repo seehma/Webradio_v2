@@ -59,12 +59,21 @@ QCheckBox::indicator:unchecked {
 QLabel{
        color: rgb(188, 17, 66);
        }
+QLabel:disabled {
+       color: rgb(80, 80, 80);
+        }
 QLabel#lbl_next{                                                  /* Label, next Playing (Media-Player) */
        color: rgba(188, 17, 66, 50%);
 }
+QLabel#lbl_next:disabled {
+       color: rgb(80, 80, 80);
+        }
 QLabel#lbl_previouse{                                             /* Label, previouse Playing (Media-Player) */
        color: rgba(188, 17, 66, 50%);
 }
+QLabel#lbl_previouse:disabled {
+       color: rgb(80, 80, 80);
+        }
 QMessageBox {
         background-color: rgb(240, 240, 240, 50%);
         color: rgb(188, 17, 66);
@@ -210,11 +219,11 @@ QSlider::handle:horizontal:hover {
         border-radius: 4px;
         }
 QSlider::sub-page:horizontal:disabled {
-        background: gray;
+        background: darkgray;
         border-color: #999;
         }
 QSlider::add-page:horizontal:disabled {
-        background: black;
+        background: rgba(240, 240, 240, 0%);
         border-color: #999;
         }
 QSlider::handle:horizontal:disabled {
