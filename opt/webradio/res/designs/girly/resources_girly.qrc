@@ -22,7 +22,7 @@
 <file alias="up.png">girly/up.png</file>
 <file alias="down.png">girly/down.png</file>
 <file alias="del.png">girly/del.png</file>
-<file alias="albumart_girly.png">girly/albumart_girly.png</file>
+<file alias="albumart_fallback.png">girly/albumart_girly.png</file>
 <file alias="sunrise.png">girly/sunrise.png</file>
 <file alias="thermometer.png">girly/thermometer.png</file>
 <file alias="umbrella.png">girly/umbrella.png</file>
