@@ -8,7 +8,7 @@ import logging
 # too lazy to keep track of QtCore or QtGui
 from PyQt4.QtCore import Qt, QByteArray, QSize, SIGNAL, QSettings
 from PyQt4.QtGui import QWidget, QVBoxLayout, QLabel, QMovie, QPixmap, QApplication
-import res1   # load fallback first
+
 
 logger = logging.getLogger("button_labels")
 
@@ -18,7 +18,7 @@ try:
                                                                                  "fallback").toString()))
 except ImportError, e:
     logger.error("Could not import design: {}".format(e))
-    res = res1
+    import res1   # load fallback if design cannot be loaded
 
 CustomSize = QSize(72, 72)
 #TODO: Enlarging of Mute and Standby-Button! It is too small ... @ RaspberryPi
