@@ -12,7 +12,7 @@ Environment="DISPLAY=:0"
 Environment="XAUTHORITY=/home/pi/.Xauthority"
 User=pi
 Type=simple
-ExecStart=/usr/bin/sudo /usr/bin/python /opt/webradio/webradio.py --fullscreen
+ExecStart=/usr/bin/sudo /usr/bin/python /opt/webradio/webradio.py
 RestartSec=5
 Restart=on-failure
 StartLimitInterval=20
