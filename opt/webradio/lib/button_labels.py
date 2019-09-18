@@ -9,7 +9,6 @@ import logging
 from PyQt4.QtCore import Qt, QByteArray, QSize, SIGNAL, QSettings
 from PyQt4.QtGui import QWidget, QVBoxLayout, QLabel, QMovie, QPixmap, QApplication
 
-
 logger = logging.getLogger("button_labels")
 
 try:
