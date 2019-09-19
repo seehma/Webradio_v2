@@ -6,7 +6,7 @@ import logging
 import os
 from distutils import spawn
 
-logger = logging.getLogger("webradio")
+logger = logging.getLogger(__name__)
 
 INTERNET = 'http://www.google.com'
 RADIODE = 'http://radio.de'
@@ -28,31 +28,30 @@ def test_onlineServices():
     try:                                                                    # check internet-connection
         urllib2.urlopen(INTERNET, timeout=1)
         service_internet = True
-    except urllib2.URLError:                                                # if there is an error
-        print("Internet:", service_internet)
-        logger.error("No Network-Connection found!")
+    except urllib2.URLError, e:                                                # if there is an error
+        logger.error("Could not connect to {}: {}".format(INTERNET, e))
         return False, result
 
     if service_internet:
         try:                                                                    # check internet-connection
             urllib2.urlopen(RADIODE, timeout=1)
             service_radiode = True
-        except urllib2.URLError:                                                # if there is an error
-            logger.error("Radio.de can not be reached")
+        except urllib2.URLError, e:                                                # if there is an error
+            logger.error("Radio.de can not be reached: {}".format(e))
             service_radiode = False
 
         try:                                                                    # check internet-connection
             urllib2.urlopen(LASTFM, timeout=1)
             service_lastfm = True
-        except urllib2.URLError:                                                # if there is an error
-            logger.error("Last FM can not be reached")
+        except urllib2.URLError, e:                                                # if there is an error
+            logger.error("Last FM can not be reached: {}".format(e))
             service_lastfm = False
 
         try:                                                                    # check internet-connection
             urllib2.urlopen(WEATHERCOM, timeout=1)
             service_weathercom = True
-        except urllib2.URLError:                                                # if there is an error
-            logger.error("Weather.com can not be reached")
+        except urllib2.URLError, e:                                                # if there is an error
+            logger.error("Weather.com can not be reached: {}".format(e))
             service_weathercom = False
 
     #print("Internet:   ", service_internet)

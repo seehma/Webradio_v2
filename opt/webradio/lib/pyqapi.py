@@ -29,7 +29,8 @@ import json
 
 try:
     from unidecode import unidecode
-except ImportError:
+except ImportError, e:
+    logger.warning("Could not import unidecode: {}", e)
     pass
 
 GOOGLE_COUNTRIES_URL = 'http://www.google.com/ig/countries?output=xml&hl=%s'
@@ -93,8 +94,8 @@ def get_weather_from_weather_com(location_id, units = 'metric'):
     url = WEATHER_COM_URL % (location_id, unit)
     try:
         handler = urlopen(url)
-    except URLError:
-        return {'error': 'Could not connect to Weather.com'}
+    except URLError, e:
+        return {'error': "Could not connect to Weather.com: {}".format(e)}
     if sys.version > '3':
         # Python 3
         content_type = dict(handler.getheaders())['Content-Type']
@@ -147,11 +148,7 @@ def get_weather_from_weather_com(location_id, units = 'metric'):
             for tag2 in list_of_tags2:
                 if weather_dom.getElementsByTagName(tag)[0].childNodes.length == 0:
                     data_structure[tag] = []
-    except IndexError:
-        error_data = {'error': 'Error parsing Weather.com response. Full response: %s' % xml_response}
-        return error_data
 
-    try:
         weather_data = {}
         for (tag, list_of_tags2) in data_structure.items():
             key = key_map[tag]
@@ -164,8 +161,10 @@ def get_weather_from_weather_com(location_id, units = 'metric'):
                 except AttributeError:
                     # current tag has empty value
                     weather_data[key][key2] = unicode('')
-    except IndexError:
-        error_data = {'error': 'Error parsing Weather.com response. Full response: %s' % xml_response}
+    except Exception, e:
+        msg = "Could not parse Weather.com response {}: {}".format(xml_response, e)
+        logger.error(msg);
+        error_data = {'error': msg}
         return error_data
 
     if weather_dom.getElementsByTagName('cc')[0].childNodes.length > 0:
@@ -254,8 +253,8 @@ def get_countries_from_google(hl = ''):
     
     try:
         handler = urlopen(url)
-    except URLError:
-        return [{'error':'Could not connect to Google'}]
+    except URLError, e:
+        return [{'error':"Could not connect to Google: {}".format(e)}]
     if sys.version > '3':
         # Python 3
         content_type = dict(handler.getheaders())['Content-Type']
@@ -307,8 +306,8 @@ def get_cities_from_google(country_code, hl = ''):
     
     try:
         handler = urlopen(url)
-    except URLError:
-        return [{'error':'Could not connect to Google'}]
+    except URLError, e:
+        return [{'error':"Could not connect to Google: {}".format(e)}]
     if sys.version > '3':
         # Python 3
         content_type = dict(handler.getheaders())['Content-Type']
@@ -370,8 +369,8 @@ def get_weather_from_yahoo(location_id, units = 'metric'):
     url = YAHOO_WEATHER_URL % (location_id, unit)
     try:
         handler = urlopen(url)
-    except URLError:
-        return {'error': 'Could not connect to Yahoo! Weather'}
+    except URLError, e:
+        return {'error': "Could not connect to Yahoo! Weather: {}".format(e)}
     if sys.version > '3':
         # Python 3
         content_type = dict(handler.getheaders())['Content-Type']
@@ -505,8 +504,8 @@ def get_weather_from_noaa(station_id):
     url = NOAA_WEATHER_URL % (station_id)
     try:
         handler = urlopen(url)
-    except URLError:
-        return {'error': 'Could not connect to NOAA'}
+    except URLError, e:
+        return {'error': "Could not connect to NOAA: {}".format(e)}
     if sys.version > '3':
         # Python 3
         content_type = dict(handler.getheaders())['Content-Type']
@@ -832,8 +831,8 @@ def get_loc_id_from_weather_com(search_string):
     url = LOCID_SEARCH_URL % quote(search_string)
     try:
         handler = urlopen(url)
-    except URLError:
-        return {'error': 'Could not connect to server'}
+    except URLError, e:
+        return {'error': "Could not connect to server: {}".format(e)}
     if sys.version > '3':
         # Python 3
         content_type = dict(handler.getheaders())['Content-Type']
@@ -923,8 +922,8 @@ def get_woeid_from_yahoo(search_string):
     url = '?'.join((WOEID_SEARCH_URL, urlencode(params)))
     try:
         handler = urlopen(url)
-    except URLError:
-        return {'error': 'Could not connect to server'}
+    except URLError, e:
+        return {'error': "Could not connect to server: {}".format(e)}
     if sys.version > '3':
         # Python 3
         content_type = dict(handler.getheaders())['Content-Type']
@@ -953,9 +952,9 @@ def get_woeid_from_yahoo(search_string):
     woeid_data = {}
     woeid_data['count'] = yahoo_woeid_result['query']['count']
     for i in xrange(yahoo_woeid_result['query']['count']):
-        try:
+        if i in result:
             place_data = result[i]
-        except KeyError:
+        else:
             place_data = result
         name_lines = [place_data[tag]
                      for tag in ['line1','line2','line3','line4']

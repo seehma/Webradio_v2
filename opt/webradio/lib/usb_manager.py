@@ -15,7 +15,7 @@ import time
 from PyQt4.QtCore import QObject, SIGNAL, QThread
 import logging
 
-logger = logging.getLogger("webradio")
+logger = logging.getLogger("usb_manager")
 
 interval = 1  #in sec.
 
@@ -68,7 +68,8 @@ class USB_manager(QObject):
         while True:
             try:
                 current_mounting_state = os.path.ismount(self.mountingFolder)
-            except:
+            except Exception, e:
+                logger.warning("Could not check mount for {}: {}".format(self.mountingFolder, e))
                 current_mounting_state = None
 
             if last_mounting_state is not None:

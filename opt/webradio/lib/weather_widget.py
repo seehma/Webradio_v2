@@ -54,8 +54,8 @@ class weather_widget(QWidget, ui):
             opener.open('https://www.weather.com/', timeout=1)               # UPDATE 28.05.2019 403 FORBIDDEN
             print("Yes it is...")
             return True
-        except urllib2.URLError:                                         # if there is an error
-            print("ERROR: Service is not available !!!")
+        except urllib2.URLError, e:                                         # if there is an error
+            logger.error("Could not connect to weathr.com: {}".format(e))
             self.failedConnections += 1
             return False
 

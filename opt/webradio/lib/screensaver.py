@@ -11,12 +11,13 @@ import global_vars
 import logging
 import os
 
-logger = logging.getLogger("webradio")
+logger = logging.getLogger("screensaver")
 
 try:
     from lib.LM_Widgets_scaled_contents import Scaling_QLabel, Scaling_QLabel_pixmap
     from lib.weatherIcon import weatherIcon
-except ImportError:
+except ImportError, e:
+    logger.warning("Could not import required libraries: {}", e)
     from LM_Widgets_scaled_contents import Scaling_QLabel, Scaling_QLabel_pixmap
     from weatherIcon import weatherIcon
 
