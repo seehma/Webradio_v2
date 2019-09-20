@@ -95,7 +95,7 @@ QListWidget{
         color: rgb(0, 0, 0);
         }
 QListWidget::item:selected{
-        background-color: rgb(240, 200, 240);
+        background-color: rgb(117, 169, 40);
         color: rgb(0, 0, 0);
         }
 QListWidgetItem{
@@ -128,7 +128,7 @@ QTreeView{
         border-color: black;
         }
 QTreeView::item:selected{                                                 /* File-View Media Player, SELECTED Item */
-        background-color: rgb(240, 200, 240);
+        background-color: rgba(117, 169, 40, 50%);
         color: rgb(0, 0, 0);
         }
 QTreeView::item, QTreeView QLabel{                                        /* File-View Media Player, UNSELECTED Item */
