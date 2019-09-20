@@ -1452,6 +1452,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     self.lbl_Fav.setPixmap(QPixmap(":/fav.png"))
                 else:
                     self.lbl_Fav.setPixmap(QPixmap(":/fav_empty.png"))
+            self.splash = AnimatedSplashScreen(self, ":/loading.gif")   # re-define Splashscreen Animation
 
             #if everything was OK, update Value in current conf accordingly.
             self.writeSettings()  # design settings are stored in Systemsettings.
