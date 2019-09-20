@@ -505,7 +505,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.audio_amp_isActive = False
             self.shutdowntrigger = False
             #print("Rest is Done",QTime.currentTime())
-            self.splash = AnimatedSplashScreen(":/loading.gif")
+            self.splash = AnimatedSplashScreen(self, ":/loading.gif")
             self.charm = FlickCharm()
 
             self.screensaver = Screensaver_Overlay(cwd,
@@ -770,6 +770,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             #print("Setup Connections...")
             self.connect(self, SIGNAL("start_loading"), lambda: self.splash_loading(True))
             self.connect(self, SIGNAL("stop_loading"), self.splash_loading)
+            self.connect(self.listWidget, SIGNAL("start_loading"), lambda: self.splash_loading(True))
+            self.connect(self.listWidget, SIGNAL("stop_loading"), self.splash_loading)
+
             self.connect(self.treeWidget_2, SIGNAL("start_loading"), lambda: self.splash_loading(True))
             self.connect(self.treeWidget_2, SIGNAL("stop_loading"), self.splash_loading)
             self.connect(self.weatherWidget, SIGNAL("start_loading"), lambda: self.splash_loading(True))
@@ -3632,7 +3635,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #print("splash called with", request)
         if request:
             #print("Show")
-            QTimer.singleShot(40000, self.splash_loading)
+            QTimer.singleShot(60000, self.splash_loading)
             self.splash.raise_()
             self.splash.show()
         else:
@@ -3920,20 +3923,29 @@ class Playlisteditor(object):
 
     @pyqtSlot()                                 # Connect here the function button "delete"
     def deleteItem(self):
-        items = self.view.selectedIndexes()
-        if len(items) == 0:
-            return
-        for item in items:
-            selectionBackup = item.row()
-            ID_to_delete, pos, artist = item.data(Qt.UserRole).toStringList()
-            self.service.client.deleteid(ID_to_delete)
-            item_to_pop = self.view.itemFromIndex(item)
-            self.view.removeItemWidget(item_to_pop)
-            if not selectionBackup > self.view.count():
-                self.view.setCurrentRow(selectionBackup)
-            self.view.setSelectionMode(QAbstractItemView.SingleSelection)
-        QApplication.processEvents()
-        self.grapCurrentPlaylist()
+        self.worker = WorkerThread(self.doDeleteItems)
+        self.worker.start()
+
+
+    def doDeleteItems(self):                    # this performs the real delete inside a worker thread
+        self.view.emit(SIGNAL("start_loading"))
+        try:
+            items = self.view.selectedIndexes()
+            if len(items) == 0:
+                return
+            for item in items:
+                selectionBackup = item.row()
+                ID_to_delete, pos, artist = item.data(Qt.UserRole).toStringList()
+                self.service.client.deleteid(ID_to_delete)
+                item_to_pop = self.view.itemFromIndex(item)
+                self.view.removeItemWidget(item_to_pop)
+                if not selectionBackup > self.view.count():
+                    self.view.setCurrentRow(selectionBackup)
+                self.view.setSelectionMode(QAbstractItemView.SingleSelection)
+
+            self.grapCurrentPlaylist()
+        finally:
+            self.view.emit(SIGNAL("stop_loading")) # successful or not - when this method ends the loading indicator must go away
 
     def replace_yt_link_in_playlist(self, song_id, song_pos, obj_copy):
         new_url = obj_copy.streamLink  # this is a long runnig process.
@@ -4077,22 +4089,29 @@ class WorkerThread(QThread):
         return self._result
 
 
-class AnimatedSplashScreen(QSplashScreen):
+class AnimatedSplashScreen(QDialog):
 
-   def __init__(self, animation):
+   def __init__(self, parent, animation):
        # run event dispatching in another thread
-       QSplashScreen.__init__(self, QPixmap())
+       QDialog.__init__(self, parent)
+       self.setWindowModality(Qt.ApplicationModal)
+       self.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog)
+       self.label = Scaling_QLabel(self)
+       
+
        self.movie = QMovie(animation)
        #self.movie.setSpeed(100)
        #self.movie.setCacheMode(QMovie.CacheAll)
+       self.label.setMovie(self.movie)
        self.connect(self.movie, SIGNAL('frameChanged(int)'), self.onNextFrame)
        self.movie.start()
 
    @pyqtSlot()
    def onNextFrame(self):
        pixmap = self.movie.currentPixmap()
-       self.setPixmap(pixmap)
+       self.label.setPixmap(pixmap)
        self.setMask(pixmap.mask())
+       self.label.setMask(pixmap.mask())
 
 
 class FileIconProvider(QFileIconProvider):
