@@ -4089,8 +4089,9 @@ class AnimatedSplashScreen(QDialog):
    @pyqtSlot()
    def onNextFrame(self):
        pixmap = self.movie.currentPixmap()
-       self.setPixmap(pixmap)
+       self.label.setPixmap(pixmap)
        self.setMask(pixmap.mask())
+       self.label.setMask(pixmap.mask())
 
 
 class FileIconProvider(QFileIconProvider):
