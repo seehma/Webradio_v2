@@ -767,6 +767,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             #print("Setup Connections...")
             self.connect(self, SIGNAL("start_loading"), lambda: self.splash_loading(True))
             self.connect(self, SIGNAL("stop_loading"), self.splash_loading)
+            self.connect(self.listWidget, SIGNAL("start_loading"), lambda: self.splash_loading(True))
+            self.connect(self.listWidget, SIGNAL("stop_loading"), self.splash_loading)
+
             self.connect(self.treeWidget_2, SIGNAL("start_loading"), lambda: self.splash_loading(True))
             self.connect(self.treeWidget_2, SIGNAL("stop_loading"), self.splash_loading)
             self.connect(self.weatherWidget, SIGNAL("start_loading"), lambda: self.splash_loading(True))
@@ -3910,22 +3913,29 @@ class Playlisteditor(object):
 
     @pyqtSlot()                                 # Connect here the function button "delete"
     def deleteItem(self):
-        items = self.view.selectedIndexes()
-        if len(items) == 0:
-            return
+        self.worker = WorkerThread(self.doDeleteItems)
+        self.worker.start()
 
-        for item in items:
-            selectionBackup = item.row()
-            ID_to_delete, pos, artist = item.data(Qt.UserRole).toStringList()
-            self.service.client.deleteid(ID_to_delete)
-            item_to_pop = self.view.itemFromIndex(item)
-            self.view.removeItemWidget(item_to_pop)
-            if not selectionBackup > self.view.count():
-                self.view.setCurrentRow(selectionBackup)
-            self.view.setSelectionMode(QAbstractItemView.SingleSelection)
 
-        QApplication.processEvents()
-        self.grapCurrentPlaylist()
+    def doDeleteItems(self):                    # this performs the real delete inside a worker thread
+        self.view.emit(SIGNAL("start_loading"))
+        try:
+            items = self.view.selectedIndexes()
+            if len(items) == 0:
+                return
+            for item in items:
+                selectionBackup = item.row()
+                ID_to_delete, pos, artist = item.data(Qt.UserRole).toStringList()
+                self.service.client.deleteid(ID_to_delete)
+                item_to_pop = self.view.itemFromIndex(item)
+                self.view.removeItemWidget(item_to_pop)
+                if not selectionBackup > self.view.count():
+                    self.view.setCurrentRow(selectionBackup)
+                self.view.setSelectionMode(QAbstractItemView.SingleSelection)
+
+            self.grapCurrentPlaylist()
+        finally:
+            self.view.emit(SIGNAL("stop_loading")) # successful or not - when this method ends the loading indicator must go away
 
     def replace_yt_link_in_playlist(self, song_id, song_pos, obj_copy):
         new_url = obj_copy.streamLink  # this is a long runnig process.
