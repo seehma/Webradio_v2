@@ -3623,7 +3623,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #print("splash called with", request)
         if request:
             #print("Show")
-            QTimer.singleShot(40000, self.splash_loading)
+            QTimer.singleShot(60000, self.splash_loading)
             self.splash.raise_()
             self.splash.show()
         else:
@@ -4074,8 +4074,10 @@ class AnimatedSplashScreen(QDialog):
    def __init__(self, parent, animation):
        # run event dispatching in another thread
        QDialog.__init__(self, parent)
+       self.setWindowModality(Qt.ApplicationModal)
        self.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog)
        self.label = Scaling_QLabel(self)
+       
 
        self.movie = QMovie(animation)
        #self.movie.setSpeed(100)
