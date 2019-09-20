@@ -175,7 +175,7 @@ LogoFolder = os.path.join(user_dir, "Logos")
 AlbumArtFolder = os.path.join(user_dir, "Albumart")
 
 ################################ Prepare Logger ######################################
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("webradio")   # __name__ == "__main__", need to define a unique name
 LOG_FILENAME = os.path.join(user_dir, "webradio.log")
 
 sys.excepthook = excepthook
@@ -1362,7 +1362,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     try:
                         delattr(mod, modname)
                     except AttributeError, e:
-                        logger.warn("Could not remove attribute {}/{}: {}".format(mod, modname, e))
+                        logger.debug("Could not remove attribute {}/{}: {}".format(mod, modname, e))
                         pass
                 try:
                     res = importlib.import_module(".res", package="res.designs.{0}".format(newDesign))
@@ -1447,6 +1447,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.widget_Standby.setInitialState("on")
             if self.widget_Mute.muted == False:
                 self.widget_Mute.show_unmute()
+            if self.myCurrentStation is not None:
+                if self.myCurrentStation.id in self.favorites.keys():
+                    self.lbl_Fav.setPixmap(QPixmap(":/fav.png"))
+                else:
+                    self.lbl_Fav.setPixmap(QPixmap(":/fav_empty.png"))
 
             #if everything was OK, update Value in current conf accordingly.
             self.writeSettings()  # design settings are stored in Systemsettings.
@@ -3145,7 +3150,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     try:
                         logger.info("Player is none, will create a new one...")
                         self.player = MPC_Player(self.myCurrentStation.url)
-                    except:
+                    except Exception, e:
                         logger.critical("Could not create MPD-Player instance: {}".format(e))
                         self.askQuestion(self.tr("A problem with MPD was detected!"), self.tr("Ok"),
                                              self.tr("Try to restart MPD, "
@@ -3923,29 +3928,22 @@ class Playlisteditor(object):
 
     @pyqtSlot()                                 # Connect here the function button "delete"
     def deleteItem(self):
-        self.worker = WorkerThread(self.doDeleteItems)
-        self.worker.start()
-
-
-    def doDeleteItems(self):                    # this performs the real delete inside a worker thread
-        self.view.emit(SIGNAL("start_loading"))
-        try:
-            items = self.view.selectedIndexes()
-            if len(items) == 0:
-                return
-            for item in items:
-                selectionBackup = item.row()
-                ID_to_delete, pos, artist = item.data(Qt.UserRole).toStringList()
-                self.service.client.deleteid(ID_to_delete)
-                item_to_pop = self.view.itemFromIndex(item)
-                self.view.removeItemWidget(item_to_pop)
-                if not selectionBackup > self.view.count():
-                    self.view.setCurrentRow(selectionBackup)
-                self.view.setSelectionMode(QAbstractItemView.SingleSelection)
-
-            self.grapCurrentPlaylist()
-        finally:
-            self.view.emit(SIGNAL("stop_loading")) # successful or not - when this method ends the loading indicator must go away
+        # UI operations cannot be outsourced in a different thread, this can cause a Segfault!
+        # in addition, this is a very fast function ;-)
+        items = self.view.selectedIndexes()
+        if len(items) == 0:
+            return
+        for item in items:
+            selectionBackup = item.row()
+            ID_to_delete, pos, artist = item.data(Qt.UserRole).toStringList()
+            self.service.client.deleteid(ID_to_delete)
+            item_to_pop = self.view.itemFromIndex(item)
+            self.view.removeItemWidget(item_to_pop)
+            if not selectionBackup > self.view.count():
+                self.view.setCurrentRow(selectionBackup)
+            self.view.setSelectionMode(QAbstractItemView.SingleSelection)
+        QApplication.processEvents()
+        self.grapCurrentPlaylist()
 
     def replace_yt_link_in_playlist(self, song_id, song_pos, obj_copy):
         new_url = obj_copy.streamLink  # this is a long runnig process.

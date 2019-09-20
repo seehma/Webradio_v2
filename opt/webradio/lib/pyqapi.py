@@ -26,12 +26,8 @@ import re
 from math import pow
 from xml.dom import minidom
 import json
-
-try:
-    from unidecode import unidecode
-except ImportError, e:
-    logger.warning("Could not import unidecode: {}", e)
-    pass
+import logging
+logger = logging.getLogger("webradio")
 
 GOOGLE_COUNTRIES_URL = 'http://www.google.com/ig/countries?output=xml&hl=%s'
 GOOGLE_CITIES_URL    = 'http://www.google.com/ig/cities?output=xml&' + \
@@ -163,7 +159,7 @@ def get_weather_from_weather_com(location_id, units = 'metric'):
                     weather_data[key][key2] = unicode('')
     except Exception, e:
         msg = "Could not parse Weather.com response {}: {}".format(xml_response, e)
-        logger.error(msg);
+        logger.error(msg)
         error_data = {'error': msg}
         return error_data
 

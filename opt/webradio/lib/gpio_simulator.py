@@ -7,7 +7,7 @@ import time
 import global_vars
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("webradio")
 
 BUTTONS = []
 for values in global_vars.configuration.get("GPIOS_IN").itervalues():

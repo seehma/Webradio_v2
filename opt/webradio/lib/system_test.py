@@ -6,7 +6,7 @@ import logging
 import os
 from distutils import spawn
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("webradio")
 
 INTERNET = 'http://www.google.com'
 RADIODE = 'http://radio.de'

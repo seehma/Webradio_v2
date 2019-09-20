@@ -9,6 +9,8 @@ import os
 import sys
 from weather_widget_ui import Ui_Form as ui
 import global_vars
+import logging
+logger = logging.getLogger("webradio")
 #cwd = os.path.dirname(os.path.realpath(__file__))      # gives the path, where the script is located
 #LOCATION_ID = "GMBY7640"   # Sattelpeilnstein
 #LOCATION_ID = global_vars.configuration.get("GENERAL").get("weather_locationid")
@@ -52,10 +54,10 @@ class weather_widget(QWidget, ui):
             opener = urllib2.build_opener(urllib2.HTTPCookieProcessor)       # UPDATE 28.05.2019 403 FORBIDDEN
             opener.addheaders = [('User-Agent', 'Mozilla/5.0')]              # UPDATE 28.05.2019 403 FORBIDDEN
             opener.open('https://www.weather.com/', timeout=1)               # UPDATE 28.05.2019 403 FORBIDDEN
-            print("Yes it is...")
+            #print("Yes it is...")
             return True
         except urllib2.URLError, e:                                         # if there is an error
-            logger.error("Could not connect to weathr.com: {}".format(e))
+            logger.error("Could not connect to weather.com: {}".format(e))
             self.failedConnections += 1
             return False
 

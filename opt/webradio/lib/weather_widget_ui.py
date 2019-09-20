@@ -10,7 +10,7 @@
 from PyQt4 import QtCore, QtGui
 import logging
 
-logger = logging.getLogger("weather_widget_ui")
+logger = logging.getLogger("webradio")
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8

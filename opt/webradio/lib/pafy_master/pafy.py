@@ -41,7 +41,7 @@ import hashlib
 import tempfile
 from xml.etree import ElementTree
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("webradio")
 
 
 early_py_version = sys.version_info[:2] < (2, 7)

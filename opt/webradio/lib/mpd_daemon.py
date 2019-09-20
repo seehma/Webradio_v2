@@ -11,7 +11,7 @@ from PyQt4.QtCore import QObject, SIGNAL, QThread
 from PyQt4.QtGui import QApplication
 
 cwd = os.path.dirname(os.path.realpath(__file__))      # gives the path, where the script is located
-logger = logging.getLogger("mpd_daemon")
+logger = logging.getLogger("webradio")
 
 try:
     import mpd

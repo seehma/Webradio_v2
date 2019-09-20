@@ -11,7 +11,7 @@ import global_vars
 import logging
 import os
 
-logger = logging.getLogger("screensaver")
+logger = logging.getLogger("webradio")
 
 try:
     from lib.LM_Widgets_scaled_contents import Scaling_QLabel, Scaling_QLabel_pixmap
