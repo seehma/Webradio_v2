@@ -501,7 +501,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.audio_amp_isActive = False
             self.shutdowntrigger = False
             #print("Rest is Done",QTime.currentTime())
-            self.splash = AnimatedSplashScreen(":/loading.gif")
+            self.splash = AnimatedSplashScreen(self, ":/loading.gif")
             self.charm = FlickCharm()
 
             self.screensaver = Screensaver_Overlay(cwd,
@@ -3913,6 +3913,7 @@ class Playlisteditor(object):
         items = self.view.selectedIndexes()
         if len(items) == 0:
             return
+
         for item in items:
             selectionBackup = item.row()
             ID_to_delete, pos, artist = item.data(Qt.UserRole).toStringList()
@@ -3922,6 +3923,7 @@ class Playlisteditor(object):
             if not selectionBackup > self.view.count():
                 self.view.setCurrentRow(selectionBackup)
             self.view.setSelectionMode(QAbstractItemView.SingleSelection)
+
         QApplication.processEvents()
         self.grapCurrentPlaylist()
 
@@ -4067,14 +4069,18 @@ class WorkerThread(QThread):
         return self._result
 
 
-class AnimatedSplashScreen(QSplashScreen):
+class AnimatedSplashScreen(QDialog):
 
-   def __init__(self, animation):
+   def __init__(self, parent, animation):
        # run event dispatching in another thread
-       QSplashScreen.__init__(self, QPixmap())
+       QDialog.__init__(self, parent)
+       self.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog)
+       self.label = Scaling_QLabel(self)
+
        self.movie = QMovie(animation)
        #self.movie.setSpeed(100)
        #self.movie.setCacheMode(QMovie.CacheAll)
+       self.label.setMovie(self.movie)
        self.connect(self.movie, SIGNAL('frameChanged(int)'), self.onNextFrame)
        self.movie.start()
 
