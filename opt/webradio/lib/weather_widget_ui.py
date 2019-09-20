@@ -8,10 +8,14 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt4 import QtCore, QtGui
+import logging
+
+logger = logging.getLogger("weather_widget_ui")
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
-except AttributeError:
+except AttributeError, e:
+    logger.warning("Could not define UTF8 decoder: {}".format(e))
     def _fromUtf8(s):
         return s
 
@@ -19,7 +23,8 @@ try:
     _encoding = QtGui.QApplication.UnicodeUTF8
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig, _encoding)
-except AttributeError:
+except AttributeError, e:
+    logger.warning("Could not define Qt UTF8 encoder: {}".format(e))
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 

@@ -14,6 +14,9 @@
 
 import time
 import multiprocessing
+import logging
+
+logger = logging.getLogger(__name__)
 
 class TimeoutException(Exception):
     pass

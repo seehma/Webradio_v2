@@ -25,7 +25,8 @@ def reconnect(func, *default_args, **default_kwargs):
         # sometimes not enough to just connect
         try:
             return func(self, *default_args, **default_kwargs)
-        except:
+        except Exception, e:
+            logger.warning("Could not run {} on MPD - new instance of MPDClient: {}".format(func, e))
             self.client = mpd.MPDClient()
             self.client.timeout = None
             self.client.idletimeout = None

@@ -6,9 +6,14 @@ from PyQt4.QtGui import QWidget, QSizePolicy, QFont, QLabel, QHBoxLayout, QSpace
     QApplication
 from PyQt4.QtDeclarative import QDeclarativeView, QDeclarativeProperty, QDeclarativeItem
 import os
+import logging
+
+logger = logging.getLogger("sleeptimer")
+
 try:
     from lib import global_vars
-except ImportError:
+except ImportError, e:
+    logger.warn("Could not import global_vars: {}".format(e))
     global_vars = QObject()
     global_vars.configuration = {"GENERAL": {"sleeptimerdigitalspinbox":False}}  #use spinner
     #global_vars.configuration = {"GENERAL": {"sleeptimerdigitalspinbox":True}}  #use spinbox
@@ -143,7 +148,7 @@ class SleepTimer(QWidget):
             return
 
         if value_sb_hours == 0 and value_sb_minutes == 0:
-            print("Stop Timer")
+            logger.info("Stop Timer")
             self.bomb_text.write("Abbruch")
             self.timer.stop()
             self.countDown.stop()
@@ -237,7 +242,7 @@ class LeadingZeroSpinBox(QSpinBox):
         return "%02d" % value
 
 def main():
-    print("NOW Received")
+    logger.debug("NOW Received")
 
 
 if __name__ == "__main__":

@@ -8,7 +8,7 @@ import os
 import logging
 import time
 
-logger = logging.getLogger("webradio")
+logger = logging.getLogger(__name__)
 
 
 def reconnect(func, *default_args, **default_kwargs):
@@ -70,8 +70,8 @@ class MPC_Player(object):
             self.client.load(name)
             logger.info("Load Playlist {0} OK".format(name))
             return True
-        except:
-            logger.warning("Load Playlist {0} FAILED".format(name))
+        except Exception, e:
+            logger.warning("Could not load Playlist {}: {}".format(name, e))
             return False
 
     @reconnect
@@ -80,15 +80,15 @@ class MPC_Player(object):
         try:
             logger.info("Deleting old Playlist {0}".format(name))
             self.client.rm(name)
-        except:
-            logger.warning("Deleting old Playlist {0} FAILED".format(name))
+        except Exception, e:
+            logger.warning("Could not delete old Playlist {0}: {}".format(name, e))
             pass
         try:
             self.client.save(name)
             logger.info("Save Playlist {0} OK".format(name))
             return True
-        except:
-            logger.warning("Save Playlist {0} FAILED".format(name))
+        except Exception, e:
+            logger.warning("Could not save Playlist {}: {}".format(name, e))
             return False
 
     @reconnect
@@ -150,8 +150,7 @@ class MPC_Player(object):
             song_id = self.client.addid(pathToAdd.encode('utf-8'))
             return song_id
         else:
-            logger.error("Player add: {0} in Musicfolder {1} failed to add.".format(path.encode('utf-8'),
-                                                                                    MusicFolder.encode('utf-8')))
+            logger.error("Player add: {0} in Musicfolder {1} failed to add. We may have a wrong path, an unsupported extension or something outside the music folder".format(path.encode('utf-8'), MusicFolder.encode('utf-8')))
             return False
 
     @reconnect
