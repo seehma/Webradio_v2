@@ -306,11 +306,12 @@ except AttributeError, e:
 
 class MainWindow(QMainWindow, Ui_MainWindow):
 
-    def __init__(self, size, parent=None):
+    def __init__(self, size=None, parent=None):
 
         super(MainWindow, self).__init__(parent)
         logger.info("Init.")
-        self.setFixedSize(size)
+        if size is not None:
+            self.setFixedSize(size)
         self.setupUi(self)
         app.processEvents()
         #self.startup_actions()
@@ -4267,22 +4268,23 @@ if __name__ == "__main__":
     splash = QSplashScreen(QPixmap(":/loading_wall.png"))
     splash.show()
     app.processEvents()
+    if not args.fullscreen:
+        sizeString = global_vars.configuration.get("GENERAL").get("screen_resolution")
+        if sizeString is None or "x" not in sizeString:
+            logger.info(u"No Screen-Resolution defined in Config-Files or in wrong Format: {0}, "
+                           u"setting default Screenresolution according Display-Size".format(sizeString))
 
-    sizeString = global_vars.configuration.get("GENERAL").get("screen_resolution")
-    if sizeString is None or "x" not in sizeString:
-        logger.info(u"No Screen-Resolution defined in Config-Files or in wrong Format: {0}, "
-                       u"setting default Screenresolution according Display-Size".format(sizeString))
+            screen_resolution = app.desktop().screenGeometry()
+            width, height = int(screen_resolution.width() * 0.8), int(screen_resolution.height() * 0.8)   #80% of Desktop-Size
 
-        screen_resolution = app.desktop().screenGeometry()
-        width, height = screen_resolution.width() + 8, screen_resolution.height() + 8
-        #0.3.9 : see issue #21 (edges arround window), add additional 4 pixels on each side of the application window to avoid
-        #visible window-decoration
-        #if width / height is to small, mainwindow will fallback to 640x480 min
-        sizeString = "{0}x{1}".format(width, height)
+            #if width / height is to small, mainwindow will fallback to 640x480 min
+            sizeString = "{0}x{1}".format(width, height)
+        else:
+            logger.info(u"Force screen-Resolution according to Config-File: {0}".format(sizeString))
+        width, height = sizeString.rstrip().split("x")
+        mainwindow = MainWindow(QSize(int(width), int(height)))
     else:
-        logger.info(u"Force screen-Resolution according to Config-File: {0}".format(sizeString))
-    width, height = sizeString.rstrip().split("x")
-    mainwindow = MainWindow(QSize(int(width), int(height)))
+        mainwindow = MainWindow()
 
     screensaver_delay = global_vars.configuration.get("GENERAL").get("screensaverdelay")
     logger.debug("Screensaver-Delay is set to {0}".format(screensaver_delay))
@@ -4303,7 +4305,7 @@ if __name__ == "__main__":
     mainwindow.show()
     splash.finish(mainwindow)
     if args.fullscreen:
-        mainwindow.showFullScreen()     # a fullscreen window at raspberry is 1024 x 600 (Splashscreen does not work ?)
+        mainwindow.showFullScreen()     # a fullscreen window at raspberry is 1024 x 600
 
     app.exec_()
 

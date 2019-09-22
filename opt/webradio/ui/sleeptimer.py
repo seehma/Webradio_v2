@@ -8,7 +8,7 @@ from PyQt4.QtDeclarative import QDeclarativeView, QDeclarativeProperty, QDeclara
 import os
 import logging
 
-logger = logging.getLogger("sleeptimer")
+logger = logging.getLogger("webradio")
 
 try:
     from lib import global_vars
