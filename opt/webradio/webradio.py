@@ -154,6 +154,7 @@ AlbumArtFolder = os.path.join(user_dir, "Albumart")
 #sh.setFormatter(logging.Formatter(u"%(asctime)s - %(levelname)s - %(name)s - %(threadName)s - %(message)s"))
 #logging.getLogger().addHandler(sh)
 logging.basicConfig(level=logging.INFO)
+global logger
 logger = logging.getLogger("webradio")   # __name__ == "__main__", need to define a unique name
 
 sys.excepthook = excepthook
@@ -3822,12 +3823,17 @@ class Playlisteditor(object):
             else:
                 key = "file"
             #print("for name using key {0}, {1}".format(key, entry[key]))
-            if key == "title":                          # key = title
-                title = entry[key]
-                if title is list:
-                    logger.warning("Multiple Titles: {}".format(entry))
-                itemname = str(title).decode('utf-8')   # it seems my buggy collection contains MP3s with lists of titles
-            else:
+            if key == "title": # key = title
+                try:
+                    if entry[key] is list:
+                        itemname = entry[key][1].decode("utf-8")   # it seems some MP3s come with a list of titles. We use the first.
+                    else:
+                        itemname = entry[key].decode("utf-8")
+                except Exception, e:                               # problem with the title? Let's take the filename then
+                    logger.warn("Could not get title for entry {}: {}".format(entry, e))
+                    key="file"
+            
+            if key != "title":
                 if entry[key].startswith("http"):    #if a youtubelink or another link is in the entry
                     #print("Populate with", self.youtubeTranslate.get(entry[key]))
                     obj = self.youtubeTranslate.get(entry[key])  # try to find the url in the youtube-translation
@@ -3913,22 +3919,27 @@ class Playlisteditor(object):
         # UI operations cannot be outsourced in a different thread, this can cause a Segfault!
         # in addition, this is a very fast function ;-)
         items = self.view.selectedIndexes()
+        logger.info("Deleting {} selected items...".format(len(items)))
         if len(items) == 0:
             return
-        for item in items:
-            try:
+        self.view.emit(SIGNAL("start_loading"))
+        try:
+            for item in items:
                 selectionBackup = item.row()
                 ID_to_delete, pos, artist = item.data(Qt.UserRole).toStringList()
-                self.service.client.deleteid(ID_to_delete)
-                item_to_pop = self.view.itemFromIndex(item)
-                self.view.removeItemWidget(item_to_pop)
-                if not selectionBackup > self.view.count():
-                    self.view.setCurrentRow(selectionBackup)
-                self.view.setSelectionMode(QAbstractItemView.SingleSelection)
-            except Exception, e:
-                logger.error("Could not delete playlist item {}: {}".format(item.data, e))
-        QApplication.processEvents()
-        self.grapCurrentPlaylist()
+                try:
+                    self.service.client.deleteid(ID_to_delete)
+                    item_to_pop = self.view.itemFromIndex(item)
+                    #self.view.removeItemWidget(item_to_pop)
+                    #if not selectionBackup > self.view.count():
+                    #    self.view.setCurrentRow(selectionBackup)
+                except ProtocolError, e: # not sure why I get these on my system. Just do not stop running just for that...
+                    logger.error("Could not delete track {} from mpd playlist: {}".format(ID_to_delete, e))
+
+        finally: # successful or not - when this method ends the UI needs to update and the loading indicator must go away
+            self.view.setSelectionMode(QAbstractItemView.SingleSelection)
+            self.grapCurrentPlaylist()
+            self.view.emit(SIGNAL("stop_loading"))
 
     def replace_yt_link_in_playlist(self, song_id, song_pos, obj_copy):
         new_url = obj_copy.streamLink  # this is a long runnig process.
