@@ -15,7 +15,7 @@ import time
 from PyQt4.QtCore import QObject, SIGNAL, QThread
 import logging
 
-logger = logging.getLogger("webradio")
+logger = logging.getLogger(__name__)
 
 interval = 1  #in sec.
 

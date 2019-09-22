@@ -6,6 +6,7 @@ import argparse
 import commands
 import hashlib
 import logging
+import logging.config
 import logging.handlers
 import os
 import pickle
@@ -105,43 +106,17 @@ def setupLogger(console=True, File=False, Variable=False, Filebackupcount=0):
     Setup a logger for the application
     :return: Nothing
     '''
-    global logger
-    global log_capture_string
-    # create logger
-    logging.raiseExceptions = False
-    logger.setLevel(logging.DEBUG)
-    formatter = logging.Formatter(u"%(asctime)s - %(levelname)s - %(filename)s - %(funcName)s - %(message)s")
-    # Check if log exists and should therefore be rolled
-    needRoll = os.path.isfile(LOG_FILENAME)
+    LOGCONFIG="logging.conf"
+    LOGCONFIG=os.path.abspath(LOGCONFIG)
+    try:
+        logging.warning("Configure logging subsystem with config file {} ...".format(LOGCONFIG))
+        logging.config.fileConfig(LOGCONFIG)
+        logging.warning("Configured logging subsystem with config file {} .".format(LOGCONFIG))
 
-    logger.info("Setting up log handlers")
-    if File:
-        # create file handler which logs even debug messages and hold a backup of old logs
-        fh = logging.handlers.RotatingFileHandler( LOG_FILENAME, backupCount=int(Filebackupcount)) # create a backup of the log
-        fh.setLevel(logging.DEBUG) if args.debug else fh.setLevel(logging.INFO)
-        fh.setFormatter(formatter)
-        logger.addHandler(fh)
-    if Variable:
-        # create variable handler for on the fly read
-        vh = logging.StreamHandler(log_capture_string)
-        vh.setLevel(logging.DEBUG) if args.debug else vh.setLevel(logging.INFO)
-        vh.setFormatter(formatter)
-        logger.addHandler(vh)
-    if console:
-        # create console handler with a higher log level
-        ch = logging.StreamHandler()
-        ch.setLevel(logging.DEBUG) if args.debug else ch.setLevel(logging.ERROR)
-        ch.setFormatter(formatter)
-        logger.addHandler(ch)
-
-    # This is a stale log, so roll it
-    if File and needRoll:
-        # Add timestamp
-        logger.debug(_('\n---------\nLog closed on {0}.\n---------\n').format(time.asctime()))
-        # Roll over on application start
-        logger.handlers[0].doRollover()
-    # Add timestamp
-    logger.debug(_('\n---------\nLog started on {0}.\n---------\n').format(time.asctime()))
+        logging.info("root handlers: {}".format(logging.getLogger().handlers))
+    except Exception, e:
+        raise e
+        logger.error("Could not read logging configuration {}: {}".format(LOGCONFIG, e))
 
 def excepthook(excType, excValue, traceback):
     global logger
@@ -175,8 +150,11 @@ LogoFolder = os.path.join(user_dir, "Logos")
 AlbumArtFolder = os.path.join(user_dir, "Albumart")
 
 ################################ Prepare Logger ######################################
+#sh = logging.StreamHandler()
+#sh.setFormatter(logging.Formatter(u"%(asctime)s - %(levelname)s - %(name)s - %(threadName)s - %(message)s"))
+#logging.getLogger().addHandler(sh)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("webradio")   # __name__ == "__main__", need to define a unique name
-LOG_FILENAME = os.path.join(user_dir, "webradio.log")
 
 sys.excepthook = excepthook
 
@@ -3844,8 +3822,11 @@ class Playlisteditor(object):
             else:
                 key = "file"
             #print("for name using key {0}, {1}".format(key, entry[key]))
-            if key == "title":
-                itemname = entry[key].decode('utf-8')   # key = title
+            if key == "title":                          # key = title
+                title = entry[key]
+                if title is list:
+                    logger.warning("Multiple Titles: {}".format(entry))
+                itemname = str(title).decode('utf-8')   # it seems my buggy collection contains MP3s with lists of titles
             else:
                 if entry[key].startswith("http"):    #if a youtubelink or another link is in the entry
                     #print("Populate with", self.youtubeTranslate.get(entry[key]))
@@ -3935,14 +3916,17 @@ class Playlisteditor(object):
         if len(items) == 0:
             return
         for item in items:
-            selectionBackup = item.row()
-            ID_to_delete, pos, artist = item.data(Qt.UserRole).toStringList()
-            self.service.client.deleteid(ID_to_delete)
-            item_to_pop = self.view.itemFromIndex(item)
-            self.view.removeItemWidget(item_to_pop)
-            if not selectionBackup > self.view.count():
-                self.view.setCurrentRow(selectionBackup)
-            self.view.setSelectionMode(QAbstractItemView.SingleSelection)
+            try:
+                selectionBackup = item.row()
+                ID_to_delete, pos, artist = item.data(Qt.UserRole).toStringList()
+                self.service.client.deleteid(ID_to_delete)
+                item_to_pop = self.view.itemFromIndex(item)
+                self.view.removeItemWidget(item_to_pop)
+                if not selectionBackup > self.view.count():
+                    self.view.setCurrentRow(selectionBackup)
+                self.view.setSelectionMode(QAbstractItemView.SingleSelection)
+            except Exception, e:
+                logger.error("Could not delete playlist item {}: {}".format(item.data, e))
         QApplication.processEvents()
         self.grapCurrentPlaylist()
 

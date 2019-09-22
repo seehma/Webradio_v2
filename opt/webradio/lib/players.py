@@ -9,7 +9,7 @@ import logging
 import time
 
 #logger = logging.getLogger(__name__)
-logger = logging.getLogger("webradio")
+logger = logging.getLogger(__name__)
 
 
 def reconnect(func, *default_args, **default_kwargs):

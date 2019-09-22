@@ -10,7 +10,7 @@
 from PyQt4 import QtCore, QtGui
 import logging
 
-logger = logging.getLogger("webradio")
+logger = logging.getLogger(__name__)
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
