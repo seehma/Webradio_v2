@@ -14,7 +14,7 @@ import commands
 import logging
 from httplib2 import ServerNotFoundError
 
-logger = logging.getLogger("webradio")
+logger = logging.getLogger(__name__)
 
 from lib.googleapiclient.discovery import build
 import pprint
@@ -27,8 +27,8 @@ YOUTUBE_API_VERSION = "v3"
 try:
     youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
                     developerKey=DEVELOPER_KEY)
-except ServerNotFoundError:
-    logger.warning("Server can not reached, maybe no network is connected?")
+except Exception, e:
+    logger.warning("Could not connect to Youtube: {}".format(e))
     youtube = None
 
 def iso_Date_to_seconds_int(timestring):
@@ -220,8 +220,8 @@ class Playlist(object):
 
                 trackobject = Track(title, thumbnail, encrypted_id, duration, self)
                 tracks.update({i: trackobject})
-            except IndexError:
-                logger.warning("Ignored File id {0} because of a failure".format(v))
+            except IndexError, e:
+                logger.warning("Could not list youtube videos {}: {}".format(v, e))
 
         self.__tracks = tracks
 
@@ -269,9 +269,9 @@ class Track(object):
                 try:
                     expiration = re.search("(?P<exp>&expire=[^\D]+)", ret).group("exp").split("=")[1]
                     self.expiration = datetime.datetime.fromtimestamp(int(expiration))   # a link expires in about 6 hours !!
-                except:
-                    logger.error("Expiration-Time can not be extracted from Link: {0}, "
-                                 "setting to 2 hours".format(self.title.decode("utf-8")))
+                except Exception, e:
+                    logger.error("Could not extract expiration-Time from : {}: {}".format(ret, e))
+                    logger.warn("falling back to 2 hours")
                     self.expiration = datetime.datetime.now() + datetime.timedelta(hours=2)  # choose a short exiration
                 #Debug only, delete after dev
                 #self.expiration = datetime.datetime.now() + datetime.timedelta(minutes=5)  # debug only!

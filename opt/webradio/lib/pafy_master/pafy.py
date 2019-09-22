@@ -41,6 +41,8 @@ import hashlib
 import tempfile
 from xml.etree import ElementTree
 
+logger = logging.getLogger(__name__)
+
 
 early_py_version = sys.version_info[:2] < (2, 7)
 
@@ -570,8 +572,8 @@ def remux(infile, outfile, quiet=False, muxer="ffmpeg"):
             with open(os.devnull, "w") as devnull:
                 call(cmd, stdout=devnull, stderr=STDOUT)
 
-        except OSError:
-            dbg("Failed to remux audio using %s", tool)
+        except Exception, e:
+            logger.debug("Could not remux audio using '{}': {}".format(cmd, e))
 
         else:
             os.unlink(infile)
@@ -888,7 +890,8 @@ class Stream(object):
                 self._fsize = int(g.opener.open(self.url).headers[cl])
                 dbg("Got stream size")
 
-            except (AttributeError, HTTPError, URLError):
+            except (AttributeError, HTTPError, URLError), e:
+                logger.warning("Could not get stream size: {}".format(e))
                 self._fsize = 0
 
         return self._fsize
@@ -1453,7 +1456,8 @@ def get_playlist(playlist_url, basic=False, gdata=False, signature=True,
         allinfo = fetch_decode(url)  # unicode
         allinfo = json.loads(allinfo)
 
-    except:
+    except Exception, e:
+        logger.error("Could not get playlist {}: {}".format(url, e))
         raise IOError("Error fetching playlist %s" % m.groups(0))
 
     # playlist specific metadata
@@ -1506,6 +1510,7 @@ def get_playlist(playlist_url, basic=False, gdata=False, signature=True,
                            callback=callback)
 
         except IOError as e:
+            logger.debug("Could nto create metadata for {}: {}".format(v, e))
             callback("%s: %s" % (v['title'], e.message))
             continue
 

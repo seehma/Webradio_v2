@@ -11,7 +11,8 @@ from PyQt4 import QtCore, QtGui
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
-except AttributeError:
+except AttributeError, e:
+    logger.warn("Could not use QString UTF8 decoder: {}, going without".format(e))
     def _fromUtf8(s):
         return s
 
@@ -19,8 +20,9 @@ try:
     _encoding = QtGui.QApplication.UnicodeUTF8
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig, _encoding)
-except AttributeError:
+except AttributeError, e:
     def _translate(context, text, disambig):
+        logger.warn("Could not use QApplication unicode with encoding '{}', going without: {}".format(_encoding, e))
         return QtGui.QApplication.translate(context, text, disambig)
 
 class Ui_MainWindow(object):

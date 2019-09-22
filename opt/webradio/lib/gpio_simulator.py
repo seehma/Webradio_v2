@@ -7,18 +7,19 @@ import time
 import global_vars
 import logging
 
-logger = logging.getLogger("webradio")
+logger = logging.getLogger(__name__)
 
 BUTTONS = []
 for values in global_vars.configuration.get("GPIOS_IN").itervalues():
     try:
         BUTTONS.append(int(values))
-    except:
-        logger.error(u"Der GPIO_IN '{0}' ist ungültig!".format(values.decode("utf-8")))
+    except Exception, e:
+        logger.error(u"Der GPIO_IN '{}' ist ungültig: {}".format(values.decode("utf-8"), e))
 
 try:
     delay_tempmeasurement = int(global_vars.configuration.get("DHT11").get("delay_tempmeasurement"))
-except:
+except Exception, e:
+    logger.warning("Could not read DHT11/delay_tempmeasurement configuration value: {}".format(e))
     delay_tempmeasurement = 180
     logger.warning(u"Die Verzögerung delay_tempmeasurement '{0}' "
                  u"ist ungültig!".format(str(global_vars.configuration.get("DHT11").get("delay_tempmeasurement")).decode("utf-8")))

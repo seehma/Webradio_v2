@@ -15,7 +15,7 @@ import logging
 import time
 import global_vars
 
-logger = logging.getLogger("webradio")
+logger = logging.getLogger(__name__)
 
 pins_in_use = {}
 for pin in global_vars.configuration.get("GPIOS_IN").itervalues():
@@ -44,11 +44,11 @@ BUTTON = 22   # brown wire (2)  -> Button is not in use,
 try:
     import Adafruit_DHT
     tempsensor = Adafruit_DHT.DHT11
-except ImportError:
+except ImportError, e:
     GPIO_TEMP= None
     delay_tempmeasurement = 180
     #TODO: Following warning will not be displayed. Fix this.
-    logging.warning("Adafruit DHT is not installed or can not be loaded. No Hardware-tempsensing available!")
+    logging.warning("Adafruit DHT is not installed or can not be loaded. No Hardware-tempsensing available: {}".format(e))
 else:
     try:
         GPIO_TEMP = int(global_vars.configuration.get("DHT11").get("gpio_temp")) # give the GPIO not the Pin-No

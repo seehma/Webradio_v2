@@ -21,7 +21,7 @@
 
 from __future__ import unicode_literals
 
-#import logging
+import logging
 import json
 import time
 from urllib import urlencode
@@ -30,7 +30,7 @@ from urllib2 import ProxyHandler, build_opener, install_opener
 import random
 
 
-#logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class RadioDeApiError(Exception):
@@ -199,13 +199,8 @@ class RadioDeApi():
         while (downloadloop is True):
             try:
                 response = urlopen(req).read()
-            except HTTPError, error:
-                print('__urlopen HTTPError: %s', error)
-                response = {}
-                #raise RadioDeApiError('HTTPError')
-            except URLError, error:
-                print('__urlopen URLError: %s', error)
-                #raise RadioDeApiError('URLError')
+            except Exception, e:
+                logger.error("Could not open URL {}: {}".format(req, e))
                 response = {}
 
             if response != {}:

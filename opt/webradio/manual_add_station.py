@@ -60,8 +60,8 @@ class UserInterface(object):
         try:
             pickle.dump(container, open(filename, "wb"))
 
-        except IOError:
-            print("was not able to store favorites, maybe dont have got the file-permissions needed")
+        except Exception, e:
+            print("Could not save favorites to {}: {}".format(filename, e))
             return (False, [])
         print("Stored Favorites to: {0}".format(filename))
         return (True, self.writePlaylist("favorites", favlist))
@@ -82,7 +82,8 @@ class UserInterface(object):
             with open(filename, "w") as playlistfile:
                 for item in listOfContent:
                     playlistfile.write("%s\n" % item)
-        except:
+        except Exception, e:
+            print("Could not write playlist to {}: {}".format(filename, e))
             return False
         return True
 
@@ -109,8 +110,8 @@ class UserInterface(object):
 
         try:
             urllib.urlretrieve(str(LogoUrl), filename=fileToImport)
-        except: # IOError, e:
-            print("Error downloading Logo: {0}".format(""))
+        except Exception, e:
+            print("Error downloading Logo: {}".format(e))
             return False
         else:
             return True

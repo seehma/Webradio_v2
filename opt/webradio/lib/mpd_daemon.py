@@ -11,12 +11,13 @@ from PyQt4.QtCore import QObject, SIGNAL, QThread
 from PyQt4.QtGui import QApplication
 
 cwd = os.path.dirname(os.path.realpath(__file__))      # gives the path, where the script is located
-logger = logging.getLogger("webradio")
+logger = logging.getLogger(__name__)
 
 try:
     import mpd
-except ImportError:
-    logger.critical("Can't import mpd. Please install the python bindings for MPD (python-mpd or mpd-python)")
+except ImportError, e:
+    logger.critical("Could not import mpd: {}".format(e))
+    logger.info("Please install the python bindings for MPD (python-mpd or mpd-python)")
     sys.exit(1)
 
 # MPD settings
@@ -63,10 +64,10 @@ class MPD_Eventlistener(QObject):
                 # Run the observer but watch for mpd crashes
                 self.__observe_mpd(client)
             except KeyboardInterrupt:
-                logger.warning("\nKeyBoardInterrupt. Thank you for using!")
+                logger.warning("KeyBoardInterrupt. Thank you for using!")
                 sys.exit()
-            except (socket.error, mpd.ConnectionError):
-                logger.critical("{0}: Cannot connect to MPD".format(time.strftime("%a, %d %b %Y %H:%M:%S")))
+            except (socket.error, mpd.ConnectionError), e:
+                logger.critical("Could not connect to MPD: {}".format(e))
                 time.sleep(SLEEP_INTERVAL)
 
     def __observe_mpd(self, client):
@@ -157,8 +158,8 @@ class MPD_Eventlistener(QObject):
 
                     #print("TIME:", timeplayed, timetotal)
                     self.emit(SIGNAL("sig_mpd_timeElapsed_information"), timeplayed, timetotal)
-                except KeyError:
-                    pass
+                except Exception, e:
+                    logger.warning("Could not understand MPD status: {}", e)
 
 
 
