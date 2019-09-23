@@ -29,18 +29,20 @@ class KeyButton(QPushButton):
         super(KeyButton, self).__init__()
 
         self._key = key
-        self._activeSize = QSize(50,50)
+        #self._activeSize = QSize(50,50)
         self.connect(self, SIGNAL("clicked()"), self.emitKey)
         self.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
         self.setFocusPolicy(Qt.NoFocus)
-        self.setMinimumHeight(40) 
+#        self.setMinimumHeight(buttonMinSize) 
+#        self.setMinimumWeight(buttonMinSize)
 
     def emitKey(self):
         self.emit(SIGNAL("sigKeyButtonClicked"), self._key)
 
     def enterEvent(self, event):
-        self.setFixedSize(self._activeSize)
-        QTimer.singleShot(500, lambda : self.setFixedSize(self.sizeHint()))
+        #self.setFixedSize(self._activeSize)
+        #QTimer.singleShot(500, lambda : self.setFixedSize(self.sizeHint()))
+        pass
 
     def leaveEvent(self, event):
         self.setFixedSize(self.sizeHint())
@@ -55,14 +57,16 @@ class SpaceKeyButton(QPushButton):
 
         self._key = key
         self.connect(self, SIGNAL("clicked()"), self.emitKey)
-        self.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
+#        self.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
         self.setFocusPolicy(Qt.NoFocus)
+#        self.setMinimumHeight(buttonMinSize) 
+#        self.setMinimumWeight(buttonMinSize)
 
     def emitKey(self):
         self.emit(SIGNAL("sigKeyButtonClicked"), self._key)
 
-    def sizeHint(self):
-        return QSize(800, 30)
+#    def sizeHint(self):
+#        return QSize(800, 30)
 
 class VirtualKeyboard(QWidget):
 
@@ -71,6 +75,7 @@ class VirtualKeyboard(QWidget):
 
         self.globalLayout = QVBoxLayout(self)
         self.keysLayout = QGridLayout()
+        self.keysLayout.setObjectName("keysLayout")
         self.buttonLayout = QHBoxLayout()
         self.dictOfButtons = {}
 #        self.setStyleSheet("QWidget {"
@@ -100,7 +105,7 @@ class VirtualKeyboard(QWidget):
         self.state = InputState.LOWER
 
         self.stateButton = QPushButton()
-        self.stateButton.setText('Shift')
+        self.stateButton.setText(self.tr('Shift'))
         self.stateButton.setObjectName("Shift")
         self.stateButton.setFocusPolicy(Qt.NoFocus)
         self.backButton = QPushButton()
@@ -134,29 +139,29 @@ class VirtualKeyboard(QWidget):
                 self.keysLayout.addWidget(self.getButtonByKey(key), self.keyListByLines.index(line), line.index(key))
                 self.getButtonByKey(key).setText(key)
                 self.connect(self.getButtonByKey(key), SIGNAL("sigKeyButtonClicked"), self.addInputByKey)
-                self.keysLayout.setColumnMinimumWidth(keyIndex, 50)
-            self.keysLayout.setRowMinimumHeight(lineIndex, 50)
+                #self.keysLayout.setColumnMinimumWidth(keyIndex, 50)
+            #self.keysLayout.setRowMinimumHeight(lineIndex, 50)
 
         self.connect(self.stateButton, SIGNAL("clicked()"), self.switchState)
         self.connect(self.backButton, SIGNAL("clicked()"), self.backspace)
         self.connect(self.okButton, SIGNAL("clicked()"), self.emitInputString)
         self.connect(self.cancelButton, SIGNAL("clicked()"), self.emitCancel)
 
-        self.buttonLayout.addWidget(self.cancelButton)
-        self.buttonLayout.addWidget(self.backButton)
-        self.buttonLayout.addWidget(self.stateButton)
-        self.buttonLayout.addWidget(self.okButton)
+        self.buttonLayout.addWidget(self.cancelButton, 1)
+        self.buttonLayout.addWidget(self.backButton, 1)
+        self.buttonLayout.addWidget(self.spaceButton, 3)   # replaced with layout (tmpLayout)
+        self.buttonLayout.addWidget(self.stateButton, 1)
+        self.buttonLayout.addWidget(self.okButton, 1)
 
         self.globalLayout.addWidget(self.inputLine)
-        self.globalLayout.addLayout(self.keysLayout)
-        # construct a small horizontal layout, to assure that space-bare is in the middle of the keyboard...
-        tmpLayout = QHBoxLayout()
-        space = QSpacerItem(0,0)
-        tmpLayout.addSpacerItem(space)
-        tmpLayout.addWidget(self.spaceButton)
-        tmpLayout.addSpacerItem(space)
-        self.globalLayout.addLayout(tmpLayout)
-        # self.globalLayout.addWidget(self.spaceButton)   # replaced with layout (tmpLayout)
+        self.globalLayout.addLayout(self.keysLayout, 1)
+#        # construct a small horizontal layout, to assure that space-bare is in the middle of the keyboard...
+#        tmpLayout = QHBoxLayout()
+#        space = QSpacerItem(0,0)
+#        tmpLayout.addSpacerItem(space)
+#        tmpLayout.addWidget(self.spaceButton)
+#        tmpLayout.addSpacerItem(space)
+#        self.globalLayout.addLayout(tmpLayout)
 
         self.globalLayout.addLayout(self.buttonLayout)
         self.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
@@ -187,10 +192,12 @@ class VirtualKeyboard(QWidget):
     def addInputByKey(self, key):
         self.inputString += (key.lower(), key.capitalize())[self.state]
         self.inputLine.setText(self.inputString)
+        self.inputLine.setFocus()
 
     def backspace(self):
         self.inputLine.backspace()
         self.inputString = self.inputString[:-1]
+        self.inputLine.setFocus()
 
     def emitInputString(self):
         self.emit(SIGNAL("sigInputString"), self.inputLine.text())

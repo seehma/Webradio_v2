@@ -312,18 +312,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         lang = str(lang)
         if self.language_txt == lang:  # do nothing if language is already set...
             return
-        mytranslator = QTranslator()
-        #print("LANG =",lang)
-        if mytranslator.load("local_{0}".format(lang), os.path.join(cwd, "locale")):
-            self.setTranslation(mytranslator, str(lang))
-            global_vars.configuration.get("GENERAL").update({"language": str(lang)})
-            self.writeSettings()   # Language-Setting is stored in Systemsettings.
-        elif lang == "en":
-            self.setTranslation(mytranslator, str(lang))  # set an empty translator as second one
-            global_vars.configuration.get("GENERAL").update({"language": str(lang)})
-            self.writeSettings()  # Language-Setting is stored in Systemsettings.
-        else:
-            logger.error("Language-Change failed because Translation can not be loaded.")
+
+        try:
+            mytranslator = QTranslator()
+            localedir = os.path.join(cwd, "locale")
+            locale = "local_{0}".format(lang)
+            logger.info("Loading locale {} from directory {}".format(locale, localedir))
+            if mytranslator.load(locale, localedir):
+                self.setTranslation(mytranslator, str(lang))
+                global_vars.configuration.get("GENERAL").update({"language": str(lang)})
+                self.writeSettings()   # Language-Setting is stored in Systemsettings.
+            elif lang == "en":
+                self.setTranslation(mytranslator, str(lang))  # set an empty translator as second one
+                global_vars.configuration.get("GENERAL").update({"language": str(lang)})
+                self.writeSettings()  # Language-Setting is stored in Systemsettings.
+            else:
+                logger.error("Language-Change failed because Translation can not be loaded.")
+        except Exception, e:
+            logger.error("Could not load language {}: {}".format(lang, e));
 
     def setTranslation(self, qTranslator, lang_txt):
         '''
@@ -968,10 +974,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 global_vars.configuration.get("GENERAL").update({"language": user_lang})
                 #print("DEBUG: user_lang:", user_lang, self.language_txt)
                 if self.language_txt != user_lang:  # if not set anyway?
+                    locale = "local_{0}".format(user_lang)
+                    localedir = os.path.join(cwd, "locale")
+                    logger.info("Loading locale {} from {}".format(locale, localedir))
                     mytranslator = QTranslator()
-                    mytranslator.load("local_{0}".format(user_lang), os.path.join(cwd, "locale"))
+                    mytranslator.load(locale, localedir)
                     self.setTranslation(mytranslator, user_lang)
-                    #print("DEBUG: user_lang: Set new Lang:", user_lang)
 
             selectedLastTab = settings.value("tab", "0")
             selectedLastTab = selectedLastTab.toInt()[0]
@@ -4253,9 +4261,11 @@ if __name__ == "__main__":
     mytranslator = QTranslator()
     user_lang = global_vars.configuration.get("GENERAL").get("language")
     if user_lang is not None:
-        logger.info("Load Userspecific Language")
+        locale = "local_{0}".format(language)
+        localedir = os.path.join(cwd, "locale")
+        logger.info("Load locale {} from {}".format(locale, localedir))
         language = user_lang
-        mytranslator.load("local_{0}".format(language), os.path.join(cwd, "locale"))
+        mytranslator.load(locale, localedir)
 
     # app.installTranslator(mytranslator)  # Installation will be handeled by the GUI
 

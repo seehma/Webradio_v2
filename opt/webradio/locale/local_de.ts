@@ -613,15 +613,21 @@
         <source>Playlisteditor</source>
         <translation></translation>
     </message>
-    <message>
+    <message><!-- used in VirtualKeyboard -->
         <location filename="../webradio.py" line="403"/>
         <source>Delete</source>
-        <translation>Entfernen</translation>
+        <translation>&#x232b;</translation>
+    </message>
+    <message><!-- used in VirtualKeyboard -->
+        <location filename="../lib/virt_keyboard.py" line="108"/>
+        <source>Shift</source>
+        <translation>&#x21e7;</translation>
     </message>
     <message>
         <location filename="../webradio.py" line="404"/>
         <source>Space</source>
-        <translation>Leerzeichen</translation>
+        <!--<translation>Leerzeichen</translation>-->
+        <translation>&#x2423;</translation>
     </message>
     <message>
         <location filename="../webradio.py" line="384"/>
@@ -694,7 +700,7 @@
     <message>
         <location filename="../lib/virt_keyboard.py" line="103"/>
         <source>Delete</source>
-        <translation>Entfernen</translation>
+        <translation>&#x232b;</translation>
     </message>
     <message>
         <location filename="../lib/virt_keyboard.py" line="109"/>
@@ -704,7 +710,8 @@
     <message>
         <location filename="../lib/virt_keyboard.py" line="112"/>
         <source>Space</source>
-        <translation>Leerzeichen</translation>
+        <!--<translation>Leerzeichen</translation>-->
+        <translation>&#x2423;</translation>
     </message>
 </context>
 <context>
