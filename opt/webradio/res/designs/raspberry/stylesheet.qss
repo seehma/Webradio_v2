@@ -232,3 +232,44 @@ QSlider::handle:horizontal:disabled {
         border: 1px solid #aaa;
         border-radius: 4px;
         }
+/* Virtual Keyboard */
+QLineEdit#SearchText {
+        background: rgb(240, 240, 240);
+        color: black;
+        font-weight: bold;
+        border-style: solid;
+        border-color: rgb(188, 17, 66);
+        border-width: 1px;
+}
+KeyButton {
+        background: rgba(128,128,128,50%);
+        color: black;
+        font: "bold 20pt Ubuntu";
+}
+QPushButton#Ok {
+        background: rgb(117, 169, 40);
+        color: black;
+        font-weight: bold;
+}
+QPushButton#Space {
+        background: rgba(128,128,128,50%);
+        color: black;
+}
+QPushButton#Back {
+        background: rgba(128,128,128,50%);
+        color: black;
+}
+QPushButton#Shift {
+        background: rgba(128,128,128,50%);
+        color: black;
+}
+QPushButton#Cancel {
+        background: rgb(188, 17, 66);
+        color: black;
+}
+/*
+        font-family: "Ubuntu";
+        font-size: 10px;
+        font-weight: bold;
+*/
+

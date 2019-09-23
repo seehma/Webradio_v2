@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import logging
+
+logger = logging.getLogger(__name__)
 
 from PyQt4.QtGui import QGridLayout, QHBoxLayout, QLineEdit, QPushButton, QSizePolicy, QVBoxLayout, QWidget, QFont, \
     QSpacerItem
@@ -53,6 +56,7 @@ class SpaceKeyButton(QPushButton):
         self._key = key
         self.connect(self, SIGNAL("clicked()"), self.emitKey)
         self.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
+        self.setFocusPolicy(Qt.NoFocus)
 
     def emitKey(self):
         self.emit(SIGNAL("sigKeyButtonClicked"), self._key)
@@ -69,23 +73,23 @@ class VirtualKeyboard(QWidget):
         self.keysLayout = QGridLayout()
         self.buttonLayout = QHBoxLayout()
         self.dictOfButtons = {}
-        self.setStyleSheet("QWidget {"
-                           "background-color: rgb(118, 118, 118);"
-                           "color: rgb(240, 240, 240);"
-                           "}"
-                           ""
-                           "QLabel{"
-                           "color: rgb(240, 240, 240);"
-                           "}"
-                           "QPushButton{"
-                           "background-color: rgb(42, 42, 42);"
-                           "color: rgb(255, 255, 255);"
-                           "border-style: solid;"
-                           "border-color: black;"
-                           "border-width: 5px;"
-                           "border-radius: 10px;"
-                           "font: 63 20pt 'Ubuntu';"
-                           "}")
+#        self.setStyleSheet("QWidget {"
+#                           "background-color: rgb(118, 118, 118);"
+#                           "color: rgb(240, 240, 240);"
+#                           "}"
+#                           ""
+#                           "QLabel{"
+#                           "color: rgb(240, 240, 240);"
+#                           "}"
+#                           "QPushButton{"
+#                           "background-color: rgb(42, 42, 42);"
+#                           "color: rgb(255, 255, 255);"
+#                           "border-style: solid;"
+#                           "border-color: black;"
+#                           "border-width: 5px;"
+#                           "border-radius: 10px;"
+#                           "font: 63 20pt 'Ubuntu';"
+#                           "}")
         self.keyListByLines = [
                     ['1','2','3','4','5','6','7','8','9','0',u'ß','?'],    # comment this line if you dont want numbers
                     ['q', 'w', 'e', 'r', 't', 'z', 'u', 'i', 'o', 'p', u'ü','+'],
@@ -97,22 +101,29 @@ class VirtualKeyboard(QWidget):
 
         self.stateButton = QPushButton()
         self.stateButton.setText('Shift')
+        self.stateButton.setObjectName("Shift")
+        self.stateButton.setFocusPolicy(Qt.NoFocus)
         self.backButton = QPushButton()
         self.backButton.setText(self.tr('Delete'))
         self.backButton.setFocusPolicy(Qt.NoFocus)
+        self.backButton.setObjectName("Back")
         self.okButton = QPushButton()
-        self.okButton.setText('OK')
+        self.okButton.setText('Ok')
         self.okButton.setFocusPolicy(Qt.NoFocus)
+        self.okButton.setObjectName("Ok")
         self.cancelButton = QPushButton()
         self.cancelButton.setText(self.tr("Abort"))
         self.cancelButton.setFocusPolicy(Qt.NoFocus)
+        self.cancelButton.setObjectName("Cancel")
         self.spaceButton = SpaceKeyButton(" ")
         self.spaceButton.setText(self.tr("Space"))
+        self.spaceButton.setObjectName("Space")
+        self.spaceButton.setFocusPolicy(Qt.NoFocus)
         self.dictOfButtons.update({"keyButton " : self.spaceButton})
         self.connect(self.spaceButton, SIGNAL("sigKeyButtonClicked"), self.addInputByKey)
 
         self.inputLine = QLineEdit()
-
+        self.inputLine.setObjectName("SearchText")
         self.inputLine.setFont(font)
 
 
@@ -149,6 +160,8 @@ class VirtualKeyboard(QWidget):
 
         self.globalLayout.addLayout(self.buttonLayout)
         self.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
+
+        self.inputLine.setFocus()
 
 
     def getButtonByKey(self, key):
