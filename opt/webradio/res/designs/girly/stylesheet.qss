@@ -113,13 +113,15 @@ QTabBar::tab{
         border: 2;
         border-color: black;
         background-color: none;
-        width:50px;  /* This defines the icon-size in the Tabwidget */
+        width: 50px;  /* This defines the icon-size in the Tabwidget */
+        height: 60px;
         }
 QTabBar::tab:selected{
         border: 2;
         border-color: rgba(240, 240, 240, 50%);
         background-color: none;
         width:70px;  /* This defines the icon-size in the Tabwidget */
+        height: 60px;
         }
 /* Displays the MPD music folder hierarchy */
 QTreeView{

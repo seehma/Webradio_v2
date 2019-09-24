@@ -10,7 +10,7 @@ import sys
 from weather_widget_ui import Ui_Form as ui
 import global_vars
 import logging
-logger = logging.getLogger("webradio")
+logger = logging.getLogger(__name__)
 #cwd = os.path.dirname(os.path.realpath(__file__))      # gives the path, where the script is located
 #LOCATION_ID = "GMBY7640"   # Sattelpeilnstein
 #LOCATION_ID = global_vars.configuration.get("GENERAL").get("weather_locationid")

@@ -15,7 +15,7 @@ import logging
 import time
 import global_vars
 
-logger = logging.getLogger("webradio")
+logger = logging.getLogger(__name__)
 
 pins_in_use = {}
 for pin in global_vars.configuration.get("GPIOS_IN").itervalues():

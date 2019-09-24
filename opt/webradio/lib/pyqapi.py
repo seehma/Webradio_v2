@@ -27,7 +27,7 @@ from math import pow
 from xml.dom import minidom
 import json
 import logging
-logger = logging.getLogger("webradio")
+logger = logging.getLogger(__name__)
 
 GOOGLE_COUNTRIES_URL = 'http://www.google.com/ig/countries?output=xml&hl=%s'
 GOOGLE_CITIES_URL    = 'http://www.google.com/ig/cities?output=xml&' + \

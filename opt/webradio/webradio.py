@@ -6,6 +6,7 @@ import argparse
 import commands
 import hashlib
 import logging
+import logging.config
 import logging.handlers
 import os
 import pickle
@@ -105,43 +106,17 @@ def setupLogger(console=True, File=False, Variable=False, Filebackupcount=0):
     Setup a logger for the application
     :return: Nothing
     '''
-    global logger
-    global log_capture_string
-    # create logger
-    logging.raiseExceptions = False
-    logger.setLevel(logging.DEBUG)
-    formatter = logging.Formatter(u"%(asctime)s - %(levelname)s - %(filename)s - %(funcName)s - %(message)s")
-    # Check if log exists and should therefore be rolled
-    needRoll = os.path.isfile(LOG_FILENAME)
+    LOGCONFIG="logging.conf"
+    LOGCONFIG=os.path.abspath(LOGCONFIG)
+    try:
+        logging.warning("Configure logging subsystem with config file {} ...".format(LOGCONFIG))
+        logging.config.fileConfig(LOGCONFIG)
+        logging.warning("Configured logging subsystem with config file {} .".format(LOGCONFIG))
 
-    logger.info("Setting up log handlers")
-    if File:
-        # create file handler which logs even debug messages and hold a backup of old logs
-        fh = logging.handlers.RotatingFileHandler( LOG_FILENAME, backupCount=int(Filebackupcount)) # create a backup of the log
-        fh.setLevel(logging.DEBUG) if args.debug else fh.setLevel(logging.INFO)
-        fh.setFormatter(formatter)
-        logger.addHandler(fh)
-    if Variable:
-        # create variable handler for on the fly read
-        vh = logging.StreamHandler(log_capture_string)
-        vh.setLevel(logging.DEBUG) if args.debug else vh.setLevel(logging.INFO)
-        vh.setFormatter(formatter)
-        logger.addHandler(vh)
-    if console:
-        # create console handler with a higher log level
-        ch = logging.StreamHandler()
-        ch.setLevel(logging.DEBUG) if args.debug else ch.setLevel(logging.ERROR)
-        ch.setFormatter(formatter)
-        logger.addHandler(ch)
-
-    # This is a stale log, so roll it
-    if File and needRoll:
-        # Add timestamp
-        logger.debug(_('\n---------\nLog closed on {0}.\n---------\n').format(time.asctime()))
-        # Roll over on application start
-        logger.handlers[0].doRollover()
-    # Add timestamp
-    logger.debug(_('\n---------\nLog started on {0}.\n---------\n').format(time.asctime()))
+        logging.info("root handlers: {}".format(logging.getLogger().handlers))
+    except Exception, e:
+        raise e
+        logger.error("Could not read logging configuration {}: {}".format(LOGCONFIG, e))
 
 def excepthook(excType, excValue, traceback):
     global logger
@@ -175,8 +150,12 @@ LogoFolder = os.path.join(user_dir, "Logos")
 AlbumArtFolder = os.path.join(user_dir, "Albumart")
 
 ################################ Prepare Logger ######################################
+#sh = logging.StreamHandler()
+#sh.setFormatter(logging.Formatter(u"%(asctime)s - %(levelname)s - %(name)s - %(threadName)s - %(message)s"))
+#logging.getLogger().addHandler(sh)
+logging.basicConfig(level=logging.INFO)
+global logger
 logger = logging.getLogger("webradio")   # __name__ == "__main__", need to define a unique name
-LOG_FILENAME = os.path.join(user_dir, "webradio.log")
 
 sys.excepthook = excepthook
 
@@ -334,18 +313,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         lang = str(lang)
         if self.language_txt == lang:  # do nothing if language is already set...
             return
-        mytranslator = QTranslator()
-        #print("LANG =",lang)
-        if mytranslator.load("local_{0}".format(lang), os.path.join(cwd, "locale")):
-            self.setTranslation(mytranslator, str(lang))
-            global_vars.configuration.get("GENERAL").update({"language": str(lang)})
-            self.writeSettings()   # Language-Setting is stored in Systemsettings.
-        elif lang == "en":
-            self.setTranslation(mytranslator, str(lang))  # set an empty translator as second one
-            global_vars.configuration.get("GENERAL").update({"language": str(lang)})
-            self.writeSettings()  # Language-Setting is stored in Systemsettings.
-        else:
-            logger.error("Language-Change failed because Translation can not be loaded.")
+
+        try:
+            mytranslator = QTranslator()
+            localedir = os.path.join(cwd, "locale")
+            locale = "local_{0}".format(lang)
+            logger.info("Loading locale {} from directory {}".format(locale, localedir))
+            if mytranslator.load(locale, localedir):
+                self.setTranslation(mytranslator, str(lang))
+                global_vars.configuration.get("GENERAL").update({"language": str(lang)})
+                self.writeSettings()   # Language-Setting is stored in Systemsettings.
+            elif lang == "en":
+                self.setTranslation(mytranslator, str(lang))  # set an empty translator as second one
+                global_vars.configuration.get("GENERAL").update({"language": str(lang)})
+                self.writeSettings()  # Language-Setting is stored in Systemsettings.
+            else:
+                logger.error("Language-Change failed because Translation can not be loaded.")
+        except Exception, e:
+            logger.error("Could not load language {}: {}".format(lang, e));
 
     def setTranslation(self, qTranslator, lang_txt):
         '''
@@ -990,10 +975,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 global_vars.configuration.get("GENERAL").update({"language": user_lang})
                 #print("DEBUG: user_lang:", user_lang, self.language_txt)
                 if self.language_txt != user_lang:  # if not set anyway?
+                    locale = "local_{0}".format(user_lang)
+                    localedir = os.path.join(cwd, "locale")
+                    logger.info("Loading locale {} from {}".format(locale, localedir))
                     mytranslator = QTranslator()
-                    mytranslator.load("local_{0}".format(user_lang), os.path.join(cwd, "locale"))
+                    mytranslator.load(locale, localedir)
                     self.setTranslation(mytranslator, user_lang)
-                    #print("DEBUG: user_lang: Set new Lang:", user_lang)
 
             selectedLastTab = settings.value("tab", "0")
             selectedLastTab = selectedLastTab.toInt()[0]
@@ -3845,9 +3832,17 @@ class Playlisteditor(object):
             else:
                 key = "file"
             #print("for name using key {0}, {1}".format(key, entry[key]))
-            if key == "title":
-                itemname = entry[key].decode('utf-8')   # key = title
-            else:
+            if key == "title": # key = title
+                try:
+                    if entry[key] is list:
+                        itemname = entry[key][1].decode("utf-8")   # it seems some MP3s come with a list of titles. We use the first.
+                    else:
+                        itemname = entry[key].decode("utf-8")
+                except Exception, e:                               # problem with the title? Let's take the filename then
+                    logger.warn("Could not get title for entry {}: {}".format(entry, e))
+                    key="file"
+            
+            if key != "title":
                 if entry[key].startswith("http"):    #if a youtubelink or another link is in the entry
                     #print("Populate with", self.youtubeTranslate.get(entry[key]))
                     obj = self.youtubeTranslate.get(entry[key])  # try to find the url in the youtube-translation
@@ -3933,19 +3928,27 @@ class Playlisteditor(object):
         # UI operations cannot be outsourced in a different thread, this can cause a Segfault!
         # in addition, this is a very fast function ;-)
         items = self.view.selectedIndexes()
+        logger.info("Deleting {} selected items...".format(len(items)))
         if len(items) == 0:
             return
-        for item in items:
-            selectionBackup = item.row()
-            ID_to_delete, pos, artist = item.data(Qt.UserRole).toStringList()
-            self.service.client.deleteid(ID_to_delete)
-            item_to_pop = self.view.itemFromIndex(item)
-            self.view.removeItemWidget(item_to_pop)
-            if not selectionBackup > self.view.count():
-                self.view.setCurrentRow(selectionBackup)
+        self.view.emit(SIGNAL("start_loading"))
+        try:
+            for item in items:
+                selectionBackup = item.row()
+                ID_to_delete, pos, artist = item.data(Qt.UserRole).toStringList()
+                try:
+                    self.service.client.deleteid(ID_to_delete)
+                    item_to_pop = self.view.itemFromIndex(item)
+                    #self.view.removeItemWidget(item_to_pop)
+                    #if not selectionBackup > self.view.count():
+                    #    self.view.setCurrentRow(selectionBackup)
+                except ProtocolError, e: # not sure why I get these on my system. Just do not stop running just for that...
+                    logger.error("Could not delete track {} from mpd playlist: {}".format(ID_to_delete, e))
+
+        finally: # successful or not - when this method ends the UI needs to update and the loading indicator must go away
             self.view.setSelectionMode(QAbstractItemView.SingleSelection)
-        QApplication.processEvents()
-        self.grapCurrentPlaylist()
+            self.grapCurrentPlaylist()
+            self.view.emit(SIGNAL("stop_loading"))
 
     def replace_yt_link_in_playlist(self, song_id, song_pos, obj_copy):
         new_url = obj_copy.streamLink  # this is a long runnig process.
@@ -4259,9 +4262,11 @@ if __name__ == "__main__":
     mytranslator = QTranslator()
     user_lang = global_vars.configuration.get("GENERAL").get("language")
     if user_lang is not None:
-        logger.info("Load Userspecific Language")
+        locale = "local_{0}".format(language)
+        localedir = os.path.join(cwd, "locale")
+        logger.info("Load locale {} from {}".format(locale, localedir))
         language = user_lang
-        mytranslator.load("local_{0}".format(language), os.path.join(cwd, "locale"))
+        mytranslator.load(locale, localedir)
 
     # app.installTranslator(mytranslator)  # Installation will be handeled by the GUI
 

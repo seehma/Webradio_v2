@@ -4,7 +4,7 @@
 import os
 import logging
 
-logger = logging.getLogger("webradio")
+logger = logging.getLogger(__name__)
 
 def getVariableFrom_MPD_Conf(var_string):
     ret = None

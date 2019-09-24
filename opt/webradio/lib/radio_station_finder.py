@@ -30,7 +30,7 @@ from urllib2 import ProxyHandler, build_opener, install_opener
 import random
 
 
-logger = logging.getLogger("webradio")
+logger = logging.getLogger(__name__)
 
 
 class RadioDeApiError(Exception):

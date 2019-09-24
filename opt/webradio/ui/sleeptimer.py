@@ -8,7 +8,8 @@ from PyQt4.QtDeclarative import QDeclarativeView, QDeclarativeProperty, QDeclara
 import os
 import logging
 
-logger = logging.getLogger("webradio")
+logger = logging.getLogger(__name__)
+
 
 try:
     from lib import global_vars
