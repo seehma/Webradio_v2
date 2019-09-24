@@ -4,6 +4,7 @@ QMainWindow {
         background-repeat: repeat-xy;
         background-position: top-left;
         color: rgb(240, 240, 240);
+        font-family: "DejaVu Sans";
         }
 /* Settings - Tab */
 QComboBox{
@@ -95,6 +96,12 @@ QTabWidget::pane{
 QTabBar::tab{
         border: 2;
         border-color: black;
+        width:60px;  /* This defines the icon-size in the Tabwidget */
+        }
+QTabBar::tab:selected{
+        border: 2;
+        border-color: rgba(240, 240, 240, 50%);
+        background-color: none;
         width:60px;  /* This defines the icon-size in the Tabwidget */
         }
 QTreeView{
@@ -209,3 +216,66 @@ QDialog {
         background-color: rgb(76, 76, 76);
         color: rgb(240, 240, 240);
         }
+/* Virtual Keyboard */
+QLineEdit#SearchText {
+        background: rgb(240, 240, 240);
+        color: black;
+        border-style: solid;
+        border-color: black;
+        border-width: 1px;
+        font-family: "DejaVu Sans";
+}
+KeyButton {
+        background: rgba(128,128,128,100%);
+        color: black;
+        font-size: 20pt;
+        min-height: 40px;
+        font-family: "DejaVu Sans";
+}
+KeyButton:pressed {
+        background: black;
+        color: rgba(128,128,128,100%);
+        font-size: 20pt;
+        min-height: 40px;
+        font-family: "DejaVu Sans";
+}
+QPushButton#Ok {
+        background: rgb(117, 169, 40);
+        color: black;
+        font-size: 18pt;
+        min-height: 40px;
+        font-family: "DejaVu Sans";
+}
+QPushButton#Space {
+        background: rgba(128,128,128,100%);
+        color: black;
+        font-size: 18pt;
+        min-height: 40px;
+        font-family: "DejaVu Sans";
+}
+QPushButton#Back {
+        background: rgba(128,128,128,100%);
+        color: black;
+        font-size: 18pt;
+        min-height: 40px;
+        font-family: "DejaVu Sans";
+}
+QPushButton#Shift {
+        background: rgba(128,128,128,100%);
+        color: black;
+        font-size: 18pt;
+        min-height: 40px;
+        font-family: "DejaVu Sans";
+}
+QPushButton#Cancel {
+        background: rgb(188, 17, 66);
+        color: black;
+        font-size: 18pt;
+        min-height: 40px;
+        font-family: "DejaVu Sans";
+}
+/*
+        font-family: "DejaVu Sans";
+        font-size: 10px;
+        font-weight: bold;
+*/

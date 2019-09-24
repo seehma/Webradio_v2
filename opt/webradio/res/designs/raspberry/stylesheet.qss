@@ -1,4 +1,4 @@
-/* stylesheet.qss (girly) */
+/* stylesheet.qss (raspberry) */
 QMainWindow {
         /* background-image: url(':/carbon.jpg'); */
         border-image: url(':/carbon.jpg');

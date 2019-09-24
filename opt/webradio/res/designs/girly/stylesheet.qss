@@ -5,6 +5,7 @@ QMainWindow {
         /* background-repeat: repeat-xy; */
         /* background-position: top-left; */
         color: rgb(200, 0, 200);
+        font-family: "DejaVu Sans";
         }
 /* QDialog is used to present shutdown options */
 QDialog {
@@ -242,3 +243,66 @@ QSlider::handle:horizontal:disabled {
         border: 1px solid #aaa;
         border-radius: 4px;
         }
+/* Virtual Keyboard */
+QLineEdit#SearchText {
+        background: rgb(240, 240, 240);
+        color: black;
+        border-style: solid;
+        border-color: rgb(188, 17, 66);
+        border-width: 1px;
+        font-family: "DejaVu Sans";
+}
+KeyButton {
+        background: rgba(128,128,128,50%);
+        color: black;
+        font-size: 20pt;
+        min-height: 40px;
+        font-family: "DejaVu Sans";
+}
+KeyButton:pressed {
+        background: black;
+        color: rgba(128,128,128,50%);
+        font-size: 20pt;
+        min-height: 40px;
+        font-family: "DejaVu Sans";
+}
+QPushButton#Ok {
+        background: rgb(117, 169, 40);
+        color: black;
+        font-size: 18pt;
+        min-height: 40px;
+        font-family: "DejaVu Sans";
+}
+QPushButton#Space {
+        background: rgba(128,128,128,50%);
+        color: black;
+        font-size: 18pt;
+        min-height: 40px;
+        font-family: "DejaVu Sans";
+}
+QPushButton#Back {
+        background: rgba(128,128,128,50%);
+        color: black;
+        font-size: 18pt;
+        min-height: 40px;
+        font-family: "DejaVu Sans";
+}
+QPushButton#Shift {
+        background: rgba(128,128,128,50%);
+        color: black;
+        font-size: 18pt;
+        min-height: 40px;
+        font-family: "DejaVu Sans";
+}
+QPushButton#Cancel {
+        background: rgb(188, 17, 66);
+        color: black;
+        font-size: 18pt;
+        min-height: 40px;
+        font-family: "DejaVu Sans";
+}
+/*
+        font-family: "DejaVu Sans";
+        font-size: 10px;
+        font-weight: bold;
+*/

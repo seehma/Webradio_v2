@@ -9,7 +9,7 @@ from PyQt4.QtGui import QGridLayout, QHBoxLayout, QLineEdit, QPushButton, QSizeP
 from PyQt4.QtCore import QSize, SIGNAL, QString, Qt, QTimer
 
 font = QFont()          #font for LineEdit ...
-font.setPointSize(20)
+font.setPointSize(24)
 
 class InputState:
     LOWER = 0
@@ -29,20 +29,19 @@ class KeyButton(QPushButton):
         super(KeyButton, self).__init__()
 
         self._key = key
-        #self._activeSize = QSize(50,50)
+        self._activeSize = QSize(50,50)
         self.connect(self, SIGNAL("clicked()"), self.emitKey)
         self.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
         self.setFocusPolicy(Qt.NoFocus)
-#        self.setMinimumHeight(buttonMinSize) 
+        self.setMinimumHeight(40)
 #        self.setMinimumWeight(buttonMinSize)
 
     def emitKey(self):
         self.emit(SIGNAL("sigKeyButtonClicked"), self._key)
 
     def enterEvent(self, event):
-        #self.setFixedSize(self._activeSize)
-        #QTimer.singleShot(500, lambda : self.setFixedSize(self.sizeHint()))
-        pass
+        self.setFixedSize(self._activeSize)                 #this is the optical feedback when a touchscreen is in use
+        QTimer.singleShot(500, lambda : self.setFixedSize(self.sizeHint()))
 
     def leaveEvent(self, event):
         self.setFixedSize(self.sizeHint())
@@ -139,8 +138,8 @@ class VirtualKeyboard(QWidget):
                 self.keysLayout.addWidget(self.getButtonByKey(key), self.keyListByLines.index(line), line.index(key))
                 self.getButtonByKey(key).setText(key)
                 self.connect(self.getButtonByKey(key), SIGNAL("sigKeyButtonClicked"), self.addInputByKey)
-                #self.keysLayout.setColumnMinimumWidth(keyIndex, 50)
-            #self.keysLayout.setRowMinimumHeight(lineIndex, 50)
+                self.keysLayout.setColumnMinimumWidth(keyIndex, 50)  # needed space for optical feedback
+            self.keysLayout.setRowMinimumHeight(lineIndex, 50)
 
         self.connect(self.stateButton, SIGNAL("clicked()"), self.switchState)
         self.connect(self.backButton, SIGNAL("clicked()"), self.backspace)

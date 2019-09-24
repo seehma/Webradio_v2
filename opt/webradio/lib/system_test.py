@@ -41,7 +41,7 @@ def test_onlineServices():
             service_radiode = False
 
         try:                                                                    # check internet-connection
-            urllib2.urlopen(LASTFM, timeout=1)
+            urllib2.urlopen(LASTFM, timeout=3)  #seems like this server is sometimes slow.
             service_lastfm = True
         except urllib2.URLError, e:                                                # if there is an error
             logger.error("Last FM can not be reached: {}".format(e))
