@@ -47,7 +47,7 @@ class KeyButton(QPushButton):
         self.setFixedSize(self.sizeHint())
 
     def sizeHint(self):
-        return QSize(40, 40)
+        return QSize(40, 50)   #dont know why this has to be 50? Otherwise the buttons are shrinking after leaveEvent
 
 class SpaceKeyButton(QPushButton):
 
@@ -77,23 +77,23 @@ class VirtualKeyboard(QWidget):
         self.keysLayout.setObjectName("keysLayout")
         self.buttonLayout = QHBoxLayout()
         self.dictOfButtons = {}
-#        self.setStyleSheet("QWidget {"
-#                           "background-color: rgb(118, 118, 118);"
-#                           "color: rgb(240, 240, 240);"
-#                           "}"
-#                           ""
-#                           "QLabel{"
-#                           "color: rgb(240, 240, 240);"
-#                           "}"
-#                           "QPushButton{"
-#                           "background-color: rgb(42, 42, 42);"
-#                           "color: rgb(255, 255, 255);"
-#                           "border-style: solid;"
-#                           "border-color: black;"
-#                           "border-width: 5px;"
-#                           "border-radius: 10px;"
-#                           "font: 63 20pt 'Ubuntu';"
-#                           "}")
+        self.setStyleSheet("QWidget {"
+                           "background-color: rgb(118, 118, 118);"
+                           "color: rgb(240, 240, 240);"
+                           "}"
+                           ""
+                           "QLabel{"
+                           "color: rgb(240, 240, 240);"
+                           "}"
+                           "QPushButton{"
+                           "background-color: rgb(42, 42, 42);"
+                           "color: rgb(255, 255, 255);"
+                           "border-style: solid;"
+                           "border-color: black;"
+                           "border-width: 5px;"
+                           "border-radius: 10px;"
+                           "font: 63 20pt 'Ubuntu';"
+                           "}")
         self.keyListByLines = [
                     ['1','2','3','4','5','6','7','8','9','0',u'ß','?'],    # comment this line if you dont want numbers
                     ['q', 'w', 'e', 'r', 't', 'z', 'u', 'i', 'o', 'p', u'ü','+'],
