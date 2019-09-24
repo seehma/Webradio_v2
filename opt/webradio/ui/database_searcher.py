@@ -14,7 +14,7 @@ import commands
 import logging
 from httplib2 import ServerNotFoundError
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("webradio")
 
 from lib.googleapiclient.discovery import build
 import pprint

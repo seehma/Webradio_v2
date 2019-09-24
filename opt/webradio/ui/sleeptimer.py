@@ -10,6 +10,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 try:
     from lib import global_vars
 except ImportError, e:
