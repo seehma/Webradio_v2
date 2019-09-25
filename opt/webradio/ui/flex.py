@@ -125,7 +125,7 @@ class Ui_MainWindow(object):
         self.lbl_Fav.setSizePolicy(sizePolicy)
         self.lbl_Fav.setMinimumSize(QtCore.QSize(51, 51))
         self.lbl_Fav.setMaximumSize(QtCore.QSize(51, 51))
-        self.lbl_Fav.setScaledContents(True)
+        #self.lbl_Fav.setScaledContents(True)   #scaledContents would prevent "KeepAspectRatio"
         self.lbl_Fav.setObjectName(_fromUtf8("lbl_Fav"))
         self.horizontalLayout_8.addWidget(self.frame)
         self.verticalLayout_3 = QtGui.QVBoxLayout()
