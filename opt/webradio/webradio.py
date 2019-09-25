@@ -1161,7 +1161,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         :return: emit Signal "sig_favorites_changed" (which will trigger the storage as dict and as m3u file)
         """
         if _bool:
-            self.lbl_Fav.setPixmap(QPixmap(":/fav.png"))
+            self.lbl_Fav.setPixmap(QPixmap(":/fav.png").scaled(self.lbl_Fav.width(),
+                                                    self.lbl_Fav.height(),
+                                                    Qt.KeepAspectRatio, Qt.SmoothTransformation))
             app.processEvents()
         elif _bool is None:
             if self.myCurrentStation != None:
@@ -1169,17 +1171,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     logger.info("Remove {0} from Favorites".format(self.myCurrentStation.name.encode("utf-8")))
                     self.myCurrentStation.unsetFavorite()
                     self.favorites.pop(self.myCurrentStation.id)
-                    self.lbl_Fav.setPixmap(QPixmap(":/fav_empty.png"))
+                    self.lbl_Fav.setPixmap(QPixmap(":/fav_empty.png").scaled(self.lbl_Fav.width(),
+                                                    self.lbl_Fav.height(),
+                                                    Qt.KeepAspectRatio, Qt.SmoothTransformation))
                     app.processEvents()
                 else:
                     logger.info("Add {0} to favorites".format(self.myCurrentStation.name.encode("utf-8")))
                     self.myCurrentStation.setAsFavorite()
                     self.favorites.update({self.myCurrentStation.id: self.myCurrentStation})
-                    self.lbl_Fav.setPixmap(QPixmap(":/fav.png"))
+                    self.lbl_Fav.setPixmap(QPixmap(":/fav.png").scaled(self.lbl_Fav.width(),
+                                                    self.lbl_Fav.height(),
+                                                    Qt.KeepAspectRatio, Qt.SmoothTransformation))
                     app.processEvents()
                 self.emit(SIGNAL("sig_favorites_changed"))
         else:
-            self.lbl_Fav.setPixmap(QPixmap(":/fav_empty.png"))
+            self.lbl_Fav.setPixmap(QPixmap(":/fav_empty.png").scaled(self.lbl_Fav.width(),
+                                                    self.lbl_Fav.height(),
+                                                    Qt.KeepAspectRatio, Qt.SmoothTransformation))
             app.processEvents()
 
     def checkInternet(self):
@@ -1447,9 +1455,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.widget_Mute.show_unmute()
             if self.myCurrentStation is not None:
                 if self.myCurrentStation.id in self.favorites.keys():
-                    self.lbl_Fav.setPixmap(QPixmap(":/fav.png"))
+                    self.lbl_Fav.setPixmap(QPixmap(":/fav.png").scaled(self.lbl_Fav.width(),
+                                                    self.lbl_Fav.height(),
+                                                    Qt.KeepAspectRatio, Qt.SmoothTransformation))
                 else:
-                    self.lbl_Fav.setPixmap(QPixmap(":/fav_empty.png"))
+                    self.lbl_Fav.setPixmap(QPixmap(":/fav_empty.png").scaled(self.lbl_Fav.width(),
+                                                    self.lbl_Fav.height(),
+                                                    Qt.KeepAspectRatio, Qt.SmoothTransformation))
             self.splash = AnimatedSplashScreen(self, ":/loading.gif")   # re-define Splashscreen Animation
 
             #if everything was OK, update Value in current conf accordingly.
