@@ -4,8 +4,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from PyQt4.QtGui import QGridLayout, QHBoxLayout, QLineEdit, QPushButton, QSizePolicy, QVBoxLayout, QWidget, QFont, \
-    QSpacerItem
+from PyQt4.QtGui import QGridLayout, QHBoxLayout, QLineEdit, QPushButton, QSizePolicy, QVBoxLayout, QWidget, QFont
 from PyQt4.QtCore import QSize, SIGNAL, QString, Qt, QTimer
 
 font = QFont()          #font for LineEdit ...
@@ -31,23 +30,26 @@ class KeyButton(QPushButton):
         self._key = key
         self._activeSize = QSize(50,50)
         self.connect(self, SIGNAL("clicked()"), self.emitKey)
-        self.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
         self.setFocusPolicy(Qt.NoFocus)
         self.setMinimumHeight(40)
-#        self.setMinimumWeight(buttonMinSize)
+        self.resetSize()
 
     def emitKey(self):
         self.emit(SIGNAL("sigKeyButtonClicked"), self._key)
 
     def enterEvent(self, event):
         self.setFixedSize(self._activeSize)                 #this is the optical feedback when a touchscreen is in use
-        QTimer.singleShot(500, lambda : self.setFixedSize(self.sizeHint()))
+        QTimer.singleShot(500, lambda : self.resetSize())
 
     def leaveEvent(self, event):
-        self.setFixedSize(self.sizeHint())
+        self.resetSize()
 
-    def sizeHint(self):
-        return QSize(40, 50)   #dont know why this has to be 50? Otherwise the buttons are shrinking after leaveEvent
+    def resetSize(self):
+        self.setMaximumWidth(1024)
+        self.setMinimumWidth(0)
+        self.setMaximumHeight(1024)
+        self.setMinimumHeight(40)
+
 
 class SpaceKeyButton(QPushButton):
 
