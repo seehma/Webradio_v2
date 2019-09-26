@@ -21,6 +21,7 @@ import re
 import csv
 import copy
 import pwd
+import json
 from mpd import ProtocolError  #do we need this import? See line 3954
 
 from PyQt4.QtCore import QString, QSize, Qt, SIGNAL, QSettings, QTime, QTimer, QDir, pyqtSlot, QObject, QEvent, \
@@ -102,7 +103,7 @@ def read_conf(filepath, extention=".ini"):
         logger.error("Could not read configuration file {}: {}".format(filepath, e))
         raise IOError
 
-def setupLogger(console=True, File=False, Variable=False, Filebackupcount=0):
+def setupLogger(console=True, File=False, Variable=False):
     '''
     Setup a logger for the application
     :return: Nothing
@@ -111,10 +112,31 @@ def setupLogger(console=True, File=False, Variable=False, Filebackupcount=0):
     LOGCONFIG=os.path.join(cwd, LOGCONFIG)  # with abspath you always have to be in the directory in question...
     try:
         logging.warning("Configure logging subsystem with config file {} ...".format(LOGCONFIG))
-        logging.LOG_FILENAME= LOG_FILENAME   # this variable is used in the logging.conf - File, defining the log-target
-        logging.config.fileConfig(LOGCONFIG)
-        logging.warning("Configured logging subsystem with config file {} .".format(LOGCONFIG))
-
+        #logging.LOG_FILENAME= LOG_FILENAME   # this variable is used in the logging.conf - File, defining the log-target
+        #logging.config.fileConfig(LOGCONFIG)  # logging.config.fileConfig api is not as capable as dictConfig
+        #(see https://docs.python.org/2/library/logging.config.html)
+        #so we parse a json, then use it for configuration
+        with open(LOGCONFIG, 'rt') as f:
+            c = json.load(f)
+    except Exception, e:
+        logger.error("Could not load logging configuration {}: {}".format(LOGCONFIG, e))
+        raise e
+    try: #to reach nested dict, but expect KeyError (user did not define to use a file-handler
+        filename = c['handlers']['file']['filename']
+    except KeyError:
+        #print it to the command line, because no logger is created till now.
+        print("No Log-File will be generated, because no handler including filename is defined!")
+    else: #if a filehandler is used, check the content
+        if len(filename) == 0:   #if no filename is defined (field empty) we will take the user-directory
+            c['handlers']['file']['filename'] = LOG_FILENAME
+        else:
+            #if there is a user-defined path, check if filepath already exists (log-file as itself is not necessary
+            #this would be created if not already existing)
+            if not os.path.exists(os.path.dirname(filename)):
+                #the filepath (independent of the log-file itself) does not exist.  >  Stop here!
+                raise IOError, "Filepath for logfile '{}' does not exist! Please check {}".format(filename, LOGCONFIG)
+    try:
+        logging.config.dictConfig(c)
         logging.info("root handlers: {}".format(logging.getLogger().handlers))
     except Exception, e:
         logger.error("Could not read logging configuration {}: {}".format(LOGCONFIG, e))
@@ -159,7 +181,7 @@ logging.basicConfig(level=logging.INFO)
 global logger
 logger = logging.getLogger("webradio")   # __name__ == "__main__", need to define a unique name
 LOG_FILENAME = os.path.join(user_dir, "webradio.log")   #need to know the log-filename for changing the file-permission
-
+setupLogger(console=True, File=True, Variable=False)
 sys.excepthook = excepthook
 
 for path in [user_dir, LogoFolder, AlbumArtFolder]:
@@ -182,7 +204,6 @@ for path in [user_dir, LogoFolder, AlbumArtFolder]:
 
 if not os.path.exists(PathFavoritesPlaylist):
     open(PathFavoritesPlaylist, 'a').close()
-setupLogger(console=True, File=True, Filebackupcount=1, Variable=False)
 
 if args.disable_gpio:
     GPIO_active = False
@@ -3620,7 +3641,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         QCloseEvent.accept()
 
         # finalize logs and change permission if necessary
-        logger.handlers[0].close()
+        #logger.handlers[0].close()   #no need to close file-handler anymore?
         if isRunningWithSudo():
             orig_user = signedInUserName()
             user = pwd.getpwnam(orig_user)
