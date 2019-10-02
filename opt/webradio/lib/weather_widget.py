@@ -67,10 +67,14 @@ class weather_widget(QWidget, ui):
             #print("Update Weather data because of None")
             #self.emit(SIGNAL("start_loading"))
             if self.__service_available():
-                self.weatherdata = weather.get_weather_from_weather_com(self.LOCATION_ID)
-                #self.emit(SIGNAL("stop_loading"))
-                self.lastUpdate = [QTime.hour(QTime.currentTime()), QTime.minute(QTime.currentTime())]
-                return True, True
+                try:
+                    self.weatherdata = weather.get_weather_from_weather_com(self.LOCATION_ID)
+                    #self.emit(SIGNAL("stop_loading"))
+                    self.lastUpdate = [QTime.hour(QTime.currentTime()), QTime.minute(QTime.currentTime())]
+                    return True, True
+                except:   # it can still go something wrong with the API of weather.com ... if so, I have to avoid a crash
+                    self.lastUpdate = None
+                    return False, True
             else:
                 self.lastUpdate = None
                 return False, True
@@ -79,10 +83,14 @@ class weather_widget(QWidget, ui):
             #print("Update Weather data because of long periode without update")
             self.emit(SIGNAL("start_loading"))
             if self.__service_available():
-                self.weatherdata = weather.get_weather_from_weather_com(self.LOCATION_ID)
-                self.emit(SIGNAL("stop_loading"))
-                self.lastUpdate = [QTime.hour(QTime.currentTime()), QTime.minute(QTime.currentTime())]
-                return True, True
+                try:
+                    self.weatherdata = weather.get_weather_from_weather_com(self.LOCATION_ID)
+                    self.emit(SIGNAL("stop_loading"))
+                    self.lastUpdate = [QTime.hour(QTime.currentTime()), QTime.minute(QTime.currentTime())]
+                    return True, True
+                except:   # it can still go something wrong with the API of weather.com ... if so, I have to avoid a crash
+                    self.lastUpdate = None
+                    return False, True
             else:
                 self.lastUpdate = None
                 return False, True

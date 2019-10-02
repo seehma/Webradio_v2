@@ -171,7 +171,10 @@ class Screensaver_Overlay(QWidget):
         location_ID = global_vars.configuration.get("GENERAL").get("weather_locationid")
         if location_ID is None:
             return   #return if no location ID can be loaded...
-        temp_condition = weather.get_weather_from_weather_com(location_ID)
+        try:
+            temp_condition = weather.get_weather_from_weather_com(location_ID)
+        except: # this is dangerous, because the weather API is sametimes a little bit instable
+            return
         self.lbl_weather_icon.setPicturePath(os.path.join(self.cwd, "res/weather/icon",
                                                           temp_condition['current_conditions']['icon'], "static"))
 
