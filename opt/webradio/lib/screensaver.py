@@ -169,16 +169,20 @@ class Screensaver_Overlay(QWidget):
         Updates the weather-icon and the temperature
         '''
         location_ID = global_vars.configuration.get("GENERAL").get("weather_locationid")
-        if location_ID is None:
-            return   #return if no location ID can be loaded...
         try:
+            if location_ID is None:
+                raise ValueError("Weather location not set.")  #return if no location ID can be loaded...
             temp_condition = weather.get_weather_from_weather_com(location_ID)
-        except: # this is dangerous, because the weather API is sametimes a little bit instable
-            return
-        self.lbl_weather_icon.setPicturePath(os.path.join(self.cwd, "res/weather/icon",
+            self.lbl_weather_icon.setPicturePath(os.path.join(self.cwd, "res/weather/icon",
                                                           temp_condition['current_conditions']['icon'], "static"))
 
-        self.lbl_temperature.setText(temp_condition['current_conditions']['temperature']+QString.fromUtf8("°C"))
+            self.lbl_temperature.setText(temp_condition['current_conditions']['temperature']+QString.fromUtf8("°C"))
+            self.lbl_weather_icon.setVisible(True)
+            self.lbl_temperature.setVisible(True)
+        except Exception as e: # this is dangerous, because the weather API is sametimes a little bit instable
+            logger.exception("Could not get weather for location %s", location_ID)
+            self.lbl_weather_icon.setVisible(False)
+            self.lbl_temperature.setVisible(False)
 
 
 
