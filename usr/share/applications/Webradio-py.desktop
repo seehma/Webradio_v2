@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Categories=Audio
+Categories=AudioVideo;Audio;Player;
 Name=Webradio-py
 Icon=/usr/share/icons/hicolor/scalable/apps/webradio_logo.png
 Terminal=false
