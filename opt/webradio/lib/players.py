@@ -82,7 +82,7 @@ class MPC_Player(object):
             logger.info("Deleting old Playlist {0}".format(name))
             self.client.rm(name)
         except Exception, e:
-            logger.warning("Could not delete old Playlist {0}: {}".format(name, e))
+            logger.warning("Could not delete old Playlist {}: {}".format(name, e))
             pass
         try:
             self.client.save(name)
