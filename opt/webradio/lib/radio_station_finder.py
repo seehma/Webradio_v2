@@ -200,7 +200,7 @@ class RadioDeApi():
             try:
                 response = urlopen(req).read()
             except Exception, e:
-                logger.error("Could not open URL {}: {}".format(req, e))
+                #logger.error("Could not open URL {}: {}".format(req, e))  #this causes unicode porblems!
                 response = {}
 
             if response != {}:

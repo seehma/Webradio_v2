@@ -45,9 +45,9 @@ class KeyButton(QPushButton):
         self.resetSize()
 
     def resetSize(self):
-        self.setMaximumWidth(1024)
-        self.setMinimumWidth(0)
-        self.setMaximumHeight(1024)
+        self.setMaximumWidth(40)
+        self.setMinimumWidth(40)
+        self.setMaximumHeight(40)
         self.setMinimumHeight(40)
 
 

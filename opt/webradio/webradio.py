@@ -3229,7 +3229,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.emit(SIGNAL("stop_loading"))
             app.processEvents()
 
-            if station is not False:                                          # if station-info was loaded sucessfully
+            if station is not False and station is not None:                  # if station-info was loaded sucessfully
                 logger.info("Station detected, now constructing RadioStation Objekt")
                 #print("Download sucessful, generating RadioStation-Object")
                 #print(station)
