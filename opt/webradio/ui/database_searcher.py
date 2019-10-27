@@ -267,7 +267,7 @@ class Track(object):
             #print ret
             if ret.startswith("http"):   #only if a link was returned
                 try:
-                    expiration = re.search("(?P<exp>&expire=[^\D]+)", ret).group("exp").split("=")[1]
+                    expiration = re.search("(?P<exp>expire=[^\D]+)", ret).group("exp").split("=")[1]
                     self.expiration = datetime.datetime.fromtimestamp(int(expiration))   # a link expires in about 6 hours !!
                 except Exception, e:
                     logger.error("Could not extract expiration-Time from : {}: {}".format(ret, e))
