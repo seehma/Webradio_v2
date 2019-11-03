@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="it_IT">
+<TS version="2.0" language="it_IT">
 <context>
     <name>Form</name>
     <message>
@@ -414,7 +414,7 @@
     <message>
         <location filename="../webradio.py" line="1069"/>
         <source>Clock: %1</source>
-        <translation type="unfinished">Orologio:% 1</translation>
+        <translation type="unfinished">Ora: %1</translation>
     </message>
     <message>
         <location filename="../webradio.py" line="1241"/>
