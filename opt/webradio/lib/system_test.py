@@ -3,8 +3,12 @@
 
 import urllib2
 import logging
-import os
+import os, ssl
 from distutils import spawn
+
+if (not os.environ.get('PYTHONHTTPSVERIFY', '') and getattr(ssl, '_create_unverified_context', None)):
+    # dont need to verify ssl cert. just takes time...
+    ssl._create_default_https_context = ssl._create_unverified_context
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +50,10 @@ def test_onlineServices():
         except urllib2.URLError, e:                                                # if there is an error
             logger.error("Last FM can not be reached: {}".format(e))
             service_lastfm = False
+        except ssl.SSLError, e:
+            # sometimes Last FM is terrible slow with SSL... ignore this (otherwise thie would prevent startup!)
+            logger.warning('Ignore SSL Error during system-check')
+            service_lastfm = True
 
         try:                                                                    # check internet-connection
             urllib2.urlopen(WEATHERCOM, timeout=1)
