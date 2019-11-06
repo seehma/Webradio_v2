@@ -30,7 +30,7 @@ def test_onlineServices():
               "weathercom": False}
 
     try:                                                                    # check internet-connection
-        urllib2.urlopen(INTERNET, timeout=1)
+        urllib2.urlopen(INTERNET, timeout=3)
         service_internet = True
     except urllib2.URLError, e:                                                # if there is an error
         logger.error("Could not connect to {}: {}".format(INTERNET, e))
@@ -38,7 +38,7 @@ def test_onlineServices():
 
     if service_internet:
         try:                                                                    # check internet-connection
-            urllib2.urlopen(RADIODE, timeout=1)
+            urllib2.urlopen(RADIODE, timeout=3)
             service_radiode = True
         except urllib2.URLError, e:                                                # if there is an error
             logger.error("Radio.de can not be reached: {}".format(e))
@@ -56,7 +56,7 @@ def test_onlineServices():
             service_lastfm = True
 
         try:                                                                    # check internet-connection
-            urllib2.urlopen(WEATHERCOM, timeout=1)
+            urllib2.urlopen(WEATHERCOM, timeout=3)
             service_weathercom = True
         except urllib2.URLError, e:                                                # if there is an error
             logger.error("Weather.com can not be reached: {}".format(e))
