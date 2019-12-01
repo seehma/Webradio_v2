@@ -7,4 +7,5 @@ TRANSLATIONS = local_de.ts \
                local_by.ts \
                local_ru.ts \
                local_nl.ts \
-               local_it.ts
+               local_it.ts \
+               local_ro.ts
