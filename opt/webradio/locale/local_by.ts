@@ -362,7 +362,7 @@
     </message>
     <message>
         <location filename="../webradio.py" line="1069"/>
-        <source>Clock: %1</source>
+        <source>%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

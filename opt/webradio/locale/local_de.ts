@@ -250,8 +250,8 @@
     </message>
     <message>
         <location filename="../webradio.py" line="1069"/>
-        <source>Clock: %1</source>
-        <translation>%1 Uhr</translation>
+        <source>%1</source>
+        <translation>%1</translation>
     </message>
     <message>
         <location filename="../webradio.py" line="1316"/>

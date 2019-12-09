@@ -3,7 +3,7 @@
 
 import urllib2
 import logging
-import os, ssl
+import os, ssl, socket
 from distutils import spawn
 
 if (not os.environ.get('PYTHONHTTPSVERIFY', '') and getattr(ssl, '_create_unverified_context', None)):
@@ -53,6 +53,9 @@ def test_onlineServices():
         except ssl.SSLError, e:
             # sometimes Last FM is terrible slow with SSL... ignore this (otherwise thie would prevent startup!)
             logger.warning('Ignore SSL Error during system-check')
+            service_lastfm = True
+        except socket.timeout as e:
+            logger.warning('Ignore socket timeout')
             service_lastfm = True
 
         try:                                                                    # check internet-connection

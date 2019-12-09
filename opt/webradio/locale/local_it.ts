@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.0" language="it_IT">
+<!DOCTYPE TS><TS version="2.0" language="it_IT" sourcelanguage="">
 <context>
     <name>Form</name>
     <message>
@@ -20,12 +19,12 @@
     </message>
     <message>
         <location filename="../ui/ui_raw/weather_widget_flex_scaling.ui" line="179"/>
-        <source>°C , feels like</source>
+        <source>&#xc2;&#xb0;C , feels like</source>
         <translation type="unfinished">°C, si sente come</translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/weather_widget_flex_scaling.ui" line="1644"/>
-        <source>°C </source>
+        <source>&#xc2;&#xb0;C </source>
         <translation type="unfinished">°C</translation>
     </message>
     <message>
@@ -363,7 +362,7 @@
     </message>
     <message>
         <location filename="../ui/ui_raw/flexi3.ui" line="2160"/>
-        <source>Zurück</source>
+        <source>Zur&#xc3;&#xbc;ck</source>
         <translation type="unfinished">Indietro</translation>
     </message>
     <message>
@@ -413,8 +412,8 @@
     </message>
     <message>
         <location filename="../webradio.py" line="1069"/>
-        <source>Clock: %1</source>
-        <translation type="unfinished">Ora: %1</translation>
+        <source>%1</source>
+        <translation type="unfinished">%1</translation>
     </message>
     <message>
         <location filename="../webradio.py" line="1241"/>

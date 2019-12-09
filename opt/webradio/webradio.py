@@ -1064,7 +1064,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         while True:
             thetime = QTime.currentTime()
             text = thetime.toString('hh:mm')
-            completetext = (self.tr("Clock: %1").arg(text))
+            completetext = (self.tr("%1").arg(text))
             self.lbl_Uhr.setText(completetext)
             time.sleep(10)
 
@@ -3836,6 +3836,7 @@ class Playlisteditor(object):
         self.view.setSelectionMode(QAbstractItemView.SingleSelection)
         #self.service = MPC_Player()
         self._workerList = []
+        self.__workerList_ids = []
         self.playlist = []
         self.load_yt_translations()   # creates a self.youtubeTranslate dictionary
 
@@ -3858,7 +3859,8 @@ class Playlisteditor(object):
             status = None
             songID = None
 
-        self.__populate(status, songID)
+        #self.__populate(status, songID)
+        QTimer.singleShot(10, lambda: self.__populate(status, songID))
 
     def __populate(self, status=None, songID=None):
         selection_to_restore = self.view.selectedIndexes()[0].row() if len(self.view.selectedIndexes()) > 0 else None
@@ -3885,7 +3887,7 @@ class Playlisteditor(object):
                     logger.warn("Could not get title for entry {}: {}".format(entry, e))
                     key="file"
             
-            if key != "title":
+            if key != "title":  #key is "file"
                 if entry[key].startswith("http"):    #if a youtubelink or another link is in the entry
                     #print("Populate with", self.youtubeTranslate.get(entry[key]))
                     obj = self.youtubeTranslate.get(entry[key])  # try to find the url in the youtube-translation
@@ -3893,15 +3895,19 @@ class Playlisteditor(object):
 
                     if obj is not None:     #if found
                         #print entry[key]
-                        #print entry["id"]
+                        #print("ID", entry["id"])
+                        #print("Current Wordlist", self.__workerList_ids)
+                        #print("current id {0} is in list: {1}".format(entry["id"], (entry["id"] not in self.__workerList_ids)))
                         #print entry["pos"]
                         #print obj.streamLink
                         #print obj.isExpired()
                         #print obj.title
                         #if obj.streamLink != entry[key]:
-                        if obj.isExpired() or obj.streamLink != entry[key]:   # isExpired is a fast function...
+                        #if obj.isExpired() or obj.streamLink != entry[key]:   # isExpired is a fast function...
+                        if obj.isExpired() and entry["id"] not in self.__workerList_ids:   # isExpired is a fast function...
                             #print("Streamlink is expired!", entry["id"], entry["pos"])
                             #self.replace_yt_link_in_playlist(entry["id"], entry["pos"], obj.streamLink, copy.deepcopy(obj))
+                            self.__workerList_ids.append(entry["id"])  # jede ID wird nur einmal aufgenommen!
                             thread = WorkerThread(self.replace_yt_link_in_playlist, entry["id"],
                                                   entry["pos"], copy.deepcopy(obj))
                             thread.start()
@@ -3924,13 +3930,15 @@ class Playlisteditor(object):
             self.view.addItem(item)
         if selection_to_restore is not None:
             self.view.setCurrentRow(selection_to_restore)
+        if len(self.__workerList_ids) > 0:
+            # wait for worker-threads to be finished...
+            for threads in self._workerList:
+                while not threads.isFinished():
+                    #print("Working...")
+                    app.processEvents()
+            else:
+                self.__workerList_ids=[]
 
-        # wait for worker-threads to be finished...
-        for threads in self._workerList:
-            while not threads.isFinished():
-                app.processEvents()
-
-        self._workerList = []  #empty the workerlist.
 
         #self.checkTranslationsForObsolet()    # check youtube translation for obsolet entries
 
@@ -3996,7 +4004,8 @@ class Playlisteditor(object):
 
     def replace_yt_link_in_playlist(self, song_id, song_pos, obj_copy):
         new_url = obj_copy.streamLink  # this is a long runnig process.
-        self.service.replaceIDwith(song_id, song_pos, new_url)
+        new_id = self.service.replaceIDwith(song_id, song_pos, new_url)
+        self.__workerList_ids.append(new_id)
         self.youtubeTranslate.update({obj_copy.streamLink: obj_copy})
 
     def tellMeWhatsPlaying(self):
@@ -4297,6 +4306,7 @@ if __name__ == "__main__":
 
     ####################################Start GUI #########################################
     app = QApplication(sys.argv)
+    app.setWindowIcon(QIcon(QPixmap(":/albumart_fallback.png")))
     app.setOverrideCursor(QCursor(Qt.BlankCursor))     # new - testing
     language = unicode(QLocale.system().name())
     qtTranslator = QTranslator()

@@ -412,8 +412,8 @@
     </message>
     <message>
         <location filename="../webradio.py" line="1069"/>
-        <source>Clock: %1</source>
-        <translation type="unfinished">Klok: %1</translation>
+        <source>%1</source>
+        <translation type="unfinished">%1</translation>
     </message>
     <message>
         <location filename="../webradio.py" line="1241"/>

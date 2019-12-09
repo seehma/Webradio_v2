@@ -511,7 +511,7 @@ If you want to support the project and help developing than visit the project-si
     </message>
     <message>
         <location filename="../webradio.py" line="1069"/>
-        <source>Clock: %1</source>
+        <source>%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
