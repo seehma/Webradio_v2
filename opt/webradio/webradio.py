@@ -3735,6 +3735,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def add_selection_to_playlist_from_search(self, pathes):
         #print("TYPE:", type(pathes[0])) # str
         #print("PATH", pathes[0])
+        temp_workerlist = []
+
+        def __load_streamLink(TRACK):
+            url = TRACK.streamLink  # it is a Track-object!
+            if url == "":
+                return False
+            if self.player.addid(url):
+                self.playlisteditor.setTranslation(url, TRACK)
+            else:
+                logger.warning("Failed to add {0}".format(TRACK.dedode("utf-8")))
         if len(pathes) == 0:
             return False
         if isinstance(pathes[0], Track):  # first entry is a Track object from youtube
@@ -3750,17 +3760,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if len(pathes) > 1:
             for pathesToAdd in pathes[1:]:
                 if isinstance(pathesToAdd, Track):
-                    url = pathesToAdd.streamLink  # it is a Track-object!
-                    if url == "":
-                        continue  #override links which are empty because anything went wrong
-                    if self.player.addid(url):
-                        self.playlisteditor.setTranslation(url, pathesToAdd)
-                    else:
-                        logger.warning("Failed to add {0}".format(pathesToAdd.dedode("utf-8")))
+                    thread = WorkerThread(__load_streamLink, pathesToAdd)  # it is a Track-object!
+                    thread.setObjectName("replace_yt_linkThread")
+                    thread.start()
+                    temp_workerlist.append(thread)
                 else:
                     if not self.player.add(os.path.join(MusicFolder, pathesToAdd), MusicFolder):
                         logger.warning("Failed to add {0}".format(pathesToAdd.dedode("utf-8")))
                     #print("file: {0} can not be added".format(pathesToAdd))
+            for threads in temp_workerlist:
+                while not threads.isFinished():
+                    app.processEvents()
 
         return firstIDinPlaylist
 
