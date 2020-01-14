@@ -96,13 +96,13 @@ QTabWidget::pane{
 QTabBar::tab{
         border: 2;
         border-color: black;
-        width:60px;  /* This defines the icon-size in the Tabwidget */
+        width:49px;  /* This defines the icon-size in the Tabwidget */
         }
 QTabBar::tab:selected{
         border: 2;
         border-color: rgba(240, 240, 240, 50%);
         background-color: none;
-        width:60px;  /* This defines the icon-size in the Tabwidget */
+        width:49px;
         }
 QTreeView{
         background: rgb(76, 76, 76);
