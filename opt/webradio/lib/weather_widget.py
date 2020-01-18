@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import pyqapi as weather
+#import pyqapi as weather
+import owm_crawler as weather
 from PyQt4.QtCore import QTime, QTimer, SIGNAL
 from PyQt4.QtGui import QWidget, QApplication
 import urllib2
@@ -38,7 +39,7 @@ class weather_widget(QWidget, ui):
         #                       "}")
         self.lastUpdate = None
         #print("Received: ", cwd)
-        self.LOCATION_ID = "GMXX0007"   # Berlin is default
+        self.LOCATION_ID = "2950159"   # Berlin is default
         self.LOCATION_NAME = "Berlin"
         self.load_LOCATIO_ID_from_global_vars() # read location ID from Settings if not None.. otherwise do nothing
 
@@ -48,16 +49,13 @@ class weather_widget(QWidget, ui):
 
     def __service_available(self):
         #print("Check if service is available")
-        try:                                                             # check internet-connection (call Google.com)
-            #urllib2.urlopen('http://www.weather.com/', timeout=1)       #UPDATE 12.07.2017, Handling Cookies
-            #urllib2.build_opener(urllib2.HTTPCookieProcessor).open('https://www.weather.com/', timeout=1) # UPDATE 28.05.2019 403 FORBIDDEN
-            opener = urllib2.build_opener(urllib2.HTTPCookieProcessor)       # UPDATE 28.05.2019 403 FORBIDDEN
-            opener.addheaders = [('User-Agent', 'Mozilla/5.0')]              # UPDATE 28.05.2019 403 FORBIDDEN
-            opener.open('https://www.weather.com/', timeout=1)               # UPDATE 28.05.2019 403 FORBIDDEN
-            #print("Yes it is...")
+        try:
+            opener = urllib2.build_opener(urllib2.HTTPCookieProcessor)
+            opener.addheaders = [('User-Agent', 'Mozilla/5.0')]
+            opener.open('https://api.openweathermap.org', timeout=1)
             return True
         except urllib2.URLError, e:                                         # if there is an error
-            logger.error("Could not connect to weather.com: {}".format(e))
+            logger.error("Could not connect to openweathermap.org: {}".format(e))
             self.failedConnections += 1
             return False
 
@@ -116,10 +114,10 @@ class weather_widget(QWidget, ui):
             self.lbl_cur_temp_feel.setText(self.weatherdata['current_conditions']['feels_like'])
 
             if QTime.currentTime() < dayend_definition:
-                possible_rain=int(self.weatherdata['forecasts'][0]['day']['chance_precip'])
+                possible_rain=float(self.weatherdata['forecasts'][0]['day']['chance_precip'])
                 self.lbl_cur_rain.setText(str(possible_rain) if possible_rain != 100 else "99")
             else:
-                possible_rain= int(self.weatherdata['forecasts'][0]['night']['chance_precip'])
+                possible_rain= float(self.weatherdata['forecasts'][0]['night']['chance_precip'])
                 self.lbl_cur_rain.setText(str(possible_rain) if possible_rain != 100 else "99")
 
             windspeed = self.weatherdata['current_conditions']['wind']['speed']
@@ -140,10 +138,10 @@ class weather_widget(QWidget, ui):
             self.lbl_night_0_icon.setPicturePath(os.path.join(self.WEATHER_ICONS_FOLDER,
                                                        self.weatherdata['forecasts'][0]['night']['icon'],"static"))
             self.lbl_day_0_temp.setText(self.weatherdata['forecasts'][0]['high'])
-            possible_rain0_day = int(self.weatherdata['forecasts'][0]['day']['chance_precip'])
+            possible_rain0_day = float(self.weatherdata['forecasts'][0]['day']['chance_precip'])
             self.lbl_day_0_rain.setText(str(possible_rain0_day) if possible_rain0_day != 100 else "99")
             self.lbl_night_0_temp.setText(self.weatherdata['forecasts'][0]['low'])
-            possible_rain0_night = int(self.weatherdata['forecasts'][0]['night']['chance_precip'])
+            possible_rain0_night = float(self.weatherdata['forecasts'][0]['night']['chance_precip'])
             self.lbl_night_0_rain.setText(str(possible_rain0_night) if possible_rain0_night != 100 else "99")
             ###############################Day 2 #####################################################################
             self.label_16.setText(self.tr(self.weatherdata['forecasts'][1]['day_of_week']))
@@ -152,10 +150,10 @@ class weather_widget(QWidget, ui):
             self.lbl_night_1_icon.setPicturePath(os.path.join(self.WEATHER_ICONS_FOLDER,
                                                        self.weatherdata['forecasts'][1]['night']['icon'],"static"))
             self.lbl_day_1_temp.setText(self.weatherdata['forecasts'][1]['high'])
-            possible_rain1_day = int(self.weatherdata['forecasts'][1]['day']['chance_precip'])
+            possible_rain1_day = float(self.weatherdata['forecasts'][1]['day']['chance_precip'])
             self.lbl_day_1_rain.setText(str(possible_rain1_day) if possible_rain1_day != 100 else "99")
             self.lbl_night_1_temp.setText(self.weatherdata['forecasts'][1]['low'])
-            possible_rain1_night = int(self.weatherdata['forecasts'][1]['night']['chance_precip'])
+            possible_rain1_night = float(self.weatherdata['forecasts'][1]['night']['chance_precip'])
             self.lbl_night_1_rain.setText(str(possible_rain1_night) if possible_rain1_night != 100 else "99")
             ###############################Day 3 #####################################################################
             self.label_17.setText(self.tr(self.weatherdata['forecasts'][2]['day_of_week']))
@@ -164,10 +162,10 @@ class weather_widget(QWidget, ui):
             self.lbl_night_2_icon.setPicturePath(os.path.join(self.WEATHER_ICONS_FOLDER,
                                                        self.weatherdata['forecasts'][2]['night']['icon'],"static"))
             self.lbl_day_2_temp.setText(self.weatherdata['forecasts'][2]['high'])
-            possible_rain2_day = int(self.weatherdata['forecasts'][2]['day']['chance_precip'])
+            possible_rain2_day = float(self.weatherdata['forecasts'][2]['day']['chance_precip'])
             self.lbl_day_2_rain.setText(str(possible_rain2_day) if possible_rain2_day != 100 else "99")
             self.lbl_night_2_temp.setText(self.weatherdata['forecasts'][2]['low'])
-            possible_rain2_night = int(self.weatherdata['forecasts'][2]['night']['chance_precip'])
+            possible_rain2_night = float(self.weatherdata['forecasts'][2]['night']['chance_precip'])
             self.lbl_night_2_rain.setText(str(possible_rain2_night) if possible_rain2_night != 100 else "99")
 
             #print("End Polulating", QTime.currentTime())

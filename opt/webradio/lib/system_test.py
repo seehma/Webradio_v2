@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 INTERNET = 'http://www.google.com'
 RADIODE = 'http://radio.de'
 LASTFM = 'http://www.lastfm.de'
-WEATHERCOM = 'http://wxdata.weather.com/'
+WEATHERCOM = 'https://api.openweathermap.org'
 
 def test_onlineServices():
     logger.info("Probe online-services.")

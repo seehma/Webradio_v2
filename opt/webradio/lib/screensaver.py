@@ -6,7 +6,7 @@ from PyQt4.QtGui import QWidget, QFont, QHBoxLayout, QSizePolicy, QSpacerItem, Q
 from PyQt4.QtCore import Qt, QString, QTimer
 import time
 from datetime import datetime as date
-import pyqapi as weather
+import owm_crawler as weather
 import global_vars
 import logging
 import os

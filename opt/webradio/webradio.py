@@ -3126,7 +3126,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.label_2.setText(u"{0:0.0f}°C {1:0.0f}% r.H.".format(int(temp), int(hum)))
         else:
             try:
-                self.label_2.setText(self.tr("Outside: ")+"{0:0.0f}".format(int(self.weatherWidget.lbl_cur_temp.text()))+ \
+                self.label_2.setText(self.tr("Outside: ")+"{0:0.0f}".format(float(self.weatherWidget.lbl_cur_temp.text()))+ \
                                      QChar(0xb0)+"C")
             except ValueError, e:
                 logger.warn("Could not read DHT value: {}".format(e))

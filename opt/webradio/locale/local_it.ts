@@ -34,8 +34,8 @@
     </message>
     <message>
         <location filename="../ui/ui_raw/weather_widget_flex_scaling.ui" line="262"/>
-        <source>% Rain probability</source>
-        <translation type="unfinished">%Probabilita&apos; Pioggia</translation>
+        <source>mm Rain</source>
+        <translation type="unfinished">mm Pioggia</translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/weather_widget_flex_scaling.ui" line="303"/>

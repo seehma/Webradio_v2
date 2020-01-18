@@ -34,8 +34,8 @@
     </message>
     <message>
         <location filename="../ui/ui_raw/weather_widget_flex_scaling.ui" line="262"/>
-        <source>% Rain probability</source>
-        <translation>% Regenwahrscheinlichkeit</translation>
+        <source>mm Rain</source>
+        <translation>mm Regen</translation>
     </message>
     <message>
         <location filename="../ui/ui_raw/weather_widget_flex_scaling.ui" line="877"/>
