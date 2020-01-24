@@ -1236,7 +1236,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
                 ret = self.askQuestion(self.tr("Can not establish an online-connection"),
                                        self.tr("Try again"),
-                                 self.tr("Radio, Weatherforecast as well as onlinefuncitons will get deactivated."),
+                                 self.tr("Radio, Weatherforecast as well as onlinefunctions will be deactivated."),
                                  self.tr("Ok, de-activate"))
                 if ret == 0:  # 0 ist "Erneut prüfen
                     logger.warning("Re-Check")
